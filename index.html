@@ -1,0 +1,3684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyPC Content Dashboard 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:        #0B0B0D;
+  --card:      #121316;
+  --surface:   #18181B;
+  --surface2:  #1C1C20;
+  --border:    rgba(255,255,255,0.06);
+  --border2:   rgba(255,255,255,0.10);
+  --text:      #FFFFFF;
+  --text2:     #A1A1AA;
+  --text3:     #71717A;
+  --accent:    #3B82F6;
+  --cyan:      #06B6D4;
+  --purple:    #8B5CF6;
+  --green:     #22C55E;
+  --orange:    #F97316;
+  --pink:      #EC4899;
+  --yellow:    #F59E0B;
+  --red:       #EF4444;
+  --radius:    24px;
+  --radius-sm: 14px;
+  --shadow:    0 20px 60px rgba(0,0,0,0.45);
+  --shadow-sm: 0 8px 30px rgba(0,0,0,0.25);
+}
+
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(59,130,246,0.07), transparent 45%),
+    radial-gradient(circle at 85% 0%, rgba(139,92,246,0.05), transparent 40%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+html { overflow-x: hidden; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+
+/* ── APP SHELL (sidebar + main) ── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  max-width: 100vw;
+}
+
+.sidebar {
+  width: 248px;
+  min-width: 248px;
+  background: rgba(18,19,22,0.7);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-logo {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  padding: 8px 10px 4px;
+}
+.sidebar-logo span { color: var(--accent); }
+.sidebar-sub {
+  font-size: 10.5px;
+  color: var(--text3);
+  padding: 0 10px 18px;
+  font-weight: 400;
+}
+
+.sidebar-group-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 1px;
+  padding: 20px 12px 10px;
+  text-transform: uppercase;
+}
+
+.sidebar-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px;
+  border-radius: 11px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  transition: background 0.2s, color 0.2s;
+  user-select: none;
+}
+.sidebar-group-header:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+.sidebar-group-chevron {
+  font-size: 10px;
+  color: var(--text3);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.sidebar-group.open .sidebar-group-chevron { transform: rotate(90deg); }
+
+.sidebar-subitems {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+  padding-left: 8px;
+  padding-top: 4px;
+}
+.sidebar-group.open .sidebar-subitems { max-height: 400px; }
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+.sidebar-item:hover { color: var(--text2); background: rgba(255,255,255,0.04); }
+.sidebar-item.active {
+  background: rgba(59,130,246,0.12);
+  color: #93C5FD;
+  font-weight: 600;
+  border: 1px solid rgba(59,130,246,0.18);
+}
+.sidebar-item.active:hover { background: rgba(59,130,246,0.16); color: #93C5FD; }
+.sidebar-item-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+
+.main-area {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+}
+
+/* ── MOBILE NAV (horizontal scroll tab strip, auto-shows on small screens) ── */
+.mobile-nav {
+  display: none;
+  background: rgba(18,19,22,0.7);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 98;
+}
+.mobile-nav-track {
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.mobile-nav-track::-webkit-scrollbar { display: none; }
+.mobile-nav-item {
+  flex-shrink: 0;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+}
+.mobile-nav-item.active {
+  border: 1px solid rgba(59,130,246,0.3);
+}
+@media (max-width: 900px) {
+  .mobile-nav { display: block; }
+  .header { position: static; }
+  .mobile-nav { top: 0; }
+}
+
+/* ── HEADER ── */
+.header {
+  background: rgba(18,19,22,0.7);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.4px;
+}
+.logo span { color: var(--accent); }
+.subtitle { font-size: 11px; color: var(--text3); margin-top: 3px; font-weight: 400; letter-spacing: 0.3px; }
+
+/* ── TABS BAR (premium segmented control) ── */
+.tabs {
+  background: rgba(11,11,13,0.6);
+  backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 72px;
+  z-index: 99;
+  overflow-x: auto;
+  gap: 16px;
+}
+.tabs::-webkit-scrollbar { height: 0; }
+
+.tabs > div:first-child {
+  display: flex !important;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 5px;
+}
+
+.tab {
+  padding: 10px 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  letter-spacing: 0.1px;
+  position: relative;
+  border-radius: 11px;
+}
+.tab:hover { color: var(--text2); background: rgba(255,255,255,0.03); }
+.tab.active {
+  color: #0B0B0D;
+  background: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+.tab.active:hover { color: #0B0B0D; background: #FFFFFF; }
+
+/* Month select in tabs */
+.tabs select, #monthSelect {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+.tabs select:hover, #monthSelect:hover { background: var(--surface2); }
+.tabs select:focus, #monthSelect:focus { border-color: var(--accent); }
+.tabs label, .tabs span { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: 0.5px; }
+
+/* ── CONTENT ── */
+.content { padding: 40px; max-width: 1600px; margin: 0 auto; overflow-x: hidden; width: 100%; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── CARD BASE ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+  margin-top: 4px;
+}
+
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.kpi-card:hover { transform: translateY(-3px); border-color: var(--border2); box-shadow: var(--shadow); }
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.kpi-card:hover::after { opacity: 1; }
+
+/* Colored top accent line */
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: var(--radius) var(--radius) 0 0; }
+.kpi-card.cyan::before   { background: linear-gradient(90deg, var(--cyan), transparent); }
+.kpi-card.purple::before { background: linear-gradient(90deg, var(--purple), transparent); }
+.kpi-card.green::before  { background: linear-gradient(90deg, var(--green), transparent); }
+.kpi-card.orange::before { background: linear-gradient(90deg, var(--orange), transparent); }
+.kpi-card.pink::before   { background: linear-gradient(90deg, var(--pink), transparent); }
+.kpi-card.yellow::before { background: linear-gradient(90deg, var(--yellow), transparent); }
+
+.kpi-label {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.2px;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.kpi-value {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1.2px;
+  font-feature-settings: "tnum";
+}
+.kpi-card.cyan .kpi-value   { color: var(--text); }
+.kpi-card.purple .kpi-value { color: var(--text); }
+.kpi-card.green .kpi-value  { color: var(--text); }
+.kpi-card.orange .kpi-value { color: var(--text); }
+.kpi-card.pink .kpi-value   { color: var(--text); }
+.kpi-card.yellow .kpi-value { color: var(--text); }
+.kpi-sub { font-size: 12px; color: var(--text3); margin-top: 10px; font-weight: 400; }
+
+/* ── PROGRESS SECTION ── */
+.progress-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-sm);
+}
+.progress-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 28px;
+  letter-spacing: 0.1px;
+}
+.progress-item { margin-bottom: 26px; }
+.progress-item:last-child { margin-bottom: 0; }
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--text2);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.progress-bar {
+  height: 7px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.fill-cyan   { background: linear-gradient(90deg, var(--cyan), #0891b2); }
+.fill-purple { background: linear-gradient(90deg, var(--purple), #7c3aed); }
+.fill-green  { background: linear-gradient(90deg, var(--green), #16a34a); }
+
+/* ── CHARTS ── */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+.chart-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+.chart-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.1px;
+  line-height: 1.3;
+}
+.chart-subtitle {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 3px;
+  font-weight: 400;
+}
+.chart-status-badge {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chart-status-badge.good { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.chart-status-badge.warn { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.2); }
+.chart-status-badge.info { background: rgba(59,130,246,0.1); color: var(--accent); border: 1px solid rgba(59,130,246,0.2); }
+.chart-container { position: relative; height: 260px; }
+
+/* ── BADGES ── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.status-on-track { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.2); }
+.status-at-risk  { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.2); }
+.status-behind   { background: rgba(239,68,68,0.1);  color: var(--red);    border: 1px solid rgba(239,68,68,0.2); }
+
+.pillar-k { background: rgba(6,182,212,0.1); color: var(--cyan);   border: 1px solid rgba(6,182,212,0.2);  padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+.pillar-l { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+.pillar-t { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.2);  padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+
+.win-badge { background: rgba(34,197,94,0.1);   color: var(--green);  border: 1px solid rgba(34,197,94,0.2);   padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+.ai-tag    { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+.creator-tag { background: var(--surface); border: 1px solid var(--border2); padding: 3px 9px; border-radius: 99px; font-size: 10px; color: var(--text2); white-space: nowrap; }
+.fb-link { color: var(--accent); font-size: 11px; text-decoration: none; transition: color 0.2s; }
+.fb-link:hover { color: var(--cyan); }
+
+/* ── TOP 20 CARDS ── */
+.top10-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 24px;
+}
+.top10-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.25s, transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.top10-item:hover {
+  border-color: rgba(59,130,246,0.35);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+.top10-thumb-area {
+  position: relative;
+  background: var(--surface2);
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top10-rank-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 20px;
+  font-weight: 900;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  border-radius: 9px;
+  padding: 2px 9px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.rank-1 .top10-rank-badge { color: #F59E0B; border-color: rgba(245,158,11,0.3); }
+.rank-2 .top10-rank-badge { color: #A1A1AA; border-color: rgba(161,161,170,0.3); }
+.rank-3 .top10-rank-badge { color: #CD7F32; border-color: rgba(205,127,50,0.3); }
+.rank-other .top10-rank-badge { color: var(--text3); }
+.top10-views-overlay {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 9px;
+  padding: 3px 9px;
+}
+.views-hit  { color: var(--cyan); }
+.views-miss { color: var(--text3); }
+.top10-play-icon { font-size: 32px; color: rgba(255,255,255,0.1); }
+.top10-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.top10-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.top10-meta {
+  font-size: 10px;
+  color: var(--text3);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.top10-creator { color: var(--text2); font-weight: 600; }
+.rank { display: none; }
+
+/* Hook Rate overlay on cards */
+.hook-rate-overlay { position: absolute; bottom: 10px; left: 10px; font-size: 11px; font-weight: 700; border-radius: 8px; padding: 2px 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); }
+.hook-rate-overlay.ex { color: var(--green); }
+.hook-rate-overlay.vs { color: var(--cyan); }
+.hook-rate-overlay.gd { color: var(--purple); }
+.hook-rate-overlay.av { color: var(--yellow); }
+.hook-rate-overlay.wk { color: var(--red); }
+.hook-rate-overlay.na { color: var(--text3); }
+
+/* Hold Rate overlay on cards */
+.hold-rate-overlay { position: absolute; bottom: 10px; left: 10px; font-size: 11px; font-weight: 700; border-radius: 8px; padding: 2px 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); }
+.hold-rate-overlay.ex { color: var(--green); }
+.hold-rate-overlay.vs { color: var(--cyan); }
+.hold-rate-overlay.gd { color: var(--purple); }
+.hold-rate-overlay.av { color: var(--yellow); }
+.hold-rate-overlay.wk { color: var(--red); }
+.hold-rate-overlay.na { color: var(--text3); }
+
+/* ── AI CONTENT TAB ── */
+.ai-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-bottom: 40px;
+}
+.ai-stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.ai-stat-val { font-size: 30px; font-weight: 700; color: var(--text); letter-spacing: -1px; }
+.ai-stat-label { font-size: 11px; color: var(--text3); margin-top: 10px; font-weight: 500; }
+
+/* ── TABLES ── */
+.ai-table { width: 100%; border-collapse: collapse; }
+.ai-table th {
+  background: var(--surface);
+  color: var(--text3);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+.ai-table td {
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  vertical-align: middle;
+  color: var(--text2);
+  transition: background 0.15s;
+}
+.ai-table tr:last-child td { border-bottom: none; }
+.ai-table tr:hover td { background: rgba(255,255,255,0.025); }
+
+/* ── MONTHLY RESULTS ── */
+.monthly-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.monthly-results-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+
+.monthly-summary-bar {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+.msb-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px 24px;
+  text-align: center;
+  min-width: 110px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.msb-item:hover { border-color: var(--border2); transform: translateY(-2px); }
+.msb-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.msb-label { font-size: 10.5px; color: var(--text3); margin-top: 8px; font-weight: 500; letter-spacing: 0.2px; }
+
+.results-table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.results-table { width: 100%; border-collapse: collapse; min-width: 900px; table-layout: fixed; }
+.results-table th {
+  background: var(--surface);
+  color: var(--text3);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.results-table th:hover { color: var(--text2); background: rgba(255,255,255,0.03); }
+.results-table th.sorted-asc,
+.results-table th.sorted-desc { color: var(--accent); background: rgba(59,130,246,0.06); }
+.results-table th .sort-arrow {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: 0.25;
+  font-size: 9px;
+  line-height: 1;
+}
+.results-table th:hover .sort-arrow { opacity: 0.5; }
+.results-table th.sorted-asc .sort-arrow,
+.results-table th.sorted-desc .sort-arrow { opacity: 1; }
+.results-table th.sorted-asc .sort-arrow::after { content: '▲'; color: var(--accent); }
+.results-table th.sorted-desc .sort-arrow::after { content: '▼'; color: var(--accent); }
+.results-table th:not(.sorted-asc):not(.sorted-desc) .sort-arrow::after { content: '⇅'; }
+.results-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  vertical-align: middle;
+  color: var(--text2);
+  transition: background 0.15s;
+}
+.results-table tr:last-child td { border-bottom: none; }
+.results-table tr:hover td { background: rgba(255,255,255,0.025); }
+
+.video-title-cell { max-width: 280px; }
+.video-title-text {
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── FILTERS ── */
+.filter-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.search-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 11px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  outline: none;
+  width: 250px;
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+.search-bar::placeholder { color: var(--text3); }
+.search-bar:focus { border-color: var(--accent); background: var(--surface2); }
+
+.filter-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+.filter-select:hover { background: var(--surface2); }
+.filter-select:focus { border-color: var(--accent); }
+.results-count { font-size: 12.5px; color: var(--text3); margin-left: auto; }
+
+/* ── CREATOR GRID ── */
+.creator-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 22px;
+  margin-bottom: 40px;
+}
+.creator-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.25s, transform 0.25s;
+}
+.creator-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.creator-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 18px; letter-spacing: -0.1px; }
+.creator-stat { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 12px; }
+.creator-stat span:last-child { color: var(--text2); font-weight: 600; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: 0.1px;
+  margin-bottom: 24px;
+  margin-top: 8px;
+}
+
+/* ── HOOK RATE ── */
+.hook-excellent { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.2);  padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-strong    { background: rgba(6,182,212,0.1);  color: var(--cyan);   border: 1px solid rgba(6,182,212,0.2);  padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-good      { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-average   { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.2); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-weak      { background: rgba(239,68,68,0.1);  color: var(--red);    border: 1px solid rgba(239,68,68,0.2);  padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-none      { background: var(--surface); color: var(--text3); border: 1px solid var(--border); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+
+.hook-summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 22px;
+  margin-bottom: 40px;
+}
+.hook-stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.hook-stat:hover { border-color: var(--border2); transform: translateY(-2px); }
+.hook-stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+.hook-stat-label { font-size: 10.5px; color: var(--text3); margin-top: 10px; font-weight: 500; letter-spacing: 0.2px; }
+
+/* ── HOLD RATE ── */
+.hold-excellent { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.2);  padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-strong    { background: rgba(6,182,212,0.1);  color: var(--cyan);   border: 1px solid rgba(6,182,212,0.2);  padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-good      { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-average   { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.2); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-weak      { background: rgba(239,68,68,0.1);  color: var(--red);    border: 1px solid rgba(239,68,68,0.2);  padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-none      { background: var(--surface); color: var(--text3); border: 1px solid var(--border); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+
+.hold-summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 22px;
+  margin-bottom: 40px;
+}
+.hold-stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.hold-stat:hover { border-color: var(--border2); transform: translateY(-2px); }
+.hold-stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+.hold-stat-label { font-size: 10.5px; color: var(--text3); margin-top: 10px; font-weight: 500; letter-spacing: 0.2px; }
+
+/* ── AI INSIGHTS TAB ── */
+#tab-insights .msb-item { min-width: 130px; }
+
+/* ── LOADING OVERLAY ── */
+#loadingOverlay {
+  background: rgba(11,11,13,0.95) !important;
+  backdrop-filter: blur(20px);
+}
+
+/* ── TOGGLE SWITCH ── */
+.toggle-switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  transition: 0.25s;
+}
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: var(--text3);
+  border-radius: 50%;
+  transition: 0.25s;
+}
+input:checked + .toggle-slider { background: rgba(59,130,246,0.25); border-color: var(--accent); }
+input:checked + .toggle-slider:before { transform: translateX(18px); background: var(--accent); }
+
+/* ── REFRESH BUTTON ── */
+button[onclick="manualRefresh()"] {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border2) !important;
+  padding: 9px 18px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  letter-spacing: 0.3px !important;
+  font-family: inherit !important;
+  transition: background 0.2s, border-color 0.2s !important;
+}
+button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important; border-color: var(--accent) !important; }
+
+/* Generate Insights button */
+#generateBtn {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 12px 24px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s !important;
+  letter-spacing: 0.2px !important;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.25) !important;
+}
+#generateBtn:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 12px 28px rgba(59,130,246,0.32) !important; }
+#generateBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── INSIGHTS PANELS ── */
+#insightsBanner {
+  border-radius: var(--radius-sm) !important;
+  padding: 18px 22px !important;
+  margin-bottom: 20px !important;
+  border: 1px solid var(--border) !important;
+  backdrop-filter: blur(20px);
+}
+
+/* Inline insight card overrides */
+#tab-insights [style*="background:#1a1d2e"],
+#tab-insights [style*="background: #1a1d2e"] {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  border-radius: var(--radius) !important;
+}
+#tab-insights > div > div { box-shadow: var(--shadow-sm); }
+
+/* ── ANIMATIONS ── */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.tab-panel.active { animation: fadeIn 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .ai-summary { grid-template-columns: repeat(2, 1fr); }
+  .hook-summary { grid-template-columns: repeat(2, 1fr); }
+  .hold-summary { grid-template-columns: repeat(2, 1fr); }
+  .content { padding: 16px; }
+  .header { padding: 0 16px; }
+  .tabs { padding: 12px 16px; }
+  .insight-pair-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .ai-summary { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .hook-summary { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .hold-summary { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .creator-grid { grid-template-columns: 1fr; }
+  .top10-list { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .monthly-summary-bar { gap: 10px; }
+  .msb-item { min-width: 100px; padding: 14px 16px; }
+  .header { height: auto; padding: 16px 16px 18px; row-gap: 12px; flex-wrap: wrap; }
+  .content { padding: 20px 16px; }
+  #monthPillGroup { margin-bottom: 2px; }
+}
+@media (max-width: 420px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .ai-summary { grid-template-columns: 1fr; }
+  .hook-summary { grid-template-columns: 1fr; }
+  .hold-summary { grid-template-columns: 1fr; }
+  .top10-list { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+<div class="sidebar">
+  <div class="sidebar-logo">EASY<span>PC</span></div>
+  <div class="sidebar-sub">Content Dashboard 2026</div>
+
+  <div class="sidebar-group open" id="group-content">
+    <div class="sidebar-group-header" onclick="toggleSidebarGroup('content')">
+      <span>📁 Content</span>
+      <span class="sidebar-group-chevron">▸</span>
+    </div>
+    <div class="sidebar-subitems">
+      <div class="sidebar-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-icon">▦</span>Overview</div>
+      <div class="sidebar-item" onclick="switchTab('top10', this)"><span class="sidebar-item-icon">🏆</span>Top 20 Content</div>
+      <div class="sidebar-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon">✦</span>AI Content</div>
+      <div class="sidebar-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon">🪝</span>Hook Rate</div>
+      <div class="sidebar-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon">⏱️</span>Hold Rate</div>
+    </div>
+  </div>
+
+  <div class="sidebar-group open" id="group-reports">
+    <div class="sidebar-group-header" onclick="toggleSidebarGroup('reports')">
+      <span>📊 Reports</span>
+      <span class="sidebar-group-chevron">▸</span>
+    </div>
+    <div class="sidebar-subitems">
+      <div class="sidebar-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon">📅</span>Monthly Results</div>
+      <div class="sidebar-item" onclick="switchTab('insights', this)" id="insightsTab"><span class="sidebar-item-icon">✦</span>AI Insights</div>
+      <div class="sidebar-item" onclick="switchTab('news', this)" id="newsTab"><span class="sidebar-item-icon">📰</span>Tech News<span id="newsBadgeDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#EF4444;margin-left:auto;"></span></div>
+    </div>
+  </div>
+</div>
+
+<div class="main-area">
+
+<div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,11,13,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.08);border-top:4px solid #3B82F6;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <div id="loadingMsg" style="color:#A1A1AA;font-size:13px;font-weight:500;letter-spacing:0.5px;">Loading live data...</div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+
+<div class="header">
+  <div>
+    <div class="logo">EASY<span>PC</span> Content Dashboard</div>
+    <div class="subtitle">2026 Performance Tracker — EasyPC Main Page</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <!-- Fix #1: pill-group month filter — keeps monthSelect hidden for JS compat -->
+    <select id="monthSelect" onchange="updateDashboard();syncMonthPills()" style="display:none;"></select>
+    <div id="monthPillGroup" style="display:flex;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:99px;padding:3px;gap:2px;"></div>
+
+    <div style="display:flex;align-items:center;gap:8px;">
+      <label class="toggle-switch">
+        <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()">
+        <span class="toggle-slider"></span>
+      </label>
+      <button onclick="manualRefresh()" style="display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:99px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.22);color:#93C5FD;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;" onmouseover="this.style.background='rgba(59,130,246,0.18)'" onmouseout="this.style.background='rgba(59,130,246,0.1)'">↻ Refresh</button>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;"><span id="lastRefreshed" style="font-size:10.5px;color:var(--text3);">Not refreshed yet</span><span id="lastUpdatedStamp" style="font-size:10px;color:#3B82F6;font-weight:600;display:none;">📅 Data as of: <span id="lastUpdatedValue"></span></span></div>
+  </div>
+</div>
+
+<!-- MOBILE NAV (auto-shows on small screens, mirrors sidebar tabs) -->
+<div class="mobile-nav">
+  <div class="mobile-nav-track">
+    <div class="sidebar-item mobile-nav-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-icon">▦</span>Overview</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('top10', this)"><span class="sidebar-item-icon">🏆</span>Top 20</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon">✦</span>AI Content</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon">🪝</span>Hook Rate</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon">⏱️</span>Hold Rate</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon">📅</span>Monthly</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('insights', this)"><span class="sidebar-item-icon">✦</span>AI Insights</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('news', this)"><span class="sidebar-item-icon">📰</span>Tech News</div>
+  </div>
+</div>
+<div class="content">
+  <div id="tab-overview" class="tab-panel active">
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <div class="progress-section">
+      <div class="progress-title">KPI Progress vs Target</div>
+      <div id="progressBars"></div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div><div class="chart-title">Monthly views</div><div class="chart-subtitle">By month · 2026</div></div>
+          <span class="chart-status-badge info" id="viewsChartBadge">Loading…</span>
+        </div>
+        <div class="chart-container"><canvas id="viewsChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div><div class="chart-title">Pillar breakdown</div><div class="chart-subtitle">Know · Like · Trust</div></div>
+          <span class="chart-status-badge info">Distribution</span>
+        </div>
+        <div class="chart-container"><canvas id="pillarChart"></canvas></div>
+      </div>
+    </div>
+    <div class="section-title">Creator Breakdown</div>
+    <div class="creator-grid" id="creatorGrid"></div>
+  </div>
+  <div id="tab-top10" class="tab-panel">
+    <div class="top10-list" id="top10List"></div>
+  </div>
+  <div id="tab-ai" class="tab-panel">
+    <div class="ai-summary" id="aiSummary"></div>
+    <div class="top10-list" id="aiCardGrid"></div>
+  </div>
+  </div>
+  <!-- HOOK RATE TAB -->
+  <div id="tab-hook" class="tab-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff;">🪝 Top 20 by Hook Rate</div>
+        <div style="font-size:11px;color:#555;margin-top:6px;">Ranked by how well each video stops the scroll in the first few seconds</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;">
+        <span class="hook-excellent">60%+ Excellent</span>
+        <span class="hook-strong">50–59% Very Strong</span>
+        <span class="hook-good">40–49% Good</span>
+        <span class="hook-average">30–39% Average</span>
+        <span class="hook-weak">&lt;30% Weak</span>
+      </div>
+    </div>
+    <div class="hook-summary" id="hookSummary" style="margin-bottom:24px;"></div>
+    <div class="top10-list" id="hookCardGrid"></div>
+  </div>
+  <div id="tab-hold" class="tab-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff;">⏱️ Top 20 by Hold Rate</div>
+        <div style="font-size:11px;color:#555;margin-top:6px;">Ranked by how well each video keeps viewers watching through to the end</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;">
+        <span class="hold-excellent">60%+ Excellent</span>
+        <span class="hold-strong">50–59% Very Strong</span>
+        <span class="hold-good">40–49% Good</span>
+        <span class="hold-average">30–39% Average</span>
+        <span class="hold-weak">&lt;30% Weak</span>
+      </div>
+    </div>
+    <div class="hold-summary" id="holdSummary" style="margin-bottom:24px;"></div>
+    <div class="top10-list" id="holdCardGrid"></div>
+  </div>
+  <div id="tab-monthly" class="tab-panel">
+    <div class="monthly-results-header">
+      <div class="monthly-results-title" id="monthlyResultsTitle">Monthly Results</div>
+    </div>
+    <div class="monthly-summary-bar" id="monthlySummaryBar"></div>
+    <div class="filter-row">
+      <input class="search-bar" id="resultsSearch" type="text" placeholder="Search title or creator..." oninput="renderMonthlyResults()">
+      <select class="filter-select" id="creatorFilter" onchange="renderMonthlyResults()">
+        <option value="">All Creators</option>
+      </select>
+      <select class="filter-select" id="pillarFilter" onchange="renderMonthlyResults()">
+        <option value="">All Pillars</option>
+        <option value="KNOW">Know</option>
+        <option value="LIKE">Like</option>
+        <option value="TRUST">Trust</option>
+      </select>
+      <select class="filter-select" id="winFilter" onchange="renderMonthlyResults()">
+        <option value="">All Videos</option>
+        <option value="win">Winning Only</option>
+        <option value="ai">AI Tagged</option>
+      </select>
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+    <div class="results-table-wrap">
+      <table class="results-table">
+        <colgroup>
+          <col style="width:4%">
+          <col style="width:9%">
+          <col style="width:20%">
+          <col style="width:10%">
+          <col style="width:8%">
+          <col style="width:9%">
+          <col style="width:9%">
+          <col style="width:9%">
+          <col style="width:8%">
+          <col style="width:5%">
+          <col style="width:7%">
+          <col style="width:6%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th onclick="sortTable('#')">#<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('datePosted')">Date Posted<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('title')">Title<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('creator')">Creator<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('views')">Views<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('thruplays')">Thruplays<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('hook_rate')">Hook Rate<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('hold_rate')">Hold Rate %<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('thruplay_rate')">Thruplay Rate %<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('pillar')">Pillar<span class="sort-arrow"></span></th>
+            <th onclick="sortTable('status')">Status<span class="sort-arrow"></span></th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="monthlyTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AI INSIGHTS TAB -->
+  <div id="tab-insights" class="tab-panel">
+
+    <!-- Header row: title + sub-tabs + generate button -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#fff;" id="insightsTitle">AI Insights</div>
+        <div style="font-size:12px;color:#555;margin-top:6px;">Powered by Claude · Analyzes your filtered month data</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <!-- Sub-tab pills -->
+        <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;">
+          <button id="insightsSubGenerate" onclick="switchInsightsView('generate')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:#fff;color:#0B0B0D;font-family:inherit;">✦ Generate</button>
+          <button id="insightsSubRecords" onclick="switchInsightsView('records')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:transparent;color:var(--text3);font-family:inherit;">📂 Saved Records</button>
+        </div>
+        <button onclick="generateInsights()" id="generateBtn" style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;border:none;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;">
+          <span id="generateBtnIcon">✦</span> Generate Insights
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ GENERATE VIEW ═══ -->
+    <div id="insightsView-generate">
+
+      <!-- AI Output -->
+      <div id="insightsOutput" style="display:none;">
+        <!-- Save bar -->
+        <div id="insightsSaveBar" style="display:flex;align-items:center;justify-content:space-between;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:14px 20px;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div style="font-size:12.5px;color:#ccc;">💾 Looks good? Save this analysis to your records for future reference.</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span id="insightsSaveStatus" style="font-size:11.5px;color:var(--text3);"></span>
+            <button id="saveInsightsBtn" onclick="saveCurrentInsights()" style="background:#a855f7;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+              💾 Save Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Status Banner -->
+        <div id="insightsBanner" style="border-radius:12px;padding:18px 22px;margin-bottom:20px;border:1px solid #2a2d3e;"></div>
+
+        <!-- ▸ HIGHLIGHTS vs PREV MONTH (new section) -->
+        <div id="insightsMoMSection" style="margin-bottom:20px;display:none;">
+          <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);padding:22px;">
+              <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">🔆 Highlights vs Previous Month</div>
+              <div id="insightsMoMHighlights" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
+            </div>
+            <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius);padding:22px;">
+              <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">🔅 Lowlights vs Previous Month</div>
+              <div id="insightsMoMLowlights" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards row -->
+        <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
+            <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">✓ What's Working</div>
+            <div id="insightsWorking" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
+            <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">✗ What's Not Working</div>
+            <div id="insightsNotWorking" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
+          </div>
+        </div>
+
+        <!-- Action items -->
+        <div style="background:var(--card);border:1px solid rgba(139,92,246,0.15);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+          <div style="font-size:11px;color:#a855f7;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">✦ Action Plan to Hit KPI</div>
+          <div id="insightsActions" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
+        </div>
+
+        <!-- Don't do -->
+        <div style="background:var(--card);border:1px solid rgba(239,68,68,0.15);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+          <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">⚠ What NOT To Do</div>
+          <div id="insightsDont" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
+        </div>
+
+        <!-- Top performers + opportunities -->
+        <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
+            <div style="font-size:11px;color:#00d4ff;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">🏆 Top Performing Content</div>
+            <div id="insightsTopVideos" style="font-size:12px;color:#ccc;line-height:1.8;"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
+            <div style="font-size:11px;color:#eab308;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">💡 Content Opportunities</div>
+            <div id="insightsOpportunities" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
+          </div>
+        </div>
+
+        <!-- Creator insights -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+          <div style="font-size:11px;color:#ec4899;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">👤 Creator Performance Notes</div>
+          <div id="insightsCreators" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
+        </div>
+
+        <!-- Hook + Hold Rate side by side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="insight-pair-grid">
+          <div style="background:#1a1d2e;border:1px solid #22c55e33;border-radius:12px;padding:22px;">
+            <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🪝 Hook Rate Analysis & Recommendations</div>
+            <div style="font-size:10px;color:#444;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Based on benchmarks: &lt;30% Weak · 30–39% Average · 40–49% Good · 50–59% Very Strong · 60%+ Excellent</div>
+            <div id="insightsHookRate" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
+          </div>
+          <div style="background:#1a1d2e;border:1px solid rgba(6,182,212,0.25);border-radius:12px;padding:22px;">
+            <div style="font-size:11px;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⏱️ Hold Rate Analysis & Recommendations</div>
+            <div style="font-size:10px;color:#444;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Based on benchmarks: &lt;30% Weak · 30–39% Average · 40–49% Good · 50–59% Very Strong · 60%+ Excellent</div>
+            <div id="insightsHoldRate" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
+          </div>
+        </div>
+
+        <!-- Hidden Gems & Wasted Hooks -->
+        <div id="insightsHiddenGems" style="margin-top:20px;background:#1a1d2e;border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:22px;display:none;">
+          <div style="font-size:11px;color:#F59E0B;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🔍 Hook vs Hold Mismatch — Actionable Videos</div>
+          <div style="font-size:10px;color:#444;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Hidden gems need a better opening · Wasted hooks need better content body</div>
+          <div id="insightsHiddenGemsBody"></div>
+        </div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="insightsLoading" style="display:none;text-align:center;padding:60px 20px;">
+        <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.08);border-top:3px solid #8B5CF6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
+        <div style="color:#A1A1AA;font-size:13px;font-weight:500;" id="insightsLoadingMsg">Claude is analyzing your data...</div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="insightsEmpty" style="text-align:center;padding:60px 20px;color:var(--text3);">
+        <div style="font-size:40px;margin-bottom:16px;">✦</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:8px;">Ready to analyze</div>
+        <div style="font-size:12px;color:var(--text3);">Select a month and click "Generate Insights" to get AI-powered analysis and recommendations.</div>
+      </div>
+
+    </div><!-- /insightsView-generate -->
+
+    <!-- ═══ RECORDS VIEW ═══ -->
+    <div id="insightsView-records" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:13px;color:var(--text3);">Saved AI insight analyses, one per month.</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Insights are saved to Google Sheet so you can access them from any device.</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button onclick="loadInsightsFromSheet()" id="loadFromSheetBtn" style="background:rgba(59,130,246,0.12);color:#93C5FD;border:1px solid rgba(59,130,246,0.25);padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">☁ Load from Sheet</button>
+          <button onclick="clearAllInsightRecords()" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">🗑 Clear All Records</button>
+        </div>
+      </div>
+      <div id="sheetLoadStatus" style="font-size:12px;color:var(--text3);margin-bottom:14px;display:none;"></div>
+      <div id="insightsRecordsList"></div>
+      <div id="insightsRecordsEmpty" style="text-align:center;padding:60px 20px;color:var(--text3);display:none;">
+        <div style="font-size:36px;margin-bottom:14px;">📂</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:8px;">No saved records yet</div>
+        <div style="font-size:12px;">Generate an insight and hit "Save Analysis" to build your monthly archive.</div>
+      </div>
+    </div><!-- /insightsView-records -->
+
+  </div>
+
+  <div id="tab-news" class="tab-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="monthly-results-title">Tech News</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">Latest updates from trusted tech sources — live fetch</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px;margin-bottom:28px;width:fit-content;">
+      <div class="news-subtab active" id="newsSubtabLatest" onclick="switchNewsSubtab('latest')" style="padding:10px 20px;font-size:12px;font-weight:600;color:#0B0B0D;background:#FFFFFF;border-radius:10px;cursor:pointer;white-space:nowrap;">📰 Latest</div>
+      <div class="news-subtab" id="newsSubtabTopics" onclick="switchNewsSubtab('topics')" style="padding:10px 20px;font-size:12px;font-weight:600;color:var(--text3);border-radius:10px;cursor:pointer;white-space:nowrap;">💡 Weekly Topics</div>
+    </div>
+
+    <div id="newsSubpanel-latest" class="news-subpanel" style="display:block;">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
+        <input type="text" id="newsSearchInput" class="search-bar" placeholder="Search articles by title or keyword..." oninput="filterNewsBySearch()" style="width:100%;max-width:400px;margin-bottom:0;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap;">
+          <label class="toggle-switch">
+            <input type="checkbox" id="relevantOnlyToggle" onchange="toggleRelevantOnly()">
+            <span class="toggle-slider"></span>
+          </label>
+          <span style="font-size:12px;color:var(--text2);font-weight:500;">⭐ Show relevant to EasyPC only</span>
+        </label>
+      </div>
+      <div class="filter-row" id="newsFilterRow" style="gap:10px;margin-bottom:20px;"></div>
+      <div id="newsStatus" style="font-size:13px;color:var(--text3);margin-bottom:24px;">
+        <span style="display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;vertical-align:middle;margin-right:8px;animation:spin 0.8s linear infinite;"></span>Loading articles...
+      </div>
+      <div class="top10-list" id="newsGrid"></div>
+    </div>
+
+    <div id="newsSubpanel-topics" class="news-subpanel" style="display:none;">
+      <div style="display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px;margin-bottom:24px;width:fit-content;">
+        <div class="topics-view-tab active" id="topicsViewSuggestions" onclick="switchTopicsView('suggestions')" style="padding:9px 18px;font-size:11.5px;font-weight:600;color:#0B0B0D;background:#FFFFFF;border-radius:9px;cursor:pointer;">This Week's Suggestions</div>
+        <div class="topics-view-tab" id="topicsViewHistory" onclick="switchTopicsView('history')" style="padding:9px 18px;font-size:11.5px;font-weight:600;color:var(--text3);border-radius:9px;cursor:pointer;">📂 History</div>
+      </div>
+
+      <div id="topicsView-suggestions" style="display:block;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px;">
+          <div style="font-size:12px;color:var(--text3);">AI-generated content angles from hardware/gadget sources — priority: TechPowerUp, Back2Gaming, Engadget</div>
+          <button onclick="generateWeeklyTopics()" id="generateTopicsBtn" style="background:var(--accent);color:#fff;border:none;padding:11px 22px;border-radius:12px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+            <span id="generateTopicsBtnIcon">✦</span> Generate This Week's Topics
+          </button>
+        </div>
+        <div id="topicsStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:20px;"></div>
+        <div class="top10-list" id="topicsGrid"></div>
+      </div>
+
+      <div id="topicsView-history" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px;">
+          <div style="font-size:12px;color:var(--text3);">Saved topics from previous weeks</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button onclick="markSelectedAsUsed()" id="bulkMarkUsedBtn" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:9px 16px;border-radius:10px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;" disabled>✓ Mark selected as used (<span id="selectedCount">0</span>)</button>
+            <div class="filter-row" style="margin-bottom:0;">
+              <select id="historyFilterSelect" onchange="renderTopicsHistory()" class="filter-select">
+                <option value="all">All</option>
+                <option value="unused">Not yet used</option>
+                <option value="used">Used</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="historyStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:20px;"></div>
+        <div class="top10-list" id="historyGrid"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlDlrch4raEz4foQM-TycNyU-AI93vDzcSza9gsb_unt2x6xHrX-5T5X38IzRMVkMB/exec";
+// Separate backend for Weekly Topics History — does NOT touch the KPI dashboard sheet above.
+const TOPICS_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDKK0JCkwES-4wkly2nTubSFxfhSBhCAtv3M36WRhU6j11eejSfxB25-wCWoWH_Gm5A/exec";
+// Insights — uses the same Apps Script as Topics; actions: saveInsight / listInsights
+const INSIGHTS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDKK0JCkwES-4wkly2nTubSFxfhSBhCAtv3M36WRhU6j11eejSfxB25-wCWoWH_Gm5A/exec";
+const KPI_TARGETS = { views: 3000000, winning: 20, thruplays: 1800000 };
+let DATA = {};
+let viewsChart = null, pillarChart = null;
+
+function showLoader(msg) {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  document.getElementById('loadingMsg').textContent = msg || 'Loading live data...';
+}
+function hideLoader() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function parseSheetData(raw) {
+  const MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const result = {};
+
+  // Support both raw.videoLog (2D array) and raw.videos (array of objects)
+  if (raw.videos && Array.isArray(raw.videos)) {
+    // Apps Script sends parsed video objects directly
+    for (const v of raw.videos) {
+      const month = (v.month || '').toString().split(/[\n\r#]/)[0].trim().toUpperCase();
+      if (!MONTHS.includes(month)) continue;
+      if (!result[month]) result[month] = { views:0, thruplays:0, winning:0, videos:0, ai:0, authentic:0, avg_rate:0, know:0, like:0, trust:0, kpi_submitted:0, creators:{}, all_videos:[], _rates:[] };
+      const m = result[month];
+      const views = parseFloat(String(v.views||0).replace(/,/g,''))||0;
+      const thruplays = parseFloat(String(v.thruplays||0).replace(/,/g,''))||0;
+      const rate = parseFloat(String(v.thruplayRate||0).replace(/%/g,''))||0;
+      const winRaw = String(v.winning||'').trim().toUpperCase();
+      const winning = winRaw==='YES'||winRaw==='TRUE';
+      const aiRaw = String(v.aiIntegrated||v.ai||'').trim().toUpperCase();
+      const ai = aiRaw==='YES'||aiRaw==='TRUE';
+      const authRaw = String(v.authentic||'').trim().toUpperCase();
+      const authentic = authRaw==='YES'||authRaw==='TRUE';
+      const pillar = String(v.pillar||'').trim().toUpperCase();
+      const creator = String(v.creator||'').trim();
+      const title = String(v.title||'').trim();
+      const link = String(v.link||'').trim();
+      const hookType = String(v.hookType||'').trim();
+      const datePosted = String(v.datePosted||v.date_posted||v.DatePosted||'').trim();
+      const dateTimestamp = datePosted ? (new Date(datePosted).getTime() || 0) : 0;
+      let hook_rate = parseFloat(String(v.hookRate||0).replace(/%/g,'').replace(/,/g,''))||0;
+      if (hook_rate > 0 && hook_rate < 1) hook_rate = Math.round(hook_rate * 100 * 100) / 100; // decimal → percentage
+      let hold_rate = parseFloat(String(v.holdRate||0).replace(/%/g,'').replace(/,/g,''))||0;
+      if (hold_rate > 0 && hold_rate < 1) hold_rate = Math.round(hold_rate * 100 * 100) / 100; // decimal → percentage
+      m.videos++; m.views+=views; m.thruplays+=thruplays;
+      if(winning) m.winning++;
+      if(ai) m.ai++;
+      if(authentic) m.authentic++;
+      if(rate>0) m._rates.push(rate);
+      if(pillar==='KNOW') m.know++; else if(pillar==='LIKE') m.like++; else if(pillar==='TRUST') m.trust++;
+      if(creator){ if(!m.creators[creator]) m.creators[creator]={videos:0,views:0,thruplays:0,winning:0}; m.creators[creator].videos++; m.creators[creator].views+=views; m.creators[creator].thruplays+=thruplays; if(winning) m.creators[creator].winning++; }
+      m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
+    }
+  } else if (raw.videoLog && Array.isArray(raw.videoLog)) {
+    // Legacy: 2D array from sheet
+    const videoLog = raw.videoLog;
+    let headerIdx = -1;
+    for (let i = 0; i < videoLog.length; i++) { if (videoLog[i].includes('MONTH')) { headerIdx = i; break; } }
+    if (headerIdx === -1) return {};
+    const headers = videoLog[headerIdx];
+    const colIdx = (name) => headers.indexOf(name);
+    const MONTH_COL=colIdx('MONTH'),CREATOR_COL=colIdx('CREATOR'),TITLE_COL=colIdx('VIDEO TITLE'),PILLAR_COL=colIdx('PILLAR'),HOOK_COL=colIdx('HOOK TYPE'),AI_COL=colIdx('AI INTEGRATED?'),AUTH_COL=colIdx('AUTHENTIC?'),VIEWS_COL=colIdx('VIEWS'),THRUPLAYS_COL=colIdx('THRUPLAYS'),RATE_COL=colIdx('THRUPLAY RATE %'),WIN_COL=colIdx('WINNING CONTENT?'),LINK_COL=colIdx('VIDEO LINK');
+    const HOOK_RATE_COL = ['HOOK RATE','HOOK RATE %','HOOKRATE','HOOK_RATE'].reduce((f,n)=>f>=0?f:colIdx(n), -1);
+    const HOLD_RATE_COL = ['HOLD RATE','HOLD RATE %','HOLDRATE','HOLD_RATE'].reduce((f,n)=>f>=0?f:colIdx(n), -1);
+    for (let i = headerIdx+1; i < videoLog.length; i++) {
+      const row = videoLog[i];
+      const month = (row[MONTH_COL]||'').toString().trim().toUpperCase();
+      if (!MONTHS.includes(month)) continue;
+      if (!result[month]) result[month]={views:0,thruplays:0,winning:0,videos:0,ai:0,authentic:0,avg_rate:0,know:0,like:0,trust:0,kpi_submitted:0,creators:{},all_videos:[],_rates:[]};
+      const m=result[month];
+      const views=parseFloat((row[VIEWS_COL]||'0').toString().replace(/,/g,''))||0;
+      const thruplays=parseFloat((row[THRUPLAYS_COL]||'0').toString().replace(/,/g,''))||0;
+      const rate=parseFloat((row[RATE_COL]||'').toString().replace('%','').trim())||0;
+      const winning=(row[WIN_COL]||'').toString().trim().toUpperCase()==='YES';
+      const ai=(row[AI_COL]||'').toString().trim().toUpperCase()==='YES';
+      const authentic=(row[AUTH_COL]||'').toString().trim().toUpperCase()==='YES';
+      const pillar=(row[PILLAR_COL]||'').toString().trim().toUpperCase();
+      const creator=(row[CREATOR_COL]||'').toString().trim();
+      const title=(row[TITLE_COL]||'').toString().trim();
+      const link=(row[LINK_COL]||'').toString().trim();
+      const hookType=(row[HOOK_COL]||'').toString().trim();
+      const DATE_COL=['DATE POSTED','DATE','DATEPOSTED','DATE_POSTED'].reduce((f,n)=>f>=0?f:colIdx(n),-1);
+      const datePosted=(DATE_COL>=0?(row[DATE_COL]||''):'').toString().trim();
+      const dateTimestamp = datePosted ? (new Date(datePosted).getTime() || 0) : 0;
+      let hook_rate=parseFloat((HOOK_RATE_COL>=0?(row[HOOK_RATE_COL]||'0'):'0').toString().replace(/%/g,'').replace(/,/g,'').trim())||0;
+      if (hook_rate > 0 && hook_rate < 1) hook_rate = Math.round(hook_rate * 100 * 10) / 10;
+      else hook_rate = Math.round(hook_rate * 10) / 10;
+      let hold_rate=parseFloat((HOLD_RATE_COL>=0?(row[HOLD_RATE_COL]||'0'):'0').toString().replace(/%/g,'').replace(/,/g,'').trim())||0;
+      if (hold_rate > 0 && hold_rate < 1) hold_rate = Math.round(hold_rate * 100 * 10) / 10;
+      else hold_rate = Math.round(hold_rate * 10) / 10;
+      m.videos++;m.views+=views;m.thruplays+=thruplays;
+      if(winning)m.winning++;if(ai)m.ai++;if(authentic)m.authentic++;
+      if(rate>0)m._rates.push(rate);
+      if(pillar==='KNOW')m.know++;else if(pillar==='LIKE')m.like++;else if(pillar==='TRUST')m.trust++;
+      if(creator){if(!m.creators[creator])m.creators[creator]={videos:0,views:0,thruplays:0,winning:0};m.creators[creator].videos++;m.creators[creator].views+=views;m.creators[creator].thruplays+=thruplays;if(winning)m.creators[creator].winning++;}
+      m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
+    }
+  } else { return {}; }
+
+  for (const m of Object.values(result)) {
+    m.avg_rate = m._rates.length > 0 ? Math.round(m._rates.reduce((a,b)=>a+b,0)/m._rates.length*10)/10 : 0;
+    const hookVids = m.all_videos.filter(v => v.hook_rate > 0);
+    m.avg_hook_rate = hookVids.length > 0 ? Math.round(hookVids.reduce((s,v)=>s+v.hook_rate,0)/hookVids.length*10)/10 : 0;
+    const holdVids = m.all_videos.filter(v => v.hold_rate > 0);
+    m.avg_hold_rate = holdVids.length > 0 ? Math.round(holdVids.reduce((s,v)=>s+v.hold_rate,0)/holdVids.length*10)/10 : 0;
+    m.kpi_submitted = m.videos; // baseline
+    delete m._rates;
+  }
+
+  // ── Add Campaign Ads TOTAL per month (tab: CAMPAIGN ADS)
+  // Videos Submitted = Video Log + Campaign Ads TOTAL → e.g. May: 48 + 20 = 68
+  try {
+    const ads = raw.campaignAds || [];
+    if (ads.length > 0) {
+      let hi = -1;
+      for (let i = 0; i < ads.length; i++) {
+        const r = ads[i].join('|').toUpperCase();
+        if (r.includes('MONTH') && r.includes('TOTAL')) { hi = i; break; }
+      }
+      if (hi !== -1) {
+        const hdrs = ads[hi].map(h => (h||'').toString().toUpperCase().trim());
+        const mc = hdrs.findIndex(h => h === 'MONTH');
+        const tc = hdrs.findIndex(h => h === 'TOTAL');
+        if (mc !== -1 && tc !== -1) {
+          for (let i = hi+1; i < ads.length; i++) {
+            const row = ads[i];
+            const month = (row[mc]||'').toString().trim().toUpperCase();
+            if (!MONTHS.includes(month)) continue;
+            const adsTotal = parseInt((row[tc]||'0').toString().replace(/,/g,''),10)||0;
+            if (result[month]) result[month].kpi_submitted = result[month].videos + adsTotal;
+          }
+        }
+      }
+    }
+  } catch(e) { console.warn('Campaign Ads parse error:', e); }
+
+  return result;
+}
+
+async function fetchLiveData() {
+  showLoader('Fetching live data from Google Sheets...');
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const raw = await res.json();
+    // DEBUG: log raw keys and sample data
+    console.log('RAW KEYS:', Object.keys(raw));
+    console.log('videos count:', raw.videos ? raw.videos.length : 'MISSING');
+    console.log('campaignAds rows:', raw.campaignAds ? raw.campaignAds.length : 'MISSING');
+    if (raw.videos && raw.videos.length > 0) console.log('Sample video:', JSON.stringify(raw.videos[0]));
+    if (raw.campaignAds && raw.campaignAds.length > 0) console.log('Campaign Ads sample:', JSON.stringify(raw.campaignAds.slice(0,4)));
+    DATA = parseSheetData(raw);
+    // Show server-side lastUpdated from Apps Script if available
+    if (raw.lastUpdated) {
+      const stampEl = document.getElementById('lastUpdatedStamp');
+      const stampVal = document.getElementById('lastUpdatedValue');
+      if (stampEl && stampVal) { stampEl.style.display = 'inline'; stampVal.textContent = raw.lastUpdated; }
+    }
+    console.log('DATA months:', Object.keys(DATA));
+    if (DATA['MAY']) console.log('MAY kpi_submitted:', DATA['MAY'].kpi_submitted, '| videos:', DATA['MAY'].videos, '| winning:', DATA['MAY'].winning);
+
+    const monthSelect = document.getElementById('monthSelect');
+    const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    const available = MONTHS_ORDER.filter(m => DATA[m] && DATA[m].videos > 0);
+    monthSelect.innerHTML = available.map(m => `<option value="${m}">${m.charAt(0)+m.slice(1).toLowerCase()}</option>`).join('');
+    if (available.length > 0) monthSelect.value = available[available.length - 1];
+    buildMonthPills(available);
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+    document.getElementById('lastRefreshed').textContent = '🟢 Last refreshed: ' + dateStr + ' · ' + timeStr;
+    const stampEl = document.getElementById('lastUpdatedStamp');
+    const stampVal = document.getElementById('lastUpdatedValue');
+    if (stampEl && stampVal) { stampEl.style.display = 'inline'; stampVal.textContent = dateStr + ' at ' + timeStr; }
+    hideLoader();
+    updateDashboard();
+  } catch(err) {
+    hideLoader();
+    document.getElementById('lastRefreshed').textContent = 'Error loading data. Try refreshing.';
+    console.error(err);
+  }
+}
+
+function buildMonthPills(available) {
+  const group = document.getElementById('monthPillGroup');
+  if (!group) return;
+  const pillStyle = `padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:500;border:none;background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;`;
+  const activeStyle = `padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:600;border:none;background:var(--text);color:#0B0B0D;cursor:pointer;font-family:inherit;white-space:nowrap;`;
+  const cur = document.getElementById('monthSelect').value;
+  group.innerHTML = available.map(m => {
+    const label = m.charAt(0) + m.slice(1,3).toLowerCase();
+    const isActive = m === cur;
+    return `<button style="${isActive ? activeStyle : pillStyle}" onclick="selectMonthPill('${m}',this)">${label}</button>`;
+  }).join('');
+}
+
+function selectMonthPill(month, btn) {
+  const ms = document.getElementById('monthSelect');
+  ms.value = month;
+  buildMonthPills(Array.from(ms.options).map(o => o.value));
+  updateDashboard();
+}
+
+function syncMonthPills() {
+  const ms = document.getElementById('monthSelect');
+  buildMonthPills(Array.from(ms.options).map(o => o.value));
+}
+
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function getStatus(val, target) {
+  const pct = val / target;
+  if (pct >= 1) return 'on-track';
+  if (pct >= 0.7) return 'at-risk';
+  return 'behind';
+}
+
+function getPillarBadge(p) {
+  if (p === 'KNOW') return '<span class="pillar-k">K</span>';
+  if (p === 'LIKE') return '<span class="pillar-l">L</span>';
+  if (p === 'TRUST') return '<span class="pillar-t">T</span>';
+  return '';
+}
+
+function kpiStatusBadge(pct) {
+  if (pct >= 100) return `<span style="color:#22c55e;font-size:11px;font-weight:700">✓ ACHIEVED ${pct}%</span>`;
+  if (pct >= 70) return `<span style="color:#eab308;font-size:11px;font-weight:700">⚠ AT RISK ${pct}%</span>`;
+  return `<span style="color:#ef4444;font-size:11px;font-weight:700">✗ BEHIND ${pct}%</span>`;
+}
+
+function updateDashboard() {
+  const month = document.getElementById('monthSelect').value;
+  const d = DATA[month];
+  if (!d) return;
+
+  const viewsPct = Math.round(d.views / KPI_TARGETS.views * 100);
+  const winPct = Math.round(d.winning / KPI_TARGETS.winning * 100);
+  const thruPct = Math.round(d.thruplays / KPI_TARGETS.thruplays * 100);
+  const status = getStatus(d.views, KPI_TARGETS.views);
+  const statusLabel = status === 'on-track' ? 'ON TRACK' : status === 'at-risk' ? 'AT RISK' : 'BEHIND';
+
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const sortedMonths = MONTHS_ORDER.filter(m => Object.keys(DATA).includes(m));
+  const prevMonth = sortedMonths[sortedMonths.indexOf(month) - 1];
+  const prev = prevMonth ? DATA[prevMonth] : null;
+
+  function delta(curr, prevVal) {
+    if (!prevVal || prevVal === 0) return '';
+    const pct = Math.round((curr - prevVal) / prevVal * 100);
+    const up = pct >= 0;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+      <span style="font-size:10.5px;color:var(--text3);font-weight:400">vs last month</span>
+      <span style="font-size:10.5px;font-weight:600;color:${up ? '#22C55E' : '#EF4444'};display:flex;align-items:center;gap:3px">
+        ${up ? '↑' : '↓'} ${Math.abs(pct)}%
+      </span></div>`;
+  }
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card cyan">
+      <div class="kpi-label">Total Views</div>
+      <div class="kpi-value">${fmt(d.views)}</div>
+      <div class="kpi-sub">Target: ${fmt(KPI_TARGETS.views)}</div>
+      ${delta(d.views, prev?.views)}
+      <div style="margin-top:8px">${kpiStatusBadge(viewsPct)}</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Thruplays</div>
+      <div class="kpi-value">${fmt(d.thruplays)}</div>
+      <div class="kpi-sub">Target: ${fmt(KPI_TARGETS.thruplays)}</div>
+      ${delta(d.thruplays, prev?.thruplays)}
+      <div style="margin-top:8px">${kpiStatusBadge(thruPct)}</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Winning Videos</div>
+      <div class="kpi-value">${d.winning}</div>
+      <div class="kpi-sub">Target: ${KPI_TARGETS.winning}</div>
+      ${delta(d.winning, prev?.winning)}
+      <div style="margin-top:8px">${kpiStatusBadge(winPct)}</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">Videos Submitted</div>
+      <div class="kpi-value">${d.kpi_submitted}</div>
+      <div class="kpi-sub">Video Log + Campaign Ads</div>
+      ${delta(d.kpi_submitted, prev?.kpi_submitted)}
+    </div>
+    <div class="kpi-card pink">
+      <div class="kpi-label">Avg Thruplay Rate</div>
+      <div class="kpi-value">${d.avg_rate}%</div>
+      <div class="kpi-sub">Authentic: ${d.authentic} videos</div>
+      ${delta(d.avg_rate, prev?.avg_rate)}
+    </div>
+    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#22c55e,#00d4ff)"></div>
+      <div class="kpi-label">Avg Hook Rate</div>
+      <div class="kpi-value" style="color:${d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444'}">${d.avg_hook_rate}%</div>
+      <div class="kpi-sub">${d.avg_hook_rate>=60?'🔥 Excellent':d.avg_hook_rate>=50?'⚡ Very Strong':d.avg_hook_rate>=40?'✓ Good':d.avg_hook_rate>=30?'~ Average':'✗ Needs Work'}</div>
+      ${delta(d.avg_hook_rate, prev?.avg_hook_rate)}
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Overall KPI Status</div>
+      <div class="kpi-value" style="font-size:16px;margin-top:4px"><span class="status-badge status-${status}">${statusLabel}</span></div>
+      <div class="kpi-sub">${viewsPct}% views · ${winPct}% wins · ${thruPct}% thruplays</div>
+    </div>
+  `;
+
+  const vPct = Math.min(100, viewsPct), wPct = Math.min(100, winPct), tPct = Math.min(100, thruPct);
+  document.getElementById('progressBars').innerHTML = `
+    <div class="progress-item"><div class="progress-label"><span>Views</span><span>${fmt(d.views)} / ${fmt(KPI_TARGETS.views)} (${viewsPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-cyan" style="width:${vPct}%"></div></div></div>
+    <div class="progress-item"><div class="progress-label"><span>Winning Videos</span><span>${d.winning} / ${KPI_TARGETS.winning} (${winPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-green" style="width:${wPct}%"></div></div></div>
+    <div class="progress-item"><div class="progress-label"><span>Thruplays</span><span>${fmt(d.thruplays)} / ${fmt(KPI_TARGETS.thruplays)} (${thruPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-purple" style="width:${tPct}%"></div></div></div>
+  `;
+
+  const monthLabels = sortedMonths.map(m => m.charAt(0) + m.slice(1,3).toLowerCase());
+  const viewsData = sortedMonths.map(m => DATA[m] ? DATA[m].views : 0);
+
+  if (viewsChart) viewsChart.destroy();
+  viewsChart = new Chart(document.getElementById('viewsChart'), {
+    type: 'bar',
+    data: { labels: monthLabels, datasets: [{ label: 'Views', data: viewsData, backgroundColor: sortedMonths.map(m => m === month ? '#3B82F6' : 'rgba(255,255,255,0.08)'), borderRadius: 8, borderSkipped: false, maxBarThickness: 36 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(18,19,22,0.95)', titleColor: '#FFFFFF', bodyColor: '#A1A1AA',
+          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
+          titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false,
+          callbacks: { label: ctx => fmt(ctx.parsed.y) + ' views' }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#71717A', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false }, ticks: { color: '#71717A', font: { size: 11 }, callback: v => fmt(v) } }
+      }
+    }
+  });
+  const vBadge = document.getElementById('viewsChartBadge');
+  if (vBadge && prev) {
+    const vDelta = Math.round((d.views - prev.views) / prev.views * 100);
+    vBadge.textContent = (vDelta >= 0 ? '↑ +' : '↓ ') + vDelta + '% MoM';
+    vBadge.className = 'chart-status-badge ' + (vDelta >= 0 ? 'good' : 'warn');
+  } else if (vBadge) { vBadge.textContent = fmt(d.views) + ' total'; vBadge.className = 'chart-status-badge info'; }
+
+  if (pillarChart) pillarChart.destroy();
+  pillarChart = new Chart(document.getElementById('pillarChart'), {
+    type: 'doughnut',
+    data: { labels: ['Know', 'Like', 'Trust'], datasets: [{ data: [d.know, d.like, d.trust], backgroundColor: ['#3B82F6', '#8B5CF6', '#22C55E'], borderWidth: 0, hoverOffset: 4 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#A1A1AA', padding: 18, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } },
+        tooltip: {
+          backgroundColor: 'rgba(18,19,22,0.95)', titleColor: '#FFFFFF', bodyColor: '#A1A1AA',
+          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
+          titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false
+        }
+      },
+      cutout: '70%'
+    }
+  });
+
+  let creatorHTML = '';
+  for (const [name, c] of Object.entries(d.creators)) {
+    const winRate = c.videos > 0 ? Math.round(c.winning / c.videos * 100) : 0;
+    creatorHTML += `<div class="creator-card"><div class="creator-name">${name}</div><div class="creator-stat"><span>Videos</span><span>${c.videos}</span></div><div class="creator-stat"><span>Views</span><span>${fmt(c.views)}</span></div><div class="creator-stat"><span>Thruplays</span><span>${fmt(c.thruplays)}</span></div><div class="creator-stat"><span>Winning</span><span>${c.winning} (${winRate}%)</span></div></div>`;
+  }
+  document.getElementById('creatorGrid').innerHTML = creatorHTML;
+
+  renderTop10(month);
+  renderAI(month);
+  renderHook(month);
+  renderHold(month);
+  renderMonthlyResults();
+}
+
+function renderTop10(month) {
+  const d = DATA[month];
+  if (!d) return;
+  const sorted = [...d.all_videos].sort((a, b) => b.views - a.views).slice(0, 20);
+  const TARGET = 50000;
+  let html = '';
+  sorted.forEach((v, i) => {
+    const rank = i + 1;
+    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+    const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+    const viewsClass = v.views >= TARGET ? 'views-hit' : 'views-miss';
+    const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
+    html += `
+    <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
+      <div class="top10-thumb-area">
+        <div class="top10-rank-badge">${rankIcon}</div>
+        <div class="top10-play-icon">▶</div>
+        <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
+        ${v.winning ? '<div style="position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid #22c55e55;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;">WIN</div>' : ''}
+      </div>
+      <div class="top10-body">
+        <div class="top10-title">${v.title}</div>
+        <div class="top10-meta">
+          <span class="top10-creator">${v.creator}</span>
+          ${getPillarBadge(v.pillar)}
+          ${v.ai ? '<span class="ai-tag">AI</span>' : ''}
+          ${linkHTML}
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('top10List').innerHTML = html;
+}
+
+function renderAI(month) {
+  const d = DATA[month];
+  if (!d) return;
+  const aiVids = d.all_videos.filter(v => v.ai);
+  const aiWins = aiVids.filter(v => v.winning).length;
+  const aiViews = aiVids.reduce((s, v) => s + v.views, 0);
+  const aiWinRate = aiVids.length > 0 ? Math.round(aiWins / aiVids.length * 100) : 0;
+
+  document.getElementById('aiSummary').innerHTML = `
+    <div class="ai-stat"><div class="ai-stat-val">${aiVids.length}</div><div class="ai-stat-label">AI Videos</div></div>
+    <div class="ai-stat"><div class="ai-stat-val">${aiWins}</div><div class="ai-stat-label">AI Wins</div></div>
+    <div class="ai-stat"><div class="ai-stat-val">${fmt(aiViews)}</div><div class="ai-stat-label">AI Total Views</div></div>
+    <div class="ai-stat"><div class="ai-stat-val">${aiWinRate}%</div><div class="ai-stat-label">AI Win Rate</div></div>
+  `;
+
+  const sorted = [...aiVids].sort((a, b) => b.views - a.views);
+  const TARGET = 50000;
+  let html = '';
+
+  if (sorted.length === 0) {
+    html = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:#444;font-size:13px;">No AI-tagged videos this month</div>`;
+  } else {
+    sorted.forEach((v, i) => {
+      const rank = i + 1;
+      const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+      const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const viewsClass = v.views >= TARGET ? 'views-hit' : 'views-miss';
+      const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
+      html += `
+      <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
+        <div class="top10-thumb-area">
+          <div class="top10-rank-badge">${rankIcon}</div>
+          <div class="top10-play-icon">▶</div>
+          <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
+          ${v.winning ? '<div style="position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid #22c55e55;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;">WIN</div>' : ''}
+          <div style="position:absolute;bottom:8px;left:8px;background:rgba(168,85,247,0.25);color:#a855f7;border:1px solid #a855f755;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;">AI</div>
+        </div>
+        <div class="top10-body">
+          <div class="top10-title">${v.title}</div>
+          <div class="top10-meta">
+            <span class="top10-creator">${v.creator}</span>
+            ${getPillarBadge(v.pillar)}
+            ${v.thruplay_rate > 0 ? `<span style="color:#555;font-size:10px">${v.thruplay_rate}% rate</span>` : ''}
+            ${linkHTML}
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('aiCardGrid').innerHTML = html;
+}
+
+let sortCol = 'views', sortDir = 'desc';
+
+function sortTable(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    sortCol = col;
+    sortDir = col === 'title' || col === 'creator' || col === 'pillar' ? 'asc' : 'desc';
+  }
+  document.querySelectorAll('.results-table th').forEach(th => {
+    th.classList.remove('sorted-asc', 'sorted-desc');
+  });
+  const ths = document.querySelectorAll('.results-table th');
+  const colMap = { '#': 0, datePosted: 1, title: 2, creator: 3, views: 4, thruplays: 5, hook_rate: 6, hold_rate: 7, thruplay_rate: 8, pillar: 9, status: 10 };
+  const idx = colMap[col];
+  if (idx !== undefined && ths[idx]) {
+    ths[idx].classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+  }
+  renderMonthlyResults();
+}
+
+function populateCreatorFilter(videos) {
+  const sel = document.getElementById('creatorFilter');
+  if (!sel) return;
+  const current = sel.value;
+  const creators = [...new Set(videos.map(v => v.creator).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">All Creators</option>' +
+    creators.map(c => `<option value="${c}"${c === current ? ' selected' : ''}>${c}</option>`).join('');
+}
+
+function renderMonthlyResults() {
+  const month = document.getElementById('monthSelect').value;
+  const d = DATA[month];
+  if (!d) return;
+  const search    = (document.getElementById('resultsSearch').value || '').toLowerCase();
+  const creatorF  = document.getElementById('creatorFilter').value;
+  const pillarF   = document.getElementById('pillarFilter').value;
+  const winF      = document.getElementById('winFilter').value;
+
+  const status = getStatus(d.views, KPI_TARGETS.views);
+  const statusLabel = status === 'on-track' ? 'ON TRACK' : status === 'at-risk' ? 'AT RISK' : 'BEHIND';
+  document.getElementById('monthlyResultsTitle').textContent = month.charAt(0) + month.slice(1).toLowerCase() + ' — Video Results';
+  document.getElementById('monthlySummaryBar').innerHTML = `
+    <div class="msb-item"><div class="msb-val" style="color:#00d4ff">${fmt(d.views)}</div><div class="msb-label">Total Views</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#a855f7">${fmt(d.thruplays)}</div><div class="msb-label">Thruplays</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#f97316">${d.avg_rate}%</div><div class="msb-label">Avg Rate</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:${d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444'}">${d.avg_hook_rate}%</div><div class="msb-label">🪝 Avg Hook Rate</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#22c55e">${d.winning}</div><div class="msb-label">Winning</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#eab308">${d.kpi_submitted}</div><div class="msb-label">Videos Submitted</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#ec4899">${d.ai}</div><div class="msb-label">AI Tagged</div></div>
+    <div class="msb-item"><div class="msb-val"><span class="status-badge status-${status}">${statusLabel}</span></div><div class="msb-label">KPI Status</div></div>
+  `;
+
+  populateCreatorFilter(d.all_videos);
+
+  let vids = [...d.all_videos];
+  if (search)   vids = vids.filter(v => v.title.toLowerCase().includes(search) || v.creator.toLowerCase().includes(search));
+  if (creatorF) vids = vids.filter(v => v.creator === creatorF);
+  if (pillarF)  vids = vids.filter(v => v.pillar === pillarF);
+  if (winF === 'win') vids = vids.filter(v => v.winning);
+  if (winF === 'ai')  vids = vids.filter(v => v.ai);
+
+  vids.sort((a, b) => {
+    let av, bv;
+    if (sortCol === '#')             { av = a.views; bv = b.views; }
+    else if (sortCol === 'title')    { av = (a.title||'').toLowerCase(); bv = (b.title||'').toLowerCase(); }
+    else if (sortCol === 'creator')  { av = (a.creator||'').toLowerCase(); bv = (b.creator||'').toLowerCase(); }
+    else if (sortCol === 'pillar')   { av = (a.pillar||'').toLowerCase(); bv = (b.pillar||'').toLowerCase(); }
+    else if (sortCol === 'status')   { av = a.winning ? 2 : a.ai ? 1 : 0; bv = b.winning ? 2 : b.ai ? 1 : 0; }
+    else if (sortCol === 'datePosted') { av = a.dateTimestamp || 0; bv = b.dateTimestamp || 0; }
+    else                             { av = a[sortCol] ?? 0; bv = b[sortCol] ?? 0; }
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ?  1 : -1;
+    return 0;
+  });
+
+  document.getElementById('resultsCount').textContent = `${vids.length} video${vids.length !== 1 ? 's' : ''}`;
+
+  const TARGET = 50000;
+  let rows = '';
+  vids.forEach((v, i) => {
+    const viewsColor = v.views >= TARGET ? '#00d4ff' : '#3a3d4e';
+    const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link">▶ Watch</a>` : '—';
+    const dateDisplay = v.dateTimestamp ? (() => { const d = new Date(v.dateTimestamp); return (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0') + '/' + d.getFullYear(); })() : v.datePosted;
+    const dateHTML = dateDisplay ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;">${dateDisplay}</span>` : '<span style="color:#333;font-size:11px;">—</span>';
+    rows += `<tr><td style="color:#555;font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div></td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}</td><td style="color:#a855f7">${fmt(v.thruplays)}</td><td>${getHookBadge(v.hook_rate)}</td><td>${getHoldBadge(v.hold_rate)}</td><td style="color:#888">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:#333;font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
+  });
+  document.getElementById('monthlyTableBody').innerHTML = rows || '<tr><td colspan="12" style="text-align:center;color:#444;padding:30px">No videos match your filter</td></tr>';
+}
+
+function getHookBadge(r) {
+  if (!r || r <= 0) return '<span class="hook-none">N/A</span>';
+  if (r >= 60) return `<span class="hook-excellent">🔥 ${r}% Excellent</span>`;
+  if (r >= 50) return `<span class="hook-strong">⚡ ${r}% Very Strong</span>`;
+  if (r >= 40) return `<span class="hook-good">✓ ${r}% Good</span>`;
+  if (r >= 30) return `<span class="hook-average">~ ${r}% Average</span>`;
+  return `<span class="hook-weak">✗ ${r}% Weak</span>`;
+}
+
+function getHookOverlayClass(r) {
+  if (!r || r <= 0) return 'na';
+  if (r >= 60) return 'ex';
+  if (r >= 50) return 'vs';
+  if (r >= 40) return 'gd';
+  if (r >= 30) return 'av';
+  return 'wk';
+}
+
+function getHoldBadge(r) {
+  if (!r || r <= 0) return '<span class="hold-none">N/A</span>';
+  if (r >= 60) return `<span class="hold-excellent">🔥 ${r}% Excellent</span>`;
+  if (r >= 50) return `<span class="hold-strong">⚡ ${r}% Very Strong</span>`;
+  if (r >= 40) return `<span class="hold-good">✓ ${r}% Good</span>`;
+  if (r >= 30) return `<span class="hold-average">~ ${r}% Average</span>`;
+  return `<span class="hold-weak">✗ ${r}% Weak</span>`;
+}
+
+function getHoldOverlayClass(r) {
+  if (!r || r <= 0) return 'na';
+  if (r >= 60) return 'ex';
+  if (r >= 50) return 'vs';
+  if (r >= 40) return 'gd';
+  if (r >= 30) return 'av';
+  return 'wk';
+}
+
+function renderHook(month) {
+  const d = DATA[month];
+  if (!d) return;
+
+  // Sort top 20 by hook_rate desc, skip those with no hook rate
+  const withRate = d.all_videos.filter(v => v.hook_rate > 0);
+  const sorted = [...withRate].sort((a, b) => b.hook_rate - a.hook_rate).slice(0, 20);
+
+  // Summary counts from the Top 20 shown — not all videos
+  const excellent  = sorted.filter(v => v.hook_rate >= 60).length;
+  const veryStrong = sorted.filter(v => v.hook_rate >= 50 && v.hook_rate < 60).length;
+  const good       = sorted.filter(v => v.hook_rate >= 40 && v.hook_rate < 50).length;
+  const average    = sorted.filter(v => v.hook_rate >= 30 && v.hook_rate < 40).length;
+  const weak       = sorted.filter(v => v.hook_rate > 0  && v.hook_rate < 30).length;
+  const avgHook    = sorted.length > 0 ? Math.round(sorted.reduce((s,v) => s+v.hook_rate, 0) / sorted.length * 10) / 10 : 0;
+
+  document.getElementById('hookSummary').innerHTML = `
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#22c55e">${excellent}</div><div class="hook-stat-label">🔥 Excellent (60%+)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hook-stat-label">⚡ Very Strong (50–59%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#a855f7">${good}</div><div class="hook-stat-label">✓ Good (40–49%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#eab308">${average}</div><div class="hook-stat-label">~ Average (30–39%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#f97316">${avgHook}%</div><div class="hook-stat-label">Avg Hook Rate</div></div>
+  `;
+
+  const TARGET_VIEWS = 50000;
+  let html = '';
+
+  if (sorted.length === 0) {
+    html = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:#444;font-size:13px;">No hook rate data available for this month.<br><span style="font-size:11px;color:#333;margin-top:8px;display:block;">Make sure the "Hook Rate" column is filled in your Google Sheet.</span></div>`;
+  } else {
+    sorted.forEach((v, i) => {
+      const rank = i + 1;
+      const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+      const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const viewsClass = v.views >= TARGET_VIEWS ? 'views-hit' : 'views-miss';
+      const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
+      const overlayClass = getHookOverlayClass(v.hook_rate);
+      html += `
+      <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
+        <div class="top10-thumb-area">
+          <div class="top10-rank-badge">${rankIcon}</div>
+          <div class="top10-play-icon">▶</div>
+          <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
+          <div class="hook-rate-overlay ${overlayClass}">🪝 ${v.hook_rate}%</div>
+          ${v.winning ? '<div style="position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid #22c55e55;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;">WIN</div>' : ''}
+        </div>
+        <div class="top10-body">
+          <div class="top10-title">${v.title}</div>
+          <div class="top10-meta">
+            <span class="top10-creator">${v.creator}</span>
+            ${getPillarBadge(v.pillar)}
+            ${getHookBadge(v.hook_rate)}
+            ${linkHTML}
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('hookCardGrid').innerHTML = html;
+}
+
+function renderHold(month) {
+  const d = DATA[month];
+  if (!d) return;
+
+  // Sort top 20 by hold_rate desc, skip those with no hold rate
+  const withRate = d.all_videos.filter(v => v.hold_rate > 0);
+  const sorted = [...withRate].sort((a, b) => b.hold_rate - a.hold_rate).slice(0, 20);
+
+  // Summary counts from the Top 20 shown — not all videos
+  const excellent  = sorted.filter(v => v.hold_rate >= 60).length;
+  const veryStrong = sorted.filter(v => v.hold_rate >= 50 && v.hold_rate < 60).length;
+  const good       = sorted.filter(v => v.hold_rate >= 40 && v.hold_rate < 50).length;
+  const average    = sorted.filter(v => v.hold_rate >= 30 && v.hold_rate < 40).length;
+  const weak       = sorted.filter(v => v.hold_rate > 0  && v.hold_rate < 30).length;
+  const avgHold    = sorted.length > 0 ? Math.round(sorted.reduce((s,v) => s+v.hold_rate, 0) / sorted.length * 10) / 10 : 0;
+
+  document.getElementById('holdSummary').innerHTML = `
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#22c55e">${excellent}</div><div class="hold-stat-label">🔥 Excellent (60%+)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hold-stat-label">⚡ Very Strong (50–59%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#a855f7">${good}</div><div class="hold-stat-label">✓ Good (40–49%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#eab308">${average}</div><div class="hold-stat-label">~ Average (30–39%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#f97316">${avgHold}%</div><div class="hold-stat-label">Avg Hold Rate</div></div>
+  `;
+
+  const TARGET_VIEWS = 50000;
+  let html = '';
+
+  if (sorted.length === 0) {
+    html = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:#444;font-size:13px;">No hold rate data available for this month.<br><span style="font-size:11px;color:#333;margin-top:8px;display:block;">Make sure the "Hold Rate %" column is filled in your Google Sheet.</span></div>`;
+  } else {
+    sorted.forEach((v, i) => {
+      const rank = i + 1;
+      const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+      const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const viewsClass = v.views >= TARGET_VIEWS ? 'views-hit' : 'views-miss';
+      const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
+      const overlayClass = getHoldOverlayClass(v.hold_rate);
+      html += `
+      <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
+        <div class="top10-thumb-area">
+          <div class="top10-rank-badge">${rankIcon}</div>
+          <div class="top10-play-icon">▶</div>
+          <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
+          <div class="hold-rate-overlay ${overlayClass}">⏱️ ${v.hold_rate}%</div>
+          ${v.winning ? '<div style="position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid #22c55e55;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;">WIN</div>' : ''}
+        </div>
+        <div class="top10-body">
+          <div class="top10-title">${v.title}</div>
+          <div class="top10-meta">
+            <span class="top10-creator">${v.creator}</span>
+            ${getPillarBadge(v.pillar)}
+            ${getHoldBadge(v.hold_rate)}
+            ${linkHTML}
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('holdCardGrid').innerHTML = html;
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.sidebar-item').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(t => {
+    if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(`'${tab}'`)) t.classList.add('active');
+  });
+  document.getElementById('tab-' + tab).classList.add('active');
+  const activeMobileItem = document.querySelector('.mobile-nav-item.active');
+  if (activeMobileItem) activeMobileItem.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  const month = document.getElementById('monthSelect').value;
+  if (tab === 'ai') renderAI(month);
+  if (tab === 'top10') renderTop10(month);
+  if (tab === 'hook') renderHook(month);
+  if (tab === 'hold') renderHold(month);
+  if (tab === 'monthly') renderMonthlyResults();
+  if (tab === 'insights') { /* snapshot removed */ }
+  if (tab === 'news') {
+    if (!newsLoaded) {
+      fetchTechNews().then(() => markNewsAsVisited());
+    } else {
+      markNewsAsVisited();
+    }
+  }
+}
+
+function toggleSidebarGroup(groupName) {
+  const group = document.getElementById('group-' + groupName);
+  if (group) group.classList.toggle('open');
+}
+
+function renderInsightsSnapshot(month) {
+  const d = DATA[month];
+  if (!d) return;
+  document.getElementById('insightsTitle').textContent = month.charAt(0) + month.slice(1).toLowerCase() + ' — AI Insights';
+  const viewsPct = Math.round(d.views / KPI_TARGETS.views * 100);
+  const winPct   = Math.round(d.winning / KPI_TARGETS.winning * 100);
+  const thruPct  = Math.round(d.thruplays / KPI_TARGETS.thruplays * 100);
+  const hookColor = d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444';
+  const snap = [
+    { label:'Total Views',       val: fmt(d.views),              pct: viewsPct, color:'#00d4ff' },
+    { label:'Thruplays',         val: fmt(d.thruplays),          pct: thruPct,  color:'#a855f7' },
+    { label:'Winning Videos',    val: d.winning,                 pct: winPct,   color:'#22c55e' },
+    { label:'Videos Submitted',  val: d.kpi_submitted,           pct: null,     color:'#f97316' },
+    { label:'Avg Thruplay Rate', val: d.avg_rate + '%',          pct: null,     color:'#ec4899' },
+    { label:'🪝 Avg Hook Rate',  val: (d.avg_hook_rate||0) + '%', pct: null,    color: hookColor },
+    { label:'AI Tagged',         val: d.ai,                      pct: null,     color:'#eab308' },
+  ];
+  document.getElementById('insightsSnapshot').innerHTML = snap.map(s => `
+    <div style="background:#1a1d2e;border:1px solid #2a2d3e;border-radius:10px;padding:14px;text-align:center;">
+      <div style="font-size:20px;font-weight:800;color:${s.color}">${s.val}</div>
+      <div style="font-size:10px;color:#555;margin-top:4px;text-transform:uppercase;letter-spacing:1px">${s.label}</div>
+      ${s.pct !== null ? `<div style="font-size:10px;margin-top:4px;color:${s.pct>=100?'#22c55e':s.pct>=70?'#eab308':'#ef4444'};font-weight:700">${s.pct}% of target</div>` : ''}
+    </div>`).join('');
+}
+
+/* ── INSIGHTS: sub-view switcher ── */
+function switchInsightsView(view) {
+  document.getElementById('insightsView-generate').style.display = view === 'generate' ? 'block' : 'none';
+  document.getElementById('insightsView-records').style.display  = view === 'records'  ? 'block' : 'none';
+  const btnGen = document.getElementById('insightsSubGenerate');
+  const btnRec = document.getElementById('insightsSubRecords');
+  const activeStyle = 'padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:#fff;color:#0B0B0D;font-family:inherit;';
+  const idleStyle   = 'padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:transparent;color:var(--text3);font-family:inherit;';
+  btnGen.style.cssText = view === 'generate' ? activeStyle : idleStyle;
+  btnRec.style.cssText = view === 'records'  ? activeStyle : idleStyle;
+  if (view === 'records') renderInsightRecords();
+}
+
+/* ── INSIGHTS: localStorage helpers ── */
+const INSIGHTS_STORAGE_KEY = 'easypc_insight_records';
+
+function loadInsightRecords() {
+  try { return JSON.parse(localStorage.getItem(INSIGHTS_STORAGE_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function saveInsightRecords(records) {
+  try { localStorage.setItem(INSIGHTS_STORAGE_KEY, JSON.stringify(records)); } catch(e) {}
+}
+
+let _currentInsightsData = null; // holds the last generated ins object + month
+
+/* Strip HTML tags for clean plain-text storage */
+function stripHtml(str) {
+  if (!str) return '';
+  return str.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+}
+function stripArr(arr) {
+  return (arr || []).map(x => stripHtml(x));
+}
+
+async function saveCurrentInsights() {
+  if (!_currentInsightsData) return;
+  const { month, ins } = _currentInsightsData;
+  const records = loadInsightRecords();
+  const timestamp = new Date().toISOString();
+
+  const record = {
+    month,
+    savedAt: timestamp,
+
+    // KPI Status
+    kpi_status:   stripHtml(ins.kpi_status),
+    kpi_color:    ins.kpi_color,
+
+    // KPI Snapshot numbers
+    snapshot: ins.snapshot || {},
+
+    // Month-over-month
+    mom_highlights: stripArr(ins.mom_highlights),
+    mom_lowlights:  stripArr(ins.mom_lowlights),
+
+    // Core analysis sections
+    working:          stripArr(ins.working),
+    not_working:      stripArr(ins.not_working),
+    actions:          stripArr(ins.actions),
+    dont:             stripArr(ins.dont),
+    top_videos_insight: stripHtml(ins.top_videos_insight),
+    opportunities:    stripArr(ins.opportunities),
+    creator_notes:    stripArr(ins.creator_notes),
+    hook_recs:        stripArr(ins.hook_recs),
+    hold_recs:        stripArr(ins.hold_recs)
+  };
+
+  records[month] = record;
+  saveInsightRecords(records);
+
+  const statusEl = document.getElementById('insightsSaveStatus');
+  const btn = document.getElementById('saveInsightsBtn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Saving...';
+  btn.style.background = '#555';
+
+  // Also save to Google Sheet so insights are accessible from any device
+  try {
+    const response = await fetch(INSIGHTS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'saveInsight', record })
+    });
+    const result = await response.json();
+    if (result.status === 'error') {
+      statusEl.textContent = '⚠ Local saved, Sheet error: ' + result.message;
+      statusEl.style.color = '#F59E0B';
+    } else {
+      statusEl.textContent = '✓ Saved locally & to Google Sheet!';
+      statusEl.style.color = '#22c55e';
+    }
+  } catch(err) {
+    statusEl.textContent = '✓ Local saved · Sheet unreachable (' + err.message + ')';
+    statusEl.style.color = '#F59E0B';
+  }
+
+  btn.innerHTML = '✓ Saved';
+  btn.style.background = '#22c55e';
+  btn.disabled = false;
+  setTimeout(() => {
+    statusEl.textContent = '';
+    btn.innerHTML = '💾 Save Analysis';
+    btn.style.background = '#a855f7';
+  }, 4000);
+}
+
+function renderInsightRecords() {
+  const records = loadInsightRecords();
+  const list = document.getElementById('insightsRecordsList');
+  const empty = document.getElementById('insightsRecordsEmpty');
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const sorted = MONTHS_ORDER.filter(m => records[m]).map(m => records[m]);
+  if (sorted.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  const bc = { green:'#22c55e', yellow:'#eab308', red:'#ef4444' };
+  const bbg = { green:'rgba(34,197,94,0.08)', yellow:'rgba(234,179,8,0.08)', red:'rgba(239,68,68,0.08)' };
+  const toList = arr => (arr||[]).map(x=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;margin-top:2px;color:#555">•</span><span>${x}</span></div>`).join('');
+
+  list.innerHTML = sorted.reverse().map(r => {
+    const color = bc[r.kpi_color] || '#00d4ff';
+    const bg    = bbg[r.kpi_color] || 'rgba(0,212,255,0.06)';
+    const dt    = r.savedAt ? (() => { const d=new Date(r.savedAt); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const h=d.getHours()%12||12; return `${mo[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${h}:${d.getMinutes().toString().padStart(2,'0')} ${d.getHours()<12?'AM':'PM'}`; })() : '';
+    const hasMoM = (r.mom_highlights && r.mom_highlights.length > 0) || (r.mom_lowlights && r.mom_lowlights.length > 0);
+    const s = r.snapshot || {};
+    const snapHtml = s.views ? `
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+        ${[
+          { label:'Views',          val: fmt(s.views),           pct: s.views_pct,      color:'#06B6D4' },
+          { label:'Thruplays',      val: fmt(s.thruplays),       pct: s.thruplays_pct,  color:'#8B5CF6' },
+          { label:'Winning Videos', val: s.winning,              pct: s.winning_pct,    color:'#22C55E' },
+          { label:'Submitted',      val: s.videos_submitted,     pct: null,             color:'#F97316' },
+          { label:'Avg Thruplay %', val: (s.avg_thruplay_rate||0)+'%', pct: null,       color:'#EC4899' },
+          { label:'Avg Hook Rate',  val: (s.avg_hook_rate||0)+'%',     pct: null,       color: s.avg_hook_rate>=60?'#22c55e':s.avg_hook_rate>=50?'#06B6D4':s.avg_hook_rate>=40?'#8B5CF6':s.avg_hook_rate>=30?'#F59E0B':'#EF4444' },
+          { label:'Avg Hold Rate',  val: (s.avg_hold_rate||0)+'%',     pct: null,       color: s.avg_hold_rate>=60?'#22c55e':s.avg_hold_rate>=50?'#06B6D4':s.avg_hold_rate>=40?'#8B5CF6':s.avg_hold_rate>=30?'#F59E0B':'#EF4444' },
+          { label:'AI Tagged',      val: s.ai_tagged,            pct: null,             color:'#F59E0B' },
+          { label:'Win Rate',       val: (s.win_rate_pct||0)+'%',pct: null,             color:'#22C55E' },
+        ].map(st => `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;min-width:90px;">
+          <div style="font-size:17px;font-weight:700;color:${st.color}">${st.val}</div>
+          <div style="font-size:9.5px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px">${st.label}</div>
+          ${st.pct !== null ? `<div style="font-size:9px;font-weight:700;margin-top:3px;color:${st.pct>=100?'#22c55e':st.pct>=70?'#eab308':'#ef4444'}">${st.pct}% of target</div>` : ''}
+        </div>`).join('')}
+      </div>` : '';
+    return `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+        <div>
+          <div style="font-size:17px;font-weight:800;color:#fff;">${r.month.charAt(0)+r.month.slice(1).toLowerCase()}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px;">Saved ${dt}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius:99px;">📊 ${r.kpi_status}</span>
+          <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">🗑 Delete</button>
+        </div>
+      </div>
+
+      ${snapHtml}
+
+      ${hasMoM ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:12px;padding:14px;">
+          <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔆 Highlights vs Prev Month</div>
+          <div style="font-size:12px;color:#ccc;">${toList(r.mom_highlights)}</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:14px;">
+          <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔅 Lowlights vs Prev Month</div>
+          <div style="font-size:12px;color:#ccc;">${toList(r.mom_lowlights)}</div>
+        </div>
+      </div>` : ''}
+
+      <details style="cursor:pointer;">
+        <summary style="list-style:none;display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:10px;margin-top:4px;font-size:12.5px;color:var(--text2);font-weight:600;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+          <span style="font-size:11px;">▶</span> View full analysis
+        </summary>
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.1);border-radius:10px;padding:14px;">
+            <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✓ What's Working</div>
+            <div style="font-size:12px;color:#ccc;">${toList(r.working)}</div>
+          </div>
+          <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.1);border-radius:10px;padding:14px;">
+            <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✗ What's Not Working</div>
+            <div style="font-size:12px;color:#ccc;">${toList(r.not_working)}</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.1);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;color:#a855f7;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✦ Action Plan to Hit KPI</div>
+          <div style="font-size:12px;color:#ccc;">${(r.actions||[]).map((x,i)=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;background:#a855f722;color:#a855f7;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">${i+1}</span><span>${x}</span></div>`).join('')}</div>
+        </div>
+        <div style="margin-top:14px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.08);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⚠ What NOT To Do</div>
+          <div style="font-size:12px;color:#ccc;">${toList(r.dont)}</div>
+        </div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);border-radius:10px;padding:14px;">
+            <div style="font-size:10px;color:#00d4ff;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🏆 Top Performing Content</div>
+            <div style="font-size:12px;color:#ccc;">${r.top_videos_insight || ''}</div>
+          </div>
+          <div style="background:rgba(234,179,8,0.05);border:1px solid rgba(234,179,8,0.1);border-radius:10px;padding:14px;">
+            <div style="font-size:10px;color:#eab308;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">💡 Opportunities</div>
+            <div style="font-size:12px;color:#ccc;">${toList(r.opportunities)}</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;background:rgba(236,72,153,0.05);border:1px solid rgba(236,72,153,0.1);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;color:#ec4899;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">👤 Creator Performance Notes</div>
+          <div style="font-size:12px;color:#ccc;">${toList(r.creator_notes)}</div>
+        </div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1);border-radius:10px;padding:14px;">
+            <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🪝 Hook Rate Analysis</div>
+            <div style="font-size:12px;color:#ccc;">${toList(r.hook_recs)}</div>
+          </div>
+          <div style="background:rgba(6,182,212,0.04);border:1px solid rgba(6,182,212,0.15);border-radius:10px;padding:14px;">
+            <div style="font-size:10px;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⏱️ Hold Rate Analysis</div>
+            <div style="font-size:12px;color:#ccc;">${(r.hold_recs && r.hold_recs.length > 0) ? toList(r.hold_recs) : '<div style="color:#555;font-size:11px;font-style:italic;">Re-generate and re-save to include hold rate data.</div>'}</div>
+          </div>
+        </div>
+      </details>
+    </div>`;
+  }).join('');
+}
+
+function deleteInsightRecord(month) {
+  const records = loadInsightRecords();
+  delete records[month];
+  saveInsightRecords(records);
+  renderInsightRecords();
+}
+
+function clearAllInsightRecords() {
+  if (!confirm('Clear all saved insight records? This cannot be undone.')) return;
+  saveInsightRecords({});
+  renderInsightRecords();
+}
+
+async function loadInsightsFromSheet() {
+  const btn = document.getElementById('loadFromSheetBtn');
+  const statusEl = document.getElementById('sheetLoadStatus');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Loading...';
+  statusEl.style.display = 'block';
+  statusEl.textContent = 'Fetching saved insights from Google Sheet...';
+  statusEl.style.color = 'var(--text3)';
+
+  try {
+    const response = await fetch(INSIGHTS_SCRIPT_URL + '?action=listInsights');
+    const result = await response.json();
+
+    if (result.status === 'error') {
+      statusEl.textContent = '⚠ Error from Sheet: ' + result.message;
+      statusEl.style.color = '#F59E0B';
+      btn.disabled = false;
+      btn.innerHTML = '☁ Load from Sheet';
+      return;
+    }
+
+    const sheetRecords = result.records || [];
+    if (sheetRecords.length === 0) {
+      statusEl.textContent = 'No insights found in Google Sheet yet. Save an analysis first.';
+      statusEl.style.color = 'var(--text3)';
+      btn.disabled = false;
+      btn.innerHTML = '☁ Load from Sheet';
+      return;
+    }
+
+    // Merge Sheet records into localStorage (Sheet wins for same month)
+    const local = loadInsightRecords();
+    sheetRecords.forEach(r => { if (r.month) local[r.month] = r; });
+    saveInsightRecords(local);
+
+    statusEl.textContent = `✓ Loaded ${sheetRecords.length} insight record${sheetRecords.length !== 1 ? 's' : ''} from Google Sheet.`;
+    statusEl.style.color = '#22c55e';
+    renderInsightRecords();
+  } catch(err) {
+    statusEl.textContent = '⚠ Could not reach Google Sheet: ' + err.message + '. Make sure your Apps Script is deployed and has the listInsights action.';
+    statusEl.style.color = '#ef4444';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '☁ Load from Sheet';
+  setTimeout(() => { statusEl.style.display = 'none'; }, 6000);
+}
+
+/* ── INSIGHTS: month-over-month comparison ── */
+function buildMoMInsights(month, d, prev, prevMonth) {
+  const highlights = [];
+  const lowlights  = [];
+  if (!prev) return { mom_highlights: [], mom_lowlights: [] };
+
+  function pctDiff(curr, prevVal) {
+    if (!prevVal || prevVal === 0) return null;
+    return Math.round((curr - prevVal) / prevVal * 100);
+  }
+  function prevLabel() { return prevMonth.charAt(0) + prevMonth.slice(1).toLowerCase(); }
+
+  const vDiff  = pctDiff(d.views, prev.views);
+  const tDiff  = pctDiff(d.thruplays, prev.thruplays);
+  const wDiff  = d.winning - prev.winning;
+  const sDiff  = d.kpi_submitted - prev.kpi_submitted;
+  const rDiff  = pctDiff(d.avg_rate, prev.avg_rate);
+  const hDiff  = (d.avg_hook_rate && prev.avg_hook_rate) ? pctDiff(d.avg_hook_rate, prev.avg_hook_rate) : null;
+  const aiDiff = d.ai - (prev.ai || 0);
+
+  if (vDiff !== null) {
+    (vDiff >= 0 ? highlights : lowlights).push(`Views ${vDiff >= 0 ? 'up' : 'down'} <strong>${Math.abs(vDiff)}%</strong> vs ${prevLabel()} (${fmt(d.views)} vs ${fmt(prev.views)}).`);
+  }
+  if (tDiff !== null) {
+    (tDiff >= 0 ? highlights : lowlights).push(`Thruplays ${tDiff >= 0 ? 'up' : 'down'} <strong>${Math.abs(tDiff)}%</strong> vs ${prevLabel()} (${fmt(d.thruplays)} vs ${fmt(prev.thruplays)}).`);
+  }
+  if (wDiff !== 0) {
+    (wDiff > 0 ? highlights : lowlights).push(`Winning videos ${wDiff > 0 ? 'increased by' : 'dropped by'} <strong>${Math.abs(wDiff)}</strong> vs ${prevLabel()} (${d.winning} vs ${prev.winning}).`);
+  }
+  if (sDiff !== 0) {
+    (sDiff > 0 ? highlights : lowlights).push(`Submitted ${Math.abs(sDiff)} ${sDiff > 0 ? 'more' : 'fewer'} videos than ${prevLabel()} (${d.kpi_submitted} vs ${prev.kpi_submitted}).`);
+  }
+  if (rDiff !== null) {
+    (rDiff >= 0 ? highlights : lowlights).push(`Avg thruplay rate ${rDiff >= 0 ? 'improved' : 'dropped'} <strong>${Math.abs(rDiff)}%</strong> vs ${prevLabel()} (${d.avg_rate}% vs ${prev.avg_rate}%).`);
+  }
+  if (hDiff !== null) {
+    (hDiff >= 0 ? highlights : lowlights).push(`Avg hook rate ${hDiff >= 0 ? 'improved' : 'dropped'} <strong>${Math.abs(hDiff)}%</strong> vs ${prevLabel()} (${d.avg_hook_rate}% vs ${prev.avg_hook_rate}%).`);
+  }
+  if (aiDiff !== 0) {
+    (aiDiff > 0 ? highlights : lowlights).push(`AI-tagged content ${aiDiff > 0 ? 'increased by' : 'decreased by'} <strong>${Math.abs(aiDiff)}</strong> video${Math.abs(aiDiff) !== 1 ? 's' : ''} vs ${prevLabel()}.`);
+  }
+
+  if (highlights.length === 0) highlights.push(`No metrics showed notable improvement vs ${prevLabel()}.`);
+  if (lowlights.length === 0)  lowlights.push(`No metrics declined vs ${prevLabel()} — great consistency!`);
+
+  return { mom_highlights: highlights, mom_lowlights: lowlights };
+}
+
+function generateInsights() {
+  const month = document.getElementById('monthSelect').value;
+  const d = DATA[month];
+  if (!d) return;
+
+  document.getElementById('insightsEmpty').style.display = 'none';
+  document.getElementById('insightsOutput').style.display = 'none';
+  document.getElementById('insightsLoading').style.display = 'block';
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('generateBtnIcon').textContent = '⏳';
+  document.getElementById('insightsLoadingMsg').textContent = 'Analyzing your data...';
+  // Reset save bar
+  document.getElementById('insightsSaveStatus').textContent = '';
+  const sBtn = document.getElementById('saveInsightsBtn');
+  sBtn.innerHTML = '💾 Save Analysis';
+  sBtn.style.background = '#a855f7';
+
+  // Resolve previous month
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const sortedMonths = MONTHS_ORDER.filter(m => DATA[m] && DATA[m].videos > 0);
+  const prevMonth = sortedMonths[sortedMonths.indexOf(month) - 1];
+  const prev = prevMonth ? DATA[prevMonth] : null;
+
+  setTimeout(() => {
+    try {
+      const ins = analyzeData(month, d);
+      const mom = buildMoMInsights(month, d, prev, prevMonth);
+      ins.mom_highlights = mom.mom_highlights;
+      ins.mom_lowlights  = mom.mom_lowlights;
+      _currentInsightsData = { month, ins };
+      renderInsightsOutput(ins, !!prev);
+      document.getElementById('insightsLoading').style.display = 'none';
+      document.getElementById('insightsOutput').style.display = 'block';
+    } catch(err) {
+      document.getElementById('insightsLoading').style.display = 'none';
+      document.getElementById('insightsEmpty').style.display = 'block';
+      document.getElementById('insightsEmpty').innerHTML = `<div style="font-size:48px;margin-bottom:16px;">⚠</div><div style="color:#ef4444;font-size:13px;font-weight:600">Analysis failed: ${err.message}</div>`;
+    }
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('generateBtnIcon').textContent = '✦';
+  }, 600);
+}
+
+function analyzeData(month, d) {
+  const viewsPct  = Math.round(d.views / KPI_TARGETS.views * 100);
+  const winPct    = Math.round(d.winning / KPI_TARGETS.winning * 100);
+  const thruPct   = Math.round(d.thruplays / KPI_TARGETS.thruplays * 100);
+  const viewsGap  = KPI_TARGETS.views - d.views;
+  const winGap    = KPI_TARGETS.winning - d.winning;
+  const thruGap   = KPI_TARGETS.thruplays - d.thruplays;
+
+  const topVids   = [...d.all_videos].sort((a,b) => b.views - a.views);
+  const winVids   = d.all_videos.filter(v => v.winning);
+  const aiVids    = d.all_videos.filter(v => v.ai);
+  const highRate  = d.all_videos.filter(v => v.thruplay_rate >= 15);
+  const lowRate   = d.all_videos.filter(v => v.thruplay_rate > 0 && v.thruplay_rate < 5);
+  const knowVids  = d.all_videos.filter(v => v.pillar === 'KNOW');
+  const likeVids  = d.all_videos.filter(v => v.pillar === 'LIKE');
+  const trustVids = d.all_videos.filter(v => v.pillar === 'TRUST');
+
+  // Best pillar by avg views
+  const pillarAvg = (arr) => arr.length ? Math.round(arr.reduce((s,v)=>s+v.views,0)/arr.length) : 0;
+  const pillars = [
+    { name:'KNOW', avg: pillarAvg(knowVids), count: knowVids.length },
+    { name:'LIKE', avg: pillarAvg(likeVids), count: likeVids.length },
+    { name:'TRUST', avg: pillarAvg(trustVids), count: trustVids.length }
+  ].sort((a,b) => b.avg - a.avg);
+  const bestPillar = pillars[0];
+  const worstPillar = pillars[pillars.length-1];
+
+  // Best creator
+  const creatorList = Object.entries(d.creators).sort((a,b) => b[1].views - a[1].views);
+  const topCreator = creatorList[0];
+  const winCreators = Object.entries(d.creators).filter(([n,c]) => c.winning > 0).sort((a,b) => b[1].winning - a[1].winning);
+
+  // Top video
+  const topVideo = topVids[0];
+  const top3 = topVids.slice(0,3);
+
+  // Win rate
+  const winRate = d.videos > 0 ? Math.round(d.winning / d.videos * 100) : 0;
+  const aiWinRate = aiVids.length > 0 ? Math.round(aiVids.filter(v=>v.winning).length / aiVids.length * 100) : 0;
+
+  // Overall status
+  const overallPct = Math.round((viewsPct + winPct + thruPct) / 3);
+  let kpi_color = overallPct >= 100 ? 'green' : overallPct >= 60 ? 'yellow' : 'red';
+  let kpi_status = overallPct >= 100
+    ? `${month} is ON TRACK — all KPI targets are being met. Keep the momentum going!`
+    : overallPct >= 60
+    ? `${month} is AT RISK — you're making progress but need to push harder to hit all targets.`
+    : `${month} is BEHIND — significant effort needed to close the gap before month end.`;
+
+  // WHAT'S WORKING
+  const working = [];
+  if (viewsPct >= 70) working.push(`Views are at ${viewsPct}% of target (${fmt(d.views)}) — solid reach this month.`);
+  if (winVids.length > 0) working.push(`${winVids.length} winning video${winVids.length>1?'s':''} produced — ${winRate}% win rate across all submissions.`);
+  if (bestPillar.count > 0) working.push(`<strong>${bestPillar.name}</strong> pillar is your strongest with avg ${fmt(bestPillar.avg)} views per video (${bestPillar.count} videos).`);
+  if (highRate.length > 0) working.push(`${highRate.length} video${highRate.length>1?'s':''} achieved 15%+ thruplay rate — strong retention on these pieces.`);
+  if (aiVids.length > 0 && aiWinRate > winRate) working.push(`AI-tagged videos have a higher win rate (${aiWinRate}%) vs overall (${winRate}%) — AI integration is paying off.`);
+  if (topCreator) working.push(`<strong>${topCreator[0]}</strong> is the top creator this month with ${fmt(topCreator[1].views)} views from ${topCreator[1].videos} videos.`);
+  if (working.length === 0) working.push('Data is still building — keep submitting quality content consistently.');
+
+  // WHAT'S NOT WORKING
+  const notWorking = [];
+  if (viewsPct < 70) notWorking.push(`Views at only ${viewsPct}% of the ${fmt(KPI_TARGETS.views)} target — still need ${fmt(viewsGap)} more views.`);
+  if (winPct < 70) notWorking.push(`Only ${d.winning} winning videos vs target of ${KPI_TARGETS.winning} — need ${winGap} more wins this month.`);
+  if (thruPct < 70) notWorking.push(`Thruplays at ${thruPct}% of target — ${fmt(thruGap)} more needed. Average watch time needs improvement.`);
+  if (d.avg_rate < 10) notWorking.push(`Avg thruplay rate is ${d.avg_rate}% — below the ideal 10%+ threshold. Hooks and retention need work.`);
+  if (lowRate.length > d.videos * 0.4) notWorking.push(`${lowRate.length} videos have under 5% thruplay rate — too many videos are losing viewers in the first 3 seconds.`);
+  if (worstPillar.count > 0 && worstPillar.avg < 30000) notWorking.push(`<strong>${worstPillar.name}</strong> pillar is underperforming with avg ${fmt(worstPillar.avg)} views — needs better content strategy.`);
+  if (notWorking.length === 0) notWorking.push('No major red flags — focus on consistency to maintain performance.');
+
+  // ACTION PLAN
+  const actions = [];
+  if (winGap > 0) actions.push(`🎯 Need ${winGap} more winning videos — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
+  if (viewsGap > 0) actions.push(`📈 To close the ${fmt(viewsGap)} views gap, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
+  if (d.avg_rate < 10) actions.push(`⚡ Improve hooks in the first 3 seconds — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
+  if (aiVids.length < d.videos * 0.3) actions.push(`🤖 Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration, it correlates with better performance.`);
+  actions.push(`🔁 Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output this month.`);
+  if (winVids.length > 0) actions.push(`📋 Study the winning videos' hook types and pillar — replicate those exact formats with new topics.`);
+  actions.push(`📅 Submit content earlier in the month to allow more time for views to accumulate before month-end reporting.`);
+
+  // DON'T DO
+  const dont = [];
+  if (lowRate.length > 0) dont.push(`Don't keep publishing content with the same hook style as your ${lowRate.length} low-retention videos (under 5% thruplay rate) — it's not working.`);
+  if (worstPillar.count > 2) dont.push(`Don't over-invest in <strong>${worstPillar.name}</strong> content right now — it's averaging only ${fmt(worstPillar.avg)} views. Shift budget to ${bestPillar.name}.`);
+  dont.push(`Don't spread creators thin across too many pillars — focus each creator on their strongest content type.`);
+  dont.push(`Don't ignore thruplay rate — views without retention don't help hit the ${fmt(KPI_TARGETS.thruplays)} thruplay target.`);
+  if (d.videos > 0 && winRate < 10) dont.push(`Don't keep repeating content formats with a sub-10% win rate — experiment with new approaches.`);
+
+  // TOP VIDEO INSIGHT
+  let top_videos_insight = '';
+  if (top3.length > 0) {
+    const topPillars = top3.map(v=>v.pillar).filter(Boolean);
+    const topRates = top3.map(v=>v.thruplay_rate).filter(r=>r>0);
+    const avgTopRate = topRates.length ? Math.round(topRates.reduce((a,b)=>a+b,0)/topRates.length*10)/10 : 0;
+    top_videos_insight = `Your top ${top3.length} videos averaged ${fmt(Math.round(top3.reduce((s,v)=>s+v.views,0)/top3.length))} views each with ${avgTopRate}% avg thruplay rate.`;
+    if (topPillars.length) top_videos_insight += ` These top performers are from the ${[...new Set(topPillars)].join(', ')} pillar${topPillars.length>1?'s':''} — use this as your content blueprint.`;
+    if (top3[0]) top_videos_insight += ` "<strong>${top3[0].title.substring(0,50)}${top3[0].title.length>50?'...':''}</strong>" is your #1 video with ${fmt(top3[0].views)} views.`;
+  }
+
+  // OPPORTUNITIES
+  const opportunities = [];
+  if (bestPillar.count < 10) opportunities.push(`Scale up <strong>${bestPillar.name}</strong> content — only ${bestPillar.count} videos this month but highest avg views at ${fmt(bestPillar.avg)}.`);
+  if (aiVids.length > 0 && aiWinRate > 0) opportunities.push(`AI content shows ${aiWinRate}% win rate — there's room to produce more AI-integrated videos.`);
+  if (highRate.length > 0) opportunities.push(`${highRate.length} videos with 15%+ thruplay rate — analyze their hooks and replicate for more submissions.`);
+  opportunities.push(`Repurpose winning content into different formats (shorter cuts, different hooks) to multiply output without extra production effort.`);
+  if (winVids.length > 0) opportunities.push(`Boost winning videos with paid promotion to maximize their reach before month end.`);
+
+  // CREATOR NOTES
+  const creator_notes = [];
+  creatorList.slice(0,4).forEach(([name, c]) => {
+    const cr_winRate = c.videos > 0 ? Math.round(c.winning/c.videos*100) : 0;
+    const avgViews = c.videos > 0 ? Math.round(c.views/c.videos) : 0;
+    let note = `<strong>${name}</strong>: ${c.videos} videos, ${fmt(c.views)} total views, ${fmt(avgViews)} avg/video`;
+    if (c.winning > 0) note += `, ${c.winning} win${c.winning>1?'s':''} (${cr_winRate}% win rate) ✓`;
+    else note += ` — no wins yet this month, needs content adjustment`;
+    creator_notes.push(note);
+  });
+
+  // Most consistent creator — highest win rate with at least 3 videos
+  const eligibleCreators = creatorList.filter(([n,c]) => c.videos >= 3);
+  if (eligibleCreators.length > 1) {
+    const mostConsistent = eligibleCreators
+      .map(([name, c]) => ({ name, winRate: Math.round(c.winning/c.videos*100), videos: c.videos, wins: c.winning }))
+      .sort((a,b) => b.winRate - a.winRate)[0];
+    const topByViews = creatorList[0];
+    if (mostConsistent && topByViews && mostConsistent.name !== topByViews[0] && mostConsistent.winRate > 0) {
+      creator_notes.push(`🎯 <strong>Most consistent:</strong> <strong>${mostConsistent.name}</strong> has the highest win rate at <strong>${mostConsistent.winRate}%</strong> (${mostConsistent.wins} wins from ${mostConsistent.videos} videos) — more reliable than pure view count suggests. Prioritize their output for steady wins.`);
+    } else if (mostConsistent && mostConsistent.winRate > 0) {
+      creator_notes.push(`🎯 <strong>${mostConsistent.name}</strong> is both your top creator AND most consistent with a <strong>${mostConsistent.winRate}%</strong> win rate — double down on their content.`);
+    }
+  }
+
+  // HOOK RATE ANALYSIS
+  const hookVids = d.all_videos.filter(v => v.hook_rate > 0);
+  const hookRecs = [];
+  if (hookVids.length === 0) {
+    hookRecs.push('No hook rate data available for this month. Make sure the Hook Rate column is filled in the Video Log sheet.');
+  } else {
+    const avgHook = d.avg_hook_rate || 0;
+    const hookLabel = avgHook>=60?'Excellent':avgHook>=50?'Very Strong':avgHook>=40?'Good':avgHook>=30?'Average':'Weak';
+    const hookColor = avgHook>=60?'#22c55e':avgHook>=50?'#00d4ff':avgHook>=40?'#a855f7':avgHook>=30?'#eab308':'#ef4444';
+    hookRecs.push(`Month avg hook rate is <strong style="color:${hookColor}">${avgHook}% — ${hookLabel}</strong> across ${hookVids.length} videos with data.`);
+
+    const excellentH = hookVids.filter(v=>v.hook_rate>=60);
+    const veryStrongH = hookVids.filter(v=>v.hook_rate>=50&&v.hook_rate<60);
+    const goodH = hookVids.filter(v=>v.hook_rate>=40&&v.hook_rate<50);
+    const avgH = hookVids.filter(v=>v.hook_rate>=30&&v.hook_rate<40);
+    const weakH = hookVids.filter(v=>v.hook_rate>0&&v.hook_rate<30);
+
+    if (excellentH.length > 0) {
+      const best = excellentH.sort((a,b)=>b.hook_rate-a.hook_rate)[0];
+      hookRecs.push(`🔥 <strong>${excellentH.length} Excellent hook${excellentH.length>1?'s':''} (60%+)</strong> — best is <em>"${best.title.substring(0,45)}${best.title.length>45?'...':''}"</em> by ${best.creator} at ${best.hook_rate}%. Study and replicate the opening pattern of these videos.`);
+    }
+    if (veryStrongH.length > 0) {
+      hookRecs.push(`⚡ <strong>${veryStrongH.length} Very Strong hook${veryStrongH.length>1?'s':''} (50–59%)</strong> — these are scroll-stoppers. A/B test their hook style with new topics to scale wins.`);
+    }
+    if (weakH.length > 0) {
+      const worstHook = weakH.sort((a,b)=>a.hook_rate-b.hook_rate)[0];
+      hookRecs.push(`✗ <strong>${weakH.length} Weak hook${weakH.length>1?'s':''} (&lt;30%)</strong> — lowest is <em>"${worstHook.title.substring(0,45)}${worstHook.title.length>45?'...':''}"</em> at ${worstHook.hook_rate}%. Avoid this opening style — rewrite the first 3 seconds with a stronger pattern interrupt.`);
+    }
+    if (avgHook < 40) {
+      hookRecs.push(`📌 Overall hook performance is below the <strong>40% Good</strong> threshold. Focus on stronger opening lines: lead with curiosity, a bold claim, or a relatable problem before showing the product.`);
+    }
+    if (avgHook >= 50) {
+      hookRecs.push(`✅ Hook performance is strong this month. Maintain this standard and document what's working — share the top hook formats with all creators as a template.`);
+    }
+    // Correlation: do high hook rate = high views?
+    const topHookViews = [...hookVids].sort((a,b)=>b.hook_rate-a.hook_rate).slice(0,5);
+    const avgViewsTopHook = topHookViews.length ? Math.round(topHookViews.reduce((s,v)=>s+v.views,0)/topHookViews.length) : 0;
+    const avgViewsAll = d.all_videos.length ? Math.round(d.all_videos.reduce((s,v)=>s+v.views,0)/d.all_videos.length) : 0;
+    if (avgViewsTopHook > avgViewsAll * 1.2) {
+      hookRecs.push(`📈 Top 5 hook rate videos avg <strong>${fmt(avgViewsTopHook)} views</strong> vs overall avg of <strong>${fmt(avgViewsAll)}</strong> — strong hooks are directly correlating with more views. Keep prioritizing hook quality.`);
+    }
+  }
+
+  // HOLD RATE ANALYSIS
+  const holdVids = d.all_videos.filter(v => v.hold_rate > 0);
+  const holdRecs = [];
+  if (holdVids.length === 0) {
+    holdRecs.push('No hold rate data available for this month. Make sure the Hold Rate % column is filled in the Video Log sheet.');
+  } else {
+    const avgHold = d.avg_hold_rate || 0;
+    const holdLabel = avgHold>=60?'Excellent':avgHold>=50?'Very Strong':avgHold>=40?'Good':avgHold>=30?'Average':'Weak';
+    const holdColor = avgHold>=60?'#22c55e':avgHold>=50?'#00d4ff':avgHold>=40?'#a855f7':avgHold>=30?'#eab308':'#ef4444';
+    holdRecs.push(`Month avg hold rate is <strong style="color:${holdColor}">${avgHold}% — ${holdLabel}</strong> across ${holdVids.length} video${holdVids.length>1?'s':''} with data.`);
+
+    const excellentHo = holdVids.filter(v=>v.hold_rate>=60);
+    const veryStrongHo = holdVids.filter(v=>v.hold_rate>=50&&v.hold_rate<60);
+    const goodHo = holdVids.filter(v=>v.hold_rate>=40&&v.hold_rate<50);
+    const avgHo = holdVids.filter(v=>v.hold_rate>=30&&v.hold_rate<40);
+    const weakHo = holdVids.filter(v=>v.hold_rate>0&&v.hold_rate<30);
+
+    if (excellentHo.length > 0) {
+      const best = excellentHo.sort((a,b)=>b.hold_rate-a.hold_rate)[0];
+      holdRecs.push(`🔥 <strong>${excellentHo.length} Excellent hold${excellentHo.length>1?'s':''} (60%+)</strong> — best is <em>"${best.title.substring(0,45)}${best.title.length>45?'...':''}"</em> by ${best.creator} at ${best.hold_rate}%. Analyze the pacing and structure of these videos — they're keeping viewers engaged far longer than average.`);
+    }
+    if (veryStrongHo.length > 0) {
+      holdRecs.push(`⚡ <strong>${veryStrongHo.length} Very Strong hold${veryStrongHo.length>1?'s':''} (50–59%)</strong> — these videos have strong mid-section retention. Use their structure as a template: study what happens in the first 10–15 seconds after the hook.`);
+    }
+    if (goodHo.length > 0) {
+      holdRecs.push(`✓ <strong>${goodHo.length} Good hold${goodHo.length>1?'s':''} (40–49%)</strong> — solid retention. Focus on tightening the middle section to push these above 50%.`);
+    }
+    if (weakHo.length > 0) {
+      const worstHold = weakHo.sort((a,b)=>a.hold_rate-b.hold_rate)[0];
+      holdRecs.push(`✗ <strong>${weakHo.length} Weak hold${weakHo.length>1?'s':''} (&lt;30%)</strong> — lowest is <em>"${worstHold.title.substring(0,45)}${worstHold.title.length>45?'...':''}"</em> at ${worstHold.hold_rate}%. Viewers are dropping off quickly after the hook. Shorten intros, cut filler, and get to the value faster.`);
+    }
+    if (avgHold < 40) {
+      holdRecs.push(`📌 Overall hold rate is below the <strong>40% Good</strong> threshold. Focus on tighter scripting and faster pacing — eliminate slow intros, reduce transitions, and deliver value within the first 5 seconds after the hook.`);
+    }
+    if (avgHold >= 50) {
+      holdRecs.push(`✅ Hold rate is strong this month. Document what's working in the structure of your top-retention videos and standardize it as a scripting template for all creators.`);
+    }
+    // Correlation: do high hold rate = high views?
+    const topHoldViews = [...holdVids].sort((a,b)=>b.hold_rate-a.hold_rate).slice(0,5);
+    const avgViewsTopHold = topHoldViews.length ? Math.round(topHoldViews.reduce((s,v)=>s+v.views,0)/topHoldViews.length) : 0;
+    const avgViewsAllH = d.all_videos.length ? Math.round(d.all_videos.reduce((s,v)=>s+v.views,0)/d.all_videos.length) : 0;
+    if (avgViewsTopHold > avgViewsAllH * 1.2) {
+      holdRecs.push(`📈 Top 5 hold rate videos avg <strong>${fmt(avgViewsTopHold)} views</strong> vs overall avg of <strong>${fmt(avgViewsAllH)}</strong> — strong viewer retention is directly correlating with more views. Prioritize hold rate as a key quality signal.`);
+    }
+    // Hook vs Hold mismatch insights
+    const bothVids = d.all_videos.filter(v => v.hook_rate > 0 && v.hold_rate > 0);
+    if (bothVids.length >= 3) {
+      // Hidden gems: weak hook but strong hold — great content, bad opening
+      const hiddenGems = bothVids.filter(v => v.hook_rate < 35 && v.hold_rate >= 45)
+        .sort((a,b) => b.hold_rate - a.hold_rate);
+      if (hiddenGems.length > 0) {
+        const gem = hiddenGems[0];
+        holdRecs.push(`💎 <strong>Hidden gem${hiddenGems.length>1?'s':''} detected (${hiddenGems.length} video${hiddenGems.length>1?'s':''})</strong> — weak hook but strong hold: <em>"${gem.title.substring(0,45)}${gem.title.length>45?'...':''}"</em> has only ${gem.hook_rate}% hook but ${gem.hold_rate}% hold. The content is good — viewers who get past the opening love it. <strong>Action: rewrite the first 3 seconds</strong> with a stronger pattern interrupt and repost.`);
+      }
+      // Wasted hooks: great hook but bad hold — clickbait problem
+      const wastedHooks = bothVids.filter(v => v.hook_rate >= 50 && v.hold_rate < 30)
+        .sort((a,b) => a.hold_rate - b.hold_rate);
+      if (wastedHooks.length > 0) {
+        const worst = wastedHooks[0];
+        holdRecs.push(`⚠️ <strong>Wasted hook${wastedHooks.length>1?'s':''} (${wastedHooks.length} video${wastedHooks.length>1?'s':''})</strong> — strong hook but weak hold: <em>"${worst.title.substring(0,45)}${worst.title.length>45?'...':''}"</em> has ${worst.hook_rate}% hook but only ${worst.hold_rate}% hold. The opening stops the scroll but the content doesn't deliver. <strong>Action: fix the body</strong> — tighten pacing, cut filler, and match the energy of the hook throughout.`);
+      }
+      // Perfect balance: both strong
+      const highHookHighHold = bothVids.filter(v => v.hook_rate >= 50 && v.hold_rate >= 40);
+      if (highHookHighHold.length > 0) {
+        holdRecs.push(`🔗 <strong>${highHookHighHold.length} video${highHookHighHold.length>1?'s':''}</strong> have both strong hook (50%+) AND good hold (40%+) — these are your most complete, high-quality videos. Replicate their full format, not just the opening.`);
+      }
+    }
+  }
+
+  // HIDDEN GEMS SUMMARY (for dedicated section)
+  const bothVidsAll = d.all_videos.filter(v => v.hook_rate > 0 && v.hold_rate > 0);
+  const hiddenGemsAll = bothVidsAll.filter(v => v.hook_rate < 35 && v.hold_rate >= 45).sort((a,b) => b.hold_rate - a.hold_rate);
+  const wastedHooksAll = bothVidsAll.filter(v => v.hook_rate >= 50 && v.hold_rate < 30).sort((a,b) => a.hold_rate - b.hold_rate);
+
+  // KPI Snapshot — raw numbers for Sheet saving
+  const snapshot = {
+    views:          d.views,
+    views_target:   KPI_TARGETS.views,
+    views_pct:      viewsPct,
+    thruplays:      d.thruplays,
+    thruplays_target: KPI_TARGETS.thruplays,
+    thruplays_pct:  thruPct,
+    winning:        d.winning,
+    winning_target: KPI_TARGETS.winning,
+    winning_pct:    winPct,
+    videos_submitted: d.kpi_submitted,
+    avg_thruplay_rate: d.avg_rate,
+    avg_hook_rate:  d.avg_hook_rate || 0,
+    avg_hold_rate:  d.avg_hold_rate || 0,
+    ai_tagged:      d.ai,
+    win_rate_pct:   winRate,
+    ai_win_rate_pct: aiWinRate,
+    total_videos:   d.videos,
+    best_pillar:    bestPillar.name,
+    best_pillar_avg_views: bestPillar.avg,
+    worst_pillar:   worstPillar.name,
+    top_creator:    topCreator ? topCreator[0] : '',
+    top_video_title: topVideo ? topVideo.title : '',
+    top_video_views: topVideo ? topVideo.views : 0
+  };
+
+  return { kpi_color, kpi_status, working, not_working: notWorking, actions, dont, top_videos_insight, opportunities, creator_notes, hook_recs: hookRecs, hold_recs: holdRecs, hidden_gems: hiddenGemsAll, wasted_hooks: wastedHooksAll, snapshot };
+}
+
+function renderInsightsOutput(ins, hasPrev) {
+  const bannerColors = { green:'#22c55e', yellow:'#eab308', red:'#ef4444' };
+  const bannerBg = { green:'rgba(34,197,94,0.08)', yellow:'rgba(234,179,8,0.08)', red:'rgba(239,68,68,0.08)' };
+  const bc = bannerColors[ins.kpi_color] || '#00d4ff';
+  const banner = document.getElementById('insightsBanner');
+  banner.style.background = bannerBg[ins.kpi_color] || 'rgba(0,212,255,0.08)';
+  banner.style.borderColor = bc + '44';
+  banner.innerHTML = `<span style="color:${bc};font-weight:700;font-size:14px">📊 ${ins.kpi_status}</span>`;
+
+  // Highlights / Lowlights vs prev month
+  const momSection = document.getElementById('insightsMoMSection');
+  if (hasPrev && ((ins.mom_highlights && ins.mom_highlights.length) || (ins.mom_lowlights && ins.mom_lowlights.length))) {
+    momSection.style.display = 'block';
+    momSection.querySelector('#insightsFirstMonth') && (momSection.querySelector('#insightsFirstMonth').style.display = 'none');
+    const toListMom = arr => (arr||[]).map(x => `<div style="display:flex;gap:8px;margin-bottom:10px;"><span style="flex-shrink:0;margin-top:2px;color:#555">•</span><span>${x}</span></div>`).join('');
+    document.getElementById('insightsMoMHighlights').innerHTML = toListMom(ins.mom_highlights);
+    document.getElementById('insightsMoMLowlights').innerHTML  = toListMom(ins.mom_lowlights);
+  } else if (!hasPrev) {
+    momSection.style.display = 'block';
+    momSection.innerHTML = `<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius);padding:18px 22px;font-size:12.5px;color:#93C5FD;">📅 <strong>First month on record</strong> — no previous month to compare against. Month-over-month highlights will appear once you have data for a second month.</div>`;
+  } else {
+    momSection.style.display = 'none';
+  }
+
+  const toList = arr => arr.map(x => `<div style="display:flex;gap:8px;margin-bottom:10px;"><span style="flex-shrink:0;margin-top:2px;color:#555">•</span><span>${x}</span></div>`).join('');
+  const toNumbered = arr => arr.map((x,i) => `<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="flex-shrink:0;background:#a855f722;color:#a855f7;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px">${i+1}</span><span>${x}</span></div>`).join('');
+
+  document.getElementById('insightsWorking').innerHTML     = toList(ins.working || []);
+  document.getElementById('insightsNotWorking').innerHTML  = toList(ins.not_working || []);
+  document.getElementById('insightsActions').innerHTML     = toNumbered(ins.actions || []);
+  document.getElementById('insightsDont').innerHTML        = toList(ins.dont || []);
+  document.getElementById('insightsTopVideos').innerHTML   = `<p style="line-height:1.8">${ins.top_videos_insight || ''}</p>`;
+  document.getElementById('insightsOpportunities').innerHTML = toList(ins.opportunities || []);
+  document.getElementById('insightsCreators').innerHTML    = toList(ins.creator_notes || []);
+  document.getElementById('insightsHookRate').innerHTML    = toList(ins.hook_recs || []);
+  document.getElementById('insightsHoldRate').innerHTML    = toList(ins.hold_recs || []);
+
+  // Hidden gems section
+  const gemsSection = document.getElementById('insightsHiddenGems');
+  const gems = ins.hidden_gems || [];
+  const wasted = ins.wasted_hooks || [];
+  if (gems.length === 0 && wasted.length === 0) {
+    gemsSection.style.display = 'none';
+  } else {
+    gemsSection.style.display = 'block';
+    let gemsHtml = '';
+    if (gems.length > 0) {
+      gemsHtml += `<div style="margin-bottom:16px;"><div style="font-size:11px;color:#F59E0B;font-weight:700;margin-bottom:10px;">💎 Hidden Gems — Weak Hook, Strong Hold (rewrite the opening)</div>`;
+      gems.forEach(v => {
+        gemsHtml += `<div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div style="font-size:12.5px;color:#fff;font-weight:500;flex:1;">${v.title.substring(0,60)}${v.title.length>60?'...':''}</div>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+            <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
+            <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+          </div>
+        </div>`;
+      });
+      gemsHtml += `</div>`;
+    }
+    if (wasted.length > 0) {
+      gemsHtml += `<div><div style="font-size:11px;color:#EF4444;font-weight:700;margin-bottom:10px;">⚠️ Wasted Hooks — Strong Hook, Weak Hold (fix the content body)</div>`;
+      wasted.forEach(v => {
+        gemsHtml += `<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div style="font-size:12.5px;color:#fff;font-weight:500;flex:1;">${v.title.substring(0,60)}${v.title.length>60?'...':''}</div>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+            <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
+            <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+          </div>
+        </div>`;
+      });
+      gemsHtml += `</div>`;
+    }
+    document.getElementById('insightsHiddenGemsBody').innerHTML = gemsHtml;
+  }
+}
+
+let autoRefreshInterval = null;
+
+function manualRefresh() {
+  fetchLiveData();
+}
+
+function toggleAutoRefresh() {
+  const toggle = document.getElementById('autoRefreshToggle');
+  if (toggle.checked) {
+    autoRefreshInterval = setInterval(() => { fetchLiveData(); }, 60000);
+    fetchLiveData();
+    document.getElementById('lastRefreshed').textContent = 'Auto-refresh ON (60s)';
+  } else {
+    clearInterval(autoRefreshInterval);
+    autoRefreshInterval = null;
+    document.getElementById('lastRefreshed').textContent = 'Auto-refresh OFF';
+  }
+}
+
+// On load, fetch live data
+fetchLiveData();
+
+/* ============================================================
+   TECH NEWS TAB — self-contained module, does not touch any
+   existing dashboard variable, function, or render logic.
+   ============================================================ */
+const NEWS_SOURCES = [
+  { name: "The Verge", feed: "https://www.theverge.com/rss/index.xml" },
+  { name: "TechCrunch", feed: "https://techcrunch.com/feed/" },
+  { name: "Engadget", feed: "https://www.engadget.com/rss.xml" },
+  { name: "Ars Technica", feed: "https://feeds.arstechnica.com/arstechnica/index" },
+  { name: "WIRED", feed: "https://www.wired.com/feed/rss" },
+  { name: "Back2Gaming", feed: "https://www.back2gaming.com/feed/" },
+  { name: "TechPowerUp", feed: "https://www.techpowerup.com/rss/news" }
+];
+const NEWS_RSS2JSON_ENDPOINT = "https://api.rss2json.com/v1/api.json?rss_url=";
+let newsArticles = [];
+let newsLoaded = false;
+let newsActiveFilter = "all";
+
+function buildNewsFilterPills() {
+  const row = document.getElementById('newsFilterRow');
+  if (!row || row.childElementCount > 0) return;
+  const allPill = document.createElement('div');
+  allPill.className = 'source-pill active';
+  allPill.textContent = 'All';
+  allPill.style.cssText = 'background:var(--text);color:#0B0B0D;border:1px solid var(--border2);padding:9px 18px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;';
+  allPill.onclick = () => setNewsFilter('all', allPill);
+  row.appendChild(allPill);
+  NEWS_SOURCES.forEach(src => {
+    const pill = document.createElement('div');
+    pill.textContent = src.name;
+    pill.style.cssText = 'background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:9px 18px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;';
+    pill.onclick = () => setNewsFilter(src.name, pill);
+    row.appendChild(pill);
+  });
+}
+
+function setNewsFilter(name, el) {
+  newsActiveFilter = name;
+  document.getElementById('newsFilterRow').querySelectorAll('div').forEach(p => {
+    p.style.background = 'var(--surface)';
+    p.style.color = 'var(--text2)';
+  });
+  el.style.background = 'var(--text)';
+  el.style.color = '#0B0B0D';
+  renderNewsArticles();
+}
+
+function newsTimeAgo(dateStr) {
+  const date = new Date(dateStr);
+  const diffHrs = Math.floor((Date.now() - date.getTime()) / 3600000);
+  if (diffHrs < 1) return "Bago lang";
+  if (diffHrs < 24) return diffHrs + "h ago";
+  return Math.floor(diffHrs / 24) + "d ago";
+}
+
+function newsExtractImage(item) {
+  if (item.thumbnail) return item.thumbnail;
+  if (item.enclosure && item.enclosure.link) return item.enclosure.link;
+  const match = (item.content || item.description || "").match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : null;
+}
+
+function newsCleanExcerpt(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || "";
+  const text = tmp.textContent || tmp.innerText || "";
+  return text.trim().substring(0, 130) + (text.length > 130 ? "..." : "");
+}
+
+const NEWS_LAST_VISITED_KEY = 'easypc_news_last_visited';
+const NEWS_BACKGROUND_CHECK_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+
+function checkForNewArticles() {
+  const badge = document.getElementById('newsBadgeDot');
+  if (!badge || newsArticles.length === 0) return;
+
+  const lastVisited = localStorage.getItem(NEWS_LAST_VISITED_KEY);
+  if (!lastVisited) {
+    // First time ever — don't show badge, just set the baseline.
+    badge.style.display = 'none';
+    return;
+  }
+
+  const lastVisitedDate = new Date(lastVisited);
+  const hasNew = newsArticles.some(a => new Date(a.date) > lastVisitedDate);
+  badge.style.display = hasNew ? 'block' : 'none';
+}
+
+function markNewsAsVisited() {
+  localStorage.setItem(NEWS_LAST_VISITED_KEY, new Date().toISOString());
+  const badge = document.getElementById('newsBadgeDot');
+  if (badge) badge.style.display = 'none';
+}
+
+/**
+ * Silent background re-check of all news feeds, run on an interval
+ * while the dashboard stays open. Does NOT touch newsStatus text,
+ * newsGrid, or any user-visible Latest News UI — it only updates
+ * newsArticles in memory and refreshes the badge dot. This way it
+ * never interrupts whatever the user is doing on another tab.
+ * Only runs after the user has visited the news tab at least once
+ * (newsLoaded === true), to avoid burning RSS2JSON quota for
+ * people who never use the Tech News feature at all.
+ */
+async function backgroundNewsCheck() {
+  if (!newsLoaded) return;
+
+  try {
+    const results = await Promise.allSettled(
+      NEWS_SOURCES.map(src => fetch(NEWS_RSS2JSON_ENDPOINT + encodeURIComponent(src.feed))
+        .then(r => r.json())
+        .then(data => ({ source: src.name, data }))
+      )
+    );
+
+    let freshArticles = [];
+    results.forEach((res, i) => {
+      if (res.status === 'fulfilled' && res.value.data.status === 'ok') {
+        const items = res.value.data.items.slice(0, 8).map(item => ({
+          source: res.value.source,
+          title: item.title,
+          excerpt: newsCleanExcerpt(item.description),
+          image: newsExtractImage(item),
+          link: item.link,
+          date: item.pubDate
+        }));
+        freshArticles = freshArticles.concat(items);
+      }
+    });
+
+    if (freshArticles.length > 0) {
+      freshArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
+      newsArticles = freshArticles;
+      checkForNewArticles();
+      // If the user happens to be sitting on the Latest sub-tab already,
+      // quietly refresh the grid so it's not stale, without disturbing scroll.
+      const latestPanelVisible = document.getElementById('newsSubpanel-latest') &&
+        document.getElementById('newsSubpanel-latest').style.display !== 'none';
+      if (latestPanelVisible) renderNewsArticles();
+    }
+  } catch (err) {
+    console.error("Background news check failed:", err);
+    // Silent — this is a passive background refresh, not user-initiated.
+  }
+}
+
+setInterval(backgroundNewsCheck, NEWS_BACKGROUND_CHECK_INTERVAL_MS);
+
+async function fetchTechNews() {
+  buildNewsFilterPills();
+  const statusEl = document.getElementById('newsStatus');
+  const results = await Promise.allSettled(
+    NEWS_SOURCES.map(src => fetch(NEWS_RSS2JSON_ENDPOINT + encodeURIComponent(src.feed))
+      .then(r => r.json().then(data => ({ httpStatus: r.status, data })))
+      .then(({ httpStatus, data }) => ({ source: src.name, httpStatus, data }))
+    )
+  );
+
+  let loadedCount = 0;
+  let failedSources = [];
+  let rateLimitedCount = 0;
+
+  results.forEach((res, i) => {
+    if (res.status === 'fulfilled' && res.value.data.status === 'ok') {
+      loadedCount++;
+      const items = res.value.data.items.slice(0, 8).map(item => ({
+        source: res.value.source,
+        title: item.title,
+        excerpt: newsCleanExcerpt(item.description),
+        image: newsExtractImage(item),
+        link: item.link,
+        date: item.pubDate
+      }));
+      newsArticles = newsArticles.concat(items);
+    } else {
+      failedSources.push(NEWS_SOURCES[i].name);
+      // RSS2JSON returns HTTP 429, or a message mentioning "rate" / "limit"
+      // when the free-tier quota is exceeded. We check both signals since
+      // the exact wording isn't formally documented.
+      const httpStatus = res.status === 'fulfilled' ? res.value.httpStatus : null;
+      const errMsg = (res.status === 'fulfilled' && res.value.data && res.value.data.message) ? res.value.data.message.toLowerCase() : '';
+      if (httpStatus === 429 || errMsg.includes('rate') || errMsg.includes('limit') || errMsg.includes('quota')) {
+        rateLimitedCount++;
+      }
+    }
+  });
+
+  newsArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
+  newsLoaded = true;
+  checkForNewArticles();
+
+  if (loadedCount === 0 && rateLimitedCount === NEWS_SOURCES.length) {
+    statusEl.textContent = "⏳ Naabot ang daily limit ng RSS2JSON (libreng tier). Subukan ulit mamaya o bukas — automatic itong mare-reset.";
+  } else if (loadedCount === 0) {
+    statusEl.textContent = "Walang na-load na feeds. Baka offline ka o pansamantalang down ang mga source. Subukan ulit mamaya.";
+  } else if (rateLimitedCount > 0) {
+    statusEl.textContent = `Loaded ${loadedCount}/${NEWS_SOURCES.length} sources. ⏳ ${rateLimitedCount} hindi na-load dahil sa rate limit — ${failedSources.join(", ")}.`;
+  } else if (failedSources.length > 0) {
+    statusEl.textContent = `Loaded ${loadedCount}/${NEWS_SOURCES.length} sources. Hindi na-load: ${failedSources.join(", ")}.`;
+  } else {
+    statusEl.textContent = `${newsArticles.length} articles mula sa ${loadedCount} sources.`;
+  }
+
+  renderNewsArticles();
+}
+
+let newsSearchQuery = "";
+let relevantOnlyFilter = false;
+
+function filterNewsBySearch() {
+  newsSearchQuery = document.getElementById('newsSearchInput').value.trim().toLowerCase();
+  renderNewsArticles();
+}
+
+function toggleRelevantOnly() {
+  relevantOnlyFilter = document.getElementById('relevantOnlyToggle').checked;
+  renderNewsArticles();
+}
+
+function renderNewsArticles() {
+  const grid = document.getElementById('newsGrid');
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  let filtered = newsActiveFilter === 'all'
+    ? newsArticles
+    : newsArticles.filter(a => a.source === newsActiveFilter);
+
+  if (newsSearchQuery) {
+    filtered = filtered.filter(a =>
+      a.title.toLowerCase().includes(newsSearchQuery) ||
+      (a.excerpt || '').toLowerCase().includes(newsSearchQuery)
+    );
+  }
+
+  if (relevantOnlyFilter) {
+    filtered = filtered.filter(a => generateAngleForArticle(a).relevance === 'high');
+  }
+
+  if (filtered.length === 0 && newsArticles.length > 0) {
+    grid.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">Walang articles na tumugma sa search/filter.</div>';
+    return;
+  }
+
+  filtered.forEach(article => {
+    const card = document.createElement('a');
+    card.className = 'top10-item';
+    card.href = article.link;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
+    card.style.textDecoration = 'none';
+    card.style.color = 'inherit';
+
+    const articleRelevance = generateAngleForArticle(article).relevance;
+    const relevanceStarBadge = articleRelevance === 'high'
+      ? '<span style="font-size:10px;color:#F59E0B;">⭐ Relevant</span>'
+      : '';
+
+    const thumbHtml = article.image
+      ? `<img src="${article.image}" alt="" loading="lazy" style="width:100%;height:130px;object-fit:cover;display:block;" onerror="this.outerHTML='<div class=&quot;top10-thumb-area&quot;><span class=&quot;top10-play-icon&quot;>📰</span></div>'">`
+      : `<div class="top10-thumb-area"><span class="top10-play-icon">📰</span></div>`;
+
+    card.innerHTML = `
+      ${thumbHtml}
+      <div class="top10-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">${article.source}</div>
+          ${relevanceStarBadge}
+        </div>
+        <div class="top10-title">${article.title}</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${article.excerpt}</div>
+        <div class="top10-meta">${newsTimeAgo(article.date)}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   WEEKLY TOPICS + HISTORY — self-contained module, sub-feature
+   of Tech News tab. Does not touch any existing function.
+   ============================================================ */
+const PRIORITY_HARDWARE_SOURCES = ["TechPowerUp", "Back2Gaming", "Engadget"];
+let weeklyTopics = [];
+let topicsHistory = [];
+let topicsGenerated = false;
+let historyLoaded = false;
+
+function switchNewsSubtab(which) {
+  document.querySelectorAll('.news-subtab').forEach(t => {
+    t.classList.remove('active');
+    t.style.background = 'transparent';
+    t.style.color = 'var(--text3)';
+  });
+  document.querySelectorAll('.news-subpanel').forEach(p => p.style.display = 'none');
+
+  const tabEl = document.getElementById(which === 'latest' ? 'newsSubtabLatest' : 'newsSubtabTopics');
+  tabEl.classList.add('active');
+  tabEl.style.background = '#FFFFFF';
+  tabEl.style.color = '#0B0B0D';
+  document.getElementById('newsSubpanel-' + which).style.display = 'block';
+
+  if (which === 'topics' && !historyLoaded) loadTopicsHistory();
+}
+
+function switchTopicsView(which) {
+  document.querySelectorAll('.topics-view-tab').forEach(t => {
+    t.classList.remove('active');
+    t.style.background = 'transparent';
+    t.style.color = 'var(--text3)';
+  });
+  document.querySelectorAll('#topicsView-suggestions, #topicsView-history').forEach(p => p.style.display = 'none');
+
+  const tabEl = document.getElementById(which === 'suggestions' ? 'topicsViewSuggestions' : 'topicsViewHistory');
+  tabEl.classList.add('active');
+  tabEl.style.background = '#FFFFFF';
+  tabEl.style.color = '#0B0B0D';
+  document.getElementById('topicsView-' + which).style.display = 'block';
+
+  if (which === 'history') renderTopicsHistory();
+}
+
+function getWeekLabel() {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const week = Math.ceil((((now - jan1) / 86400000) + jan1.getDay() + 1) / 7);
+  return `Week ${week}, ${now.getFullYear()}`;
+}
+
+const ANGLE_RULES = [
+  { keywords: ['gpu', 'graphics card', 'rtx', 'radeon', 'geforce'], relevance: 'high',
+    angle: "Gawin mong reel: bagong GPU na ito — paghambingin sa current stock ng EasyPC at sabihin kung sulit ba ang upgrade." },
+  { keywords: ['cpu', 'processor', 'ryzen', 'intel core', 'chip'], relevance: 'high',
+    angle: "Gawin mong reel: bagong processor — explain kung sino dapat mag-upgrade at sino dapat mag-hintay." },
+  { keywords: ['price', 'discount', 'cheaper', 'sale', 'deal'], relevance: 'high',
+    angle: "Gawin mong reel: pagtipid angle — i-tie sa current promos ng EasyPC kung meron." },
+  { keywords: ['laptop', 'notebook', 'ultrabook'], relevance: 'high',
+    angle: "Gawin mong reel: laptop comparison o buying-guide angle — anong specs dapat habulin sa price range na ito." },
+  { keywords: ['ssd', 'storage', 'hard drive', 'nvme'], relevance: 'high',
+    angle: "Gawin mong reel: storage upgrade tip — bilis vs price tradeoff, anong dapat bilhin." },
+  { keywords: ['ram', 'memory'], relevance: 'high',
+    angle: "Gawin mong reel: RAM upgrade explainer — kelan kailangan mag-upgrade, magkano dapat gastusin." },
+  { keywords: ['monitor', 'display', 'screen'], relevance: 'medium',
+    angle: "Gawin mong reel: monitor buying tip — refresh rate o resolution na dapat alamin." },
+  { keywords: ['game', 'gaming', 'esports'], relevance: 'high',
+    angle: "Gawin mong reel: gaming setup angle — i-connect sa PC build recommendations ng EasyPC." },
+  { keywords: ['ai', 'artificial intelligence', 'chatbot'], relevance: 'medium',
+    angle: "Gawin mong reel: AI tool explainer — libreng tool na pwedeng gamitin agad, one-click solution framing." },
+  { keywords: ['free', 'open source', 'no cost'], relevance: 'high',
+    angle: "Gawin mong reel: 'free tool' angle — ito ang pinaka-best performing formula mo dati (parang Ninite.com post)." },
+  { keywords: ['security', 'hack', 'breach', 'vulnerability'], relevance: 'medium',
+    angle: "Gawin mong reel: security tip — paano protektahan ang sariling PC/data." },
+  { keywords: ['windows', 'microsoft'], relevance: 'medium',
+    angle: "Gawin mong reel: Windows tip o update explainer — practical step-by-step." },
+  { keywords: ['battery', 'power', 'charging'], relevance: 'medium',
+    angle: "Gawin mong reel: battery/power tip — paano pahabain ang buhay ng device." },
+  { keywords: ['smartphone', 'phone', 'iphone', 'android'], relevance: 'low',
+    angle: "Gawin mong reel: phone news angle — i-tie lang kung may PC/accessory connection." },
+  { keywords: ['vr', 'virtual reality', 'metaverse'], relevance: 'low',
+    angle: "Gawin mong reel: VR/future-tech angle — pang-awareness content, hindi direct sales." }
+];
+
+const DEFAULT_ANGLE = "Gawin mong reel: i-summarize ang balita sa simpleng Taglish at idagdag ang opinyon/tip ng EasyPC tungkol dito.";
+
+function generateAngleForArticle(article) {
+  const text = (article.title + ' ' + article.excerpt).toLowerCase();
+  for (const rule of ANGLE_RULES) {
+    if (rule.keywords.some(kw => text.includes(kw))) {
+      let relevance = rule.relevance;
+      if (PRIORITY_HARDWARE_SOURCES.includes(article.source) && relevance === 'medium') {
+        relevance = 'high';
+      }
+      return { angle: rule.angle, relevance };
+    }
+  }
+  return { angle: DEFAULT_ANGLE, relevance: PRIORITY_HARDWARE_SOURCES.includes(article.source) ? 'medium' : 'low' };
+}
+
+function normalizeForOverlapCheck(text) {
+  return (text || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 3);
+}
+
+function isAlreadyCovered(article, historyList) {
+  const articleWords = new Set(normalizeForOverlapCheck(article.title));
+  if (articleWords.size === 0) return null;
+
+  for (const past of historyList) {
+    const pastWords = new Set(normalizeForOverlapCheck(past.title));
+    if (pastWords.size === 0) continue;
+
+    let overlapCount = 0;
+    articleWords.forEach(w => { if (pastWords.has(w)) overlapCount++; });
+
+    const overlapRatio = overlapCount / Math.min(articleWords.size, pastWords.size);
+    if (overlapRatio >= 0.5 && overlapCount >= 2) {
+      return past; // return the matching past topic for reference
+    }
+  }
+  return null;
+}
+
+async function generateWeeklyTopics() {
+  const statusEl = document.getElementById('topicsStatus');
+  const grid = document.getElementById('topicsGrid');
+
+  if (newsArticles.length === 0) {
+    statusEl.textContent = "Pumunta muna sa 'Latest' tab para ma-load ang news articles.";
+    return;
+  }
+
+  grid.innerHTML = "";
+  statusEl.textContent = "Tinitingnan ang history para sa duplicate topics...";
+
+  // Always fetch a fresh copy of history for accurate duplicate-checking,
+  // since topicsHistory may be stale or never loaded if user hasn't
+  // visited the History sub-tab yet.
+  let historyForCheck = [];
+  try {
+    const response = await fetch(TOPICS_APPS_SCRIPT_URL + "?action=list");
+    const result = await response.json();
+    if (result.status !== "error") historyForCheck = result.topics || [];
+  } catch (err) {
+    console.error("Hindi na-fetch ang history para sa duplicate check:", err);
+    // Non-fatal — just proceed without duplicate detection.
+  }
+
+  const priority = newsArticles.filter(a => PRIORITY_HARDWARE_SOURCES.includes(a.source));
+  const rest = newsArticles.filter(a => !PRIORITY_HARDWARE_SOURCES.includes(a.source));
+  const candidates = [...priority, ...rest].slice(0, 8);
+
+  if (candidates.length === 0) {
+    statusEl.textContent = "Walang articles na available. Subukan ulit sa 'Latest' tab.";
+    return;
+  }
+
+  weeklyTopics = candidates.map(article => {
+    const { angle, relevance } = generateAngleForArticle(article);
+    const coveredMatch = isAlreadyCovered(article, historyForCheck);
+    return {
+      id: 'topic_' + article.link.split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 1000000007, 7),
+      source: article.source,
+      title: article.title,
+      link: article.link,
+      angle: angle,
+      relevance: relevance,
+      weekLabel: getWeekLabel(),
+      generatedAt: new Date().toISOString(),
+      alreadyCovered: coveredMatch ? true : false,
+      coveredWeekLabel: coveredMatch ? coveredMatch.weekLabel : null
+    };
+  });
+
+  topicsGenerated = true;
+  const coveredCount = weeklyTopics.filter(t => t.alreadyCovered).length;
+  statusEl.textContent = `${weeklyTopics.length} content ideas para sa ${getWeekLabel()}.` +
+    (coveredCount > 0 ? ` ⚠️ ${coveredCount} posibleng paulit-ulit na topic.` : '');
+  renderWeeklyTopics();
+
+  // Fire-and-forget: log every candidate shown (not just saved ones) to the
+  // "Generated Log" sheet tab for audit purposes. Non-blocking — doesn't
+  // delay rendering and a failure here doesn't affect the topics shown.
+  logGeneratedTopics(weeklyTopics);
+}
+
+async function logGeneratedTopics(topics) {
+  try {
+    const response = await fetch(TOPICS_APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "logGenerated", topics: topics })
+    });
+    const result = await response.json();
+    if (result.status === "error") {
+      console.error("Log error response:", result.message);
+      const statusEl = document.getElementById('topicsStatus');
+      if (statusEl) statusEl.textContent += ` (Log error: ${result.message})`;
+    }
+  } catch (err) {
+    console.error("Hindi na-log ang generated topics:", err);
+    const statusEl = document.getElementById('topicsStatus');
+    if (statusEl) statusEl.textContent += ` (Log fetch error: ${err.message})`;
+  }
+}
+
+function relevanceBadge(level) {
+  if (level === 'high') return '<span style="background:rgba(34,197,94,0.1);color:#22C55E;border:1px solid rgba(34,197,94,0.2);padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;">High relevance</span>';
+  if (level === 'low') return '<span style="background:var(--surface);color:var(--text3);border:1px solid var(--border);padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;">Low relevance</span>';
+  return '<span style="background:rgba(245,158,11,0.1);color:#F59E0B;border:1px solid rgba(245,158,11,0.2);padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;">Medium relevance</span>';
+}
+
+function renderWeeklyTopics() {
+  const grid = document.getElementById('topicsGrid');
+  grid.innerHTML = "";
+
+  weeklyTopics.forEach(topic => {
+    const card = document.createElement('div');
+    card.className = 'top10-item';
+    card.style.cursor = 'default';
+    if (topic.alreadyCovered) card.style.opacity = '0.75';
+
+    const coveredWarning = topic.alreadyCovered
+      ? `<div style="font-size:11px;color:#F59E0B;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:6px 10px;">⚠️ Posibleng paulit-ulit${topic.coveredWeekLabel ? ' — may kahawig na topic mula ' + topic.coveredWeekLabel : ''}</div>`
+      : '';
+
+    card.innerHTML = `
+      <div class="top10-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">${topic.source}</div>
+          ${relevanceBadge(topic.relevance)}
+        </div>
+        <div class="top10-title">${topic.title}</div>
+        ${coveredWarning}
+        <div style="font-size:12.5px;color:var(--text);line-height:1.5;background:var(--surface);border-radius:10px;padding:10px 12px;border-left:2px solid var(--accent);">💡 ${topic.angle}</div>
+        <div style="display:flex;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid var(--border);">
+          <a href="${topic.link}" target="_blank" rel="noopener noreferrer" class="fb-link" style="flex:1;text-align:center;background:var(--surface);border-radius:8px;padding:7px 0;">View article</a>
+          <button onclick="saveTopicToHistory('${topic.id}')" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 0;font-size:11.5px;font-weight:600;cursor:pointer;">Save to history</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+async function saveTopicToHistory(topicId) {
+  const topic = weeklyTopics.find(t => t.id === topicId);
+  if (!topic) return;
+
+  try {
+    const response = await fetch(TOPICS_APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "save", topic: topic })
+    });
+    const result = await response.json();
+
+    if (result.status === "error") {
+      alert("May error sa pag-save: " + result.message);
+      return;
+    }
+    if (result.message === "already_exists") {
+      alert("Naka-save na ito dati.");
+      return;
+    }
+    alert("Na-save sa History! Pumunta sa 'History' tab para makita.");
+    historyLoaded = false; // force refresh next time History tab opens
+  } catch (err) {
+    console.error(err);
+    alert("May error sa pag-save. Subukan ulit. (" + err.message + ")");
+  }
+}
+
+async function loadTopicsHistory() {
+  historyLoaded = true;
+  const statusEl = document.getElementById('historyStatus');
+  statusEl.textContent = "Loading history...";
+
+  try {
+    const response = await fetch(TOPICS_APPS_SCRIPT_URL + "?action=list");
+    const result = await response.json();
+
+    if (result.status === "error") {
+      statusEl.textContent = "Error: " + result.message;
+      return;
+    }
+
+    topicsHistory = result.topics || [];
+
+    if (topicsHistory.length === 0) {
+      statusEl.textContent = "Walang naka-save na topics pa.";
+      renderTopicsHistory();
+      return;
+    }
+
+    topicsHistory.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+    statusEl.textContent = `${topicsHistory.length} saved topics.`;
+    renderTopicsHistory();
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "May error sa pag-load ng history. (" + err.message + ")";
+  }
+}
+
+async function toggleTopicUsed(topicId) {
+  const topic = topicsHistory.find(t => t.id === topicId);
+  if (!topic) return;
+  const previousUsedAt = topic.usedAt;
+  topic.used = !topic.used;
+  topic.usedAt = topic.used ? new Date().toISOString() : null;
+
+  try {
+    const response = await fetch(TOPICS_APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "toggleUsed", id: topic.id, used: topic.used })
+    });
+    const result = await response.json();
+
+    if (result.status === "error") {
+      topic.used = !topic.used; // revert on failure
+      topic.usedAt = previousUsedAt;
+      alert("May error sa pag-update: " + result.message);
+      return;
+    }
+    renderTopicsHistory();
+  } catch (err) {
+    topic.used = !topic.used; // revert on failure
+    topic.usedAt = previousUsedAt;
+    console.error(err);
+    alert("May error sa pag-update. Subukan ulit.");
+  }
+}
+
+function formatSavedDate(isoStr) {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return '';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const hours = d.getHours();
+  const h12 = hours % 12 === 0 ? 12 : hours % 12;
+  const ampm = hours < 12 ? 'AM' : 'PM';
+  const mins = d.getMinutes().toString().padStart(2, '0');
+  return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${h12}:${mins} ${ampm}`;
+}
+
+let selectedTopicIds = new Set();
+
+function renderTopicsHistory() {
+  const grid = document.getElementById('historyGrid');
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const filterVal = document.getElementById('historyFilterSelect') ? document.getElementById('historyFilterSelect').value : 'all';
+  const filtered = topicsHistory.filter(t => {
+    if (filterVal === 'used') return t.used;
+    if (filterVal === 'unused') return !t.used;
+    return true;
+  });
+
+  // Drop selections for topics no longer in view (filtered out or unused)
+  const visibleIds = new Set(filtered.map(t => t.id));
+  selectedTopicIds.forEach(id => { if (!visibleIds.has(id)) selectedTopicIds.delete(id); });
+  updateBulkActionButton();
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">Walang topics dito.</div>';
+    return;
+  }
+
+  filtered.forEach(topic => {
+    const card = document.createElement('div');
+    card.className = 'top10-item';
+    card.style.cursor = 'default';
+    card.style.opacity = topic.used ? '0.6' : '1';
+    card.style.position = 'relative';
+
+    const isChecked = selectedTopicIds.has(topic.id);
+
+    card.innerHTML = `
+      <div class="top10-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" onchange="toggleTopicSelection('${topic.id}', this.checked)" ${isChecked ? 'checked' : ''} style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent);">
+            <span style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">${topic.source}</span>
+          </label>
+          <span style="font-size:10px;color:var(--text3);">${topic.weekLabel || ''}</span>
+        </div>
+        <div class="top10-title">${topic.title}</div>
+        <div style="font-size:12.5px;color:var(--text);line-height:1.5;background:var(--surface);border-radius:10px;padding:10px 12px;border-left:2px solid var(--accent);">💡 ${topic.angle}</div>
+        <div style="font-size:10.5px;color:var(--text3);">🕐 Saved: ${formatSavedDate(topic.savedAt)}</div>
+        ${topic.used && topic.usedAt ? `<div style="font-size:10.5px;color:#22C55E;">✓ Used: ${formatSavedDate(topic.usedAt)}</div>` : ''}
+        <div style="display:flex;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid var(--border);">
+          <a href="${topic.link}" target="_blank" rel="noopener noreferrer" class="fb-link" style="flex:1;text-align:center;background:var(--surface);border-radius:8px;padding:7px 0;">View article</a>
+          <button onclick="toggleTopicUsed('${topic.id}')" style="flex:1;background:${topic.used ? 'var(--surface)' : '#22C55E'};color:${topic.used ? 'var(--text2)' : '#fff'};border:none;border-radius:8px;padding:7px 0;font-size:11.5px;font-weight:600;cursor:pointer;">${topic.used ? '↺ Mark unused' : '✓ Mark used'}</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function toggleTopicSelection(topicId, checked) {
+  if (checked) selectedTopicIds.add(topicId);
+  else selectedTopicIds.delete(topicId);
+  updateBulkActionButton();
+}
+
+function updateBulkActionButton() {
+  const btn = document.getElementById('bulkMarkUsedBtn');
+  const countEl = document.getElementById('selectedCount');
+  if (!btn || !countEl) return;
+  countEl.textContent = selectedTopicIds.size;
+  btn.disabled = selectedTopicIds.size === 0;
+  btn.style.opacity = selectedTopicIds.size === 0 ? '0.5' : '1';
+  btn.style.cursor = selectedTopicIds.size === 0 ? 'not-allowed' : 'pointer';
+}
+
+async function markSelectedAsUsed() {
+  if (selectedTopicIds.size === 0) return;
+  const ids = Array.from(selectedTopicIds);
+  const btn = document.getElementById('bulkMarkUsedBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  let successCount = 0;
+  for (const id of ids) {
+    const topic = topicsHistory.find(t => t.id === id);
+    if (!topic || topic.used) continue;
+    try {
+      const response = await fetch(TOPICS_APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "toggleUsed", id: topic.id, used: true })
+      });
+      const result = await response.json();
+      if (result.status !== "error") {
+        topic.used = true;
+        topic.usedAt = new Date().toISOString();
+        successCount++;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  selectedTopicIds.clear();
+  alert(`${successCount} topics na-mark as used.`);
+  renderTopicsHistory();
+}
+
+
+</script>
+</body>
+</html>
