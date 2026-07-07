@@ -314,8 +314,8 @@ html { overflow-x: hidden; }
 /* ── KPI GRID ── */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin-bottom: 40px;
   margin-top: 4px;
 }
@@ -961,6 +961,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   .header { padding: 0 16px; }
   .tabs { padding: 12px 16px; }
   .insight-pair-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 @media (max-width: 600px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
