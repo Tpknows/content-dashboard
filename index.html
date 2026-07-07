@@ -1865,6 +1865,7 @@ function renderTop10(month) {
           <span class="top10-creator">${v.creator}</span>
           ${getPillarBadge(v.pillar)}
           ${v.ai ? '<span class="ai-tag">AI</span>' : ''}
+          ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
           ${linkHTML}
         </div>
       </div>
@@ -1916,6 +1917,7 @@ function renderAI(month) {
             <span class="top10-creator">${v.creator}</span>
             ${getPillarBadge(v.pillar)}
             ${v.thruplay_rate > 0 ? `<span style="color:#555;font-size:10px">${v.thruplay_rate}% rate</span>` : ''}
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
             ${linkHTML}
           </div>
         </div>
@@ -2104,6 +2106,7 @@ function renderHook(month) {
             <span class="top10-creator">${v.creator}</span>
             ${getPillarBadge(v.pillar)}
             ${getHookBadge(v.hook_rate)}
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
             ${linkHTML}
           </div>
         </div>
@@ -2166,6 +2169,7 @@ function renderHold(month) {
             <span class="top10-creator">${v.creator}</span>
             ${getPillarBadge(v.pillar)}
             ${getHoldBadge(v.hold_rate)}
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
             ${linkHTML}
           </div>
         </div>
