@@ -1277,6 +1277,10 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Notes / Caption draft</label>
         <textarea id="calFieldNotes" rows="3" placeholder="Optional notes, hooks, or caption draft..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
       </div>
+      <div id="calFieldHistoryWrap" style="display:none;margin-bottom:18px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
+        <div id="calFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
+      </div>
       <div style="display:flex;gap:10px;">
         <button onclick="submitCalendarEntry()" id="calendarSaveBtn" style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
         <button onclick="closeCalendarForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
@@ -4199,8 +4203,29 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldSavedBy').value = entry ? (entry.savedBy || '') : lastSavedByName;
   document.getElementById('calFieldNotes').value = entry ? entry.notes : '';
   document.getElementById('calendarSaveBtn').textContent = entry ? 'Update Entry' : 'Save to Sheet';
+  renderCalendarHistory(entry);
   document.getElementById('calendarFormCard').style.display = 'block';
   document.getElementById('calendarFormCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderCalendarHistory(entry) {
+  const wrap = document.getElementById('calFieldHistoryWrap');
+  const list = document.getElementById('calFieldHistoryList');
+  if (!entry || !Array.isArray(entry.statusHistory) || entry.statusHistory.length === 0) {
+    wrap.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+  wrap.style.display = 'block';
+  list.innerHTML = [...entry.statusHistory].reverse().map(h => {
+    const dt = new Date(h.at);
+    const dateLabel = isNaN(dt.getTime()) ? h.at : dt.toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+    const changeLabel = h.from ? `${h.from} → <span style="color:${calendarStatusColor(h.to)};font-weight:700;">${h.to}</span>` : `Created as <span style="color:${calendarStatusColor(h.to)};font-weight:700;">${h.to}</span>`;
+    return `<div style="font-size:11.5px;color:var(--text2);padding:8px 0;border-bottom:1px solid var(--border);">
+      <div>${changeLabel}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px;">${h.by ? h.by + ' · ' : ''}${dateLabel}</div>
+    </div>`;
+  }).join('');
 }
 
 function closeCalendarForm() {
@@ -4229,6 +4254,17 @@ async function submitCalendarEntry() {
   };
 
   if (payload.savedBy) lastSavedByName = payload.savedBy;
+
+  // Build/append status history — only adds a record when the status actually changed
+  const previousEntry = editingCalendarId ? contentCalendar.find(e => e.id === editingCalendarId) : null;
+  const prevHistory = (previousEntry && Array.isArray(previousEntry.statusHistory)) ? previousEntry.statusHistory : [];
+  if (!previousEntry) {
+    payload.statusHistory = [{ from: null, to: payload.status, by: payload.savedBy || '', at: new Date().toISOString() }];
+  } else if (previousEntry.status !== payload.status) {
+    payload.statusHistory = [...prevHistory, { from: previousEntry.status, to: payload.status, by: payload.savedBy || '', at: new Date().toISOString() }];
+  } else {
+    payload.statusHistory = prevHistory;
+  }
 
   const btn = document.getElementById('calendarSaveBtn');
   btn.disabled = true;
