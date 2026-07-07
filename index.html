@@ -1595,7 +1595,7 @@ async function fetchLiveData() {
     const monthSelect = document.getElementById('monthSelect');
     const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
     const available = MONTHS_ORDER.filter(m => DATA[m] && DATA[m].videos > 0);
-    monthSelect.innerHTML = available.map(m => `<option value="${m}">${m.charAt(0)+m.slice(1).toLowerCase()}</option>`).join('');
+    monthSelect.innerHTML = `<option value="ALL_YEAR">📊 All Year</option>` + available.map(m => `<option value="${m}">${m.charAt(0)+m.slice(1).toLowerCase()}</option>`).join('');
     if (available.length > 0) monthSelect.value = available[available.length - 1];
     buildMonthPills(available);
 
@@ -1620,12 +1620,15 @@ function buildMonthPills(available) {
   if (!group) return;
   const pillStyle = `padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:500;border:none;background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;`;
   const activeStyle = `padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:600;border:none;background:var(--text);color:#0B0B0D;cursor:pointer;font-family:inherit;white-space:nowrap;`;
+  const allYearStyle = `padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:600;border:none;background:linear-gradient(90deg,#3B82F6,#a855f7);color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;`;
   const cur = document.getElementById('monthSelect').value;
-  group.innerHTML = available.map(m => {
+  const allYearBtn = `<button style="${cur === 'ALL_YEAR' ? allYearStyle : pillStyle}" onclick="selectMonthPill('ALL_YEAR',this)">📊 All Year</button>`;
+  const monthBtns = available.filter(m => m !== 'ALL_YEAR').map(m => {
     const label = m.charAt(0) + m.slice(1,3).toLowerCase();
     const isActive = m === cur;
     return `<button style="${isActive ? activeStyle : pillStyle}" onclick="selectMonthPill('${m}',this)">${label}</button>`;
   }).join('');
+  group.innerHTML = allYearBtn + monthBtns;
 }
 
 function selectMonthPill(month, btn) {
@@ -1666,8 +1669,24 @@ function kpiStatusBadge(pct) {
   return `<span style="color:#ef4444;font-size:11px;font-weight:700">✗ BEHIND ${pct}%</span>`;
 }
 
+function getVideos(month) {
+  if (month === 'ALL_YEAR') {
+    return Object.values(DATA).flatMap(m => m.all_videos || []);
+  }
+  return DATA[month] ? DATA[month].all_videos : [];
+}
+
 function updateDashboard() {
   const month = document.getElementById('monthSelect').value;
+  if (month === 'ALL_YEAR') {
+    // For All Year: only refresh the four content tabs, hide KPI section
+    document.getElementById('kpiGrid').innerHTML = `<div style="grid-column:1/-1;padding:28px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);text-align:center;color:var(--text3);font-size:13px;">📊 <strong style="color:#fff">All Year view</strong> — KPI cards show per-month targets. Select a month to see KPIs.</div>`;
+    renderTop10(month);
+    renderAI(month);
+    renderHook(month);
+    renderHold(month);
+    return;
+  }
   const d = DATA[month];
   if (!d) return;
 
@@ -1821,9 +1840,9 @@ function updateDashboard() {
 }
 
 function renderTop10(month) {
-  const d = DATA[month];
-  if (!d) return;
-  const sorted = [...d.all_videos].sort((a, b) => b.views - a.views).slice(0, 20);
+  const videos = getVideos(month);
+  if (!videos.length) return;
+  const sorted = [...videos].sort((a, b) => b.views - a.views).slice(0, 20);
   const TARGET = 50000;
   let html = '';
   sorted.forEach((v, i) => {
@@ -1855,9 +1874,9 @@ function renderTop10(month) {
 }
 
 function renderAI(month) {
-  const d = DATA[month];
-  if (!d) return;
-  const aiVids = d.all_videos.filter(v => v.ai);
+  const videos = getVideos(month);
+  if (!videos.length) return;
+  const aiVids = videos.filter(v => v.ai);
   const aiWins = aiVids.filter(v => v.winning).length;
   const aiViews = aiVids.reduce((s, v) => s + v.views, 0);
   const aiWinRate = aiVids.length > 0 ? Math.round(aiWins / aiVids.length * 100) : 0;
@@ -2034,11 +2053,11 @@ function getHoldOverlayClass(r) {
 }
 
 function renderHook(month) {
-  const d = DATA[month];
-  if (!d) return;
+  const videos = getVideos(month);
+  if (!videos.length) return;
 
   // Sort top 20 by hook_rate desc, skip those with no hook rate
-  const withRate = d.all_videos.filter(v => v.hook_rate > 0);
+  const withRate = videos.filter(v => v.hook_rate > 0);
   const sorted = [...withRate].sort((a, b) => b.hook_rate - a.hook_rate).slice(0, 20);
 
   // Summary counts from the Top 20 shown — not all videos
@@ -2096,11 +2115,11 @@ function renderHook(month) {
 }
 
 function renderHold(month) {
-  const d = DATA[month];
-  if (!d) return;
+  const videos = getVideos(month);
+  if (!videos.length) return;
 
   // Sort top 20 by hold_rate desc, skip those with no hold rate
-  const withRate = d.all_videos.filter(v => v.hold_rate > 0);
+  const withRate = videos.filter(v => v.hold_rate > 0);
   const sorted = [...withRate].sort((a, b) => b.hold_rate - a.hold_rate).slice(0, 20);
 
   // Summary counts from the Top 20 shown — not all videos
