@@ -1731,6 +1731,13 @@ function updateDashboard() {
       <div class="kpi-sub">${d.avg_hook_rate>=60?'🔥 Excellent':d.avg_hook_rate>=50?'⚡ Very Strong':d.avg_hook_rate>=40?'✓ Good':d.avg_hook_rate>=30?'~ Average':'✗ Needs Work'}</div>
       ${delta(d.avg_hook_rate, prev?.avg_hook_rate)}
     </div>
+    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#a855f7,#ec4899)"></div>
+      <div class="kpi-label">Avg Hold Rate</div>
+      <div class="kpi-value" style="color:${d.avg_hold_rate>=60?'#22c55e':d.avg_hold_rate>=50?'#00d4ff':d.avg_hold_rate>=40?'#a855f7':d.avg_hold_rate>=30?'#eab308':'#ef4444'}">${d.avg_hold_rate}%</div>
+      <div class="kpi-sub">${d.avg_hold_rate>=60?'🔥 Excellent':d.avg_hold_rate>=50?'⚡ Very Strong':d.avg_hold_rate>=40?'✓ Good':d.avg_hold_rate>=30?'~ Average':'✗ Needs Work'}</div>
+      ${delta(d.avg_hold_rate, prev?.avg_hold_rate)}
+    </div>
     <div class="kpi-card yellow">
       <div class="kpi-label">Overall KPI Status</div>
       <div class="kpi-value" style="font-size:16px;margin-top:4px"><span class="status-badge status-${status}">${statusLabel}</span></div>
