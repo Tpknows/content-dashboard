@@ -571,8 +571,8 @@ html { overflow-x: hidden; }
   gap: 8px;
   flex-wrap: wrap;
   align-items: center;
-  margin-top: auto;
-  padding-top: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid var(--border);
 }
 .top10-creator { color: var(--text2); font-weight: 600; }
@@ -1861,11 +1861,13 @@ function renderTop10(month) {
       </div>
       <div class="top10-body">
         <div class="top10-title">${v.title}</div>
-        <div class="top10-meta">
+        <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
           <span class="top10-creator">${v.creator}</span>
+          ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+        </div>
+        <div class="top10-meta">
           ${getPillarBadge(v.pillar)}
           ${v.ai ? '<span class="ai-tag">AI</span>' : ''}
-          ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
           ${linkHTML}
         </div>
       </div>
@@ -1913,11 +1915,13 @@ function renderAI(month) {
         </div>
         <div class="top10-body">
           <div class="top10-title">${v.title}</div>
-          <div class="top10-meta">
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
             <span class="top10-creator">${v.creator}</span>
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+          </div>
+          <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
             ${v.thruplay_rate > 0 ? `<span style="color:#555;font-size:10px">${v.thruplay_rate}% rate</span>` : ''}
-            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
             ${linkHTML}
           </div>
         </div>
@@ -2102,11 +2106,13 @@ function renderHook(month) {
         </div>
         <div class="top10-body">
           <div class="top10-title">${v.title}</div>
-          <div class="top10-meta">
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
             <span class="top10-creator">${v.creator}</span>
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+          </div>
+          <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
             ${getHookBadge(v.hook_rate)}
-            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
             ${linkHTML}
           </div>
         </div>
@@ -2165,11 +2171,13 @@ function renderHold(month) {
         </div>
         <div class="top10-body">
           <div class="top10-title">${v.title}</div>
-          <div class="top10-meta">
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
             <span class="top10-creator">${v.creator}</span>
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+          </div>
+          <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
             ${getHoldBadge(v.hold_rate)}
-            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);margin-left:auto;">📅 ${v.datePosted}</span>` : ''}
             ${linkHTML}
           </div>
         </div>
