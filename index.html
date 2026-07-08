@@ -3204,230 +3204,208 @@ function exportInsightsToPPT() {
   prs.title  = `EasyPC Content Insights — ${month}`;
   prs.author = 'EasyPC Content Dashboard';
 
-  // ── Design tokens (corporate white) ──
+  // ── Design tokens — minimalist zinc + emerald, matches the dashboard's own palette ──
   const C = {
-    white:   'FFFFFF', bg:      'F8FAFC', card:    'FFFFFF',
-    navy:    '1E293B', slate:   '475569', muted:   '94A3B8',
-    blue:    '3B82F6', purple:  '8B5CF6', green:   '22C55E',
-    yellow:  'F59E0B', red:     'EF4444', cyan:    '06B6D4',
-    border:  'E2E8F0', accent:  '6366F1'
+    bg:      'FFFFFF', card:    'FFFFFF', dark: '18181B',
+    ink:     '18181B', body:    '3F3F46',
+    muted:   '71717A', faint:   'A1A1AA',
+    border:  'E4E4E7',
+    accent:  '10B981',   // emerald — positive / primary accent
+    warn:    'DC2626',   // muted red — negative signal only
+    amber:   'D97706'    // caution state for the cover KPI pill
   };
   const FONT = 'Calibri';
 
+  let slideNum = 1;
+
   // ── Shared helpers ──
   const slide = () => {
-    const s = prs.addSlide();
-    // White bg
-    s.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{ color: C.white } });
-    // Top accent bar
-    s.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:0.08, fill:{ color: C.accent } });
-    // Bottom footer
-    s.addShape(prs.ShapeType.rect, { x:0, y:7.4, w:'100%', h:0.1, fill:{ color: C.border } });
-    s.addText(`EasyPC Content Dashboard  ·  ${month} Insights  ·  Confidential`, {
-      x:0.3, y:7.42, w:12.73, h:0.18, fontSize:7, color:C.muted, fontFace:FONT, align:'left'
+    slideNum++;
+    const sl = prs.addSlide();
+    sl.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{ color: C.bg } });
+    sl.addText(String(slideNum - 1).padStart(2,'0'), {
+      x:11.9, y:0.28, w:1.0, h:0.5, fontSize:20, bold:true, color:C.faint, fontFace:FONT, align:'right'
     });
-    return s;
+    sl.addText(`EasyPC Content Dashboard  ·  ${month} Insights`, {
+      x:0.5, y:7.42, w:10, h:0.2, fontSize:7.5, color:C.faint, fontFace:FONT
+    });
+    return sl;
   };
 
   const sectionTitle = (sl, title, subtitle) => {
-    sl.addText(title, { x:0.5, y:0.18, w:12.33, h:0.45, fontSize:20, bold:true, color:C.navy, fontFace:FONT });
-    if (subtitle) sl.addText(subtitle, { x:0.5, y:0.62, w:12.33, h:0.26, fontSize:10, color:C.muted, fontFace:FONT });
-    sl.addShape(prs.ShapeType.rect, { x:0.5, y:0.94, w:1.2, h:0.04, fill:{ color:C.accent } });
+    sl.addText(title, { x:0.5, y:0.35, w:10.8, h:0.5, fontSize:24, bold:true, color:C.ink, fontFace:FONT });
+    if (subtitle) sl.addText(subtitle, { x:0.5, y:0.83, w:10.8, h:0.28, fontSize:10.5, color:C.muted, fontFace:FONT });
   };
 
   const bulletList = (sl, items, x, y, w, h) => {
-    const clean = (items||[]).map(i => '• ' + stripHtmlTags(i)).filter(Boolean);
-    if (!clean.length) clean.push('• No data available.');
+    const clean = (items||[]).map(i => '–  ' + stripHtmlTags(i)).filter(Boolean);
+    if (!clean.length) clean.push('–  No data available.');
     sl.addText(clean.join('\n'), {
-      x, y, w, h, fontSize:10.5, color:C.slate, fontFace:FONT,
-      valign:'top', wrap:true, lineSpacingMultiple:1.3
+      x, y, w, h, fontSize:10.5, color:C.body, fontFace:FONT,
+      valign:'top', wrap:true, lineSpacingMultiple:1.35
     });
   };
 
-  const kpiCard = (sl, label, val, color, x, y, w, h) => {
-    sl.addShape(prs.ShapeType.roundRect, { x, y, w, h, rectRadius:0.12, fill:{color:C.card}, line:{color:C.border, width:1} });
-    sl.addText(val, { x, y:y+0.12, w, h:h*0.55, fontSize:22, bold:true, color, fontFace:FONT, align:'center', valign:'middle' });
-    sl.addText(label, { x, y:y+h*0.58, w, h:h*0.35, fontSize:8.5, color:C.muted, fontFace:FONT, align:'center', valign:'top' });
+  const kpiCard = (sl, label, val, x, y, w, h) => {
+    sl.addShape(prs.ShapeType.roundRect, { x, y, w, h, rectRadius:0.08, fill:{color:C.card}, line:{color:C.border, width:1} });
+    sl.addText(val, { x, y:y+0.12, w, h:h*0.55, fontSize:21, bold:true, color:C.ink, fontFace:FONT, align:'center', valign:'middle' });
+    sl.addText(label, { x, y:y+h*0.58, w, h:h*0.35, fontSize:7.8, color:C.muted, fontFace:FONT, align:'center', valign:'top' });
+  };
+
+  // Two-column card with a colored icon-dot label — the repeated visual motif across the deck
+  const twoColCard = (sl, x, dotColor, label, items) => {
+    sl.addShape(prs.ShapeType.roundRect, { x, y:1.12, w:5.9, h:5.78, rectRadius:0.1, fill:{color:C.card}, line:{color:C.border, width:1} });
+    sl.addShape(prs.ShapeType.ellipse, { x:x+0.28, y:1.36, w:0.28, h:0.28, fill:{color:dotColor} });
+    sl.addText(label, { x:x+0.7, y:1.32, w:4.9, h:0.36, fontSize:11, bold:true, color:C.ink, fontFace:FONT, valign:'middle' });
+    bulletList(sl, items, x+0.3, 1.86, 5.3, 4.9);
   };
 
   // ══════════════════════════════════════════════════════════
-  // SLIDE 1 — TITLE / COVER
+  // SLIDE 1 — TITLE / COVER (dark, sandwiches with the light content slides)
   // ══════════════════════════════════════════════════════════
   const s1 = prs.addSlide();
-  s1.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{ color: C.navy } });
-  s1.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:0.12, fill:{ color: C.accent } });
-  // Logo text
-  s1.addText('EASY', { x:0.6, y:1.8, w:2.5, h:0.7, fontSize:38, bold:true, color:C.white, fontFace:FONT });
-  s1.addText('PC', { x:1.65, y:1.8, w:2.5, h:0.7, fontSize:38, bold:true, color:C.blue, fontFace:FONT });
-  s1.addText('Content Performance Report', { x:0.6, y:2.52, w:10, h:0.5, fontSize:24, bold:true, color:C.white, fontFace:FONT });
+  s1.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{ color: C.dark } });
+  s1.addText('EASY', { x:0.6, y:1.9, w:2.3, h:0.7, fontSize:36, bold:true, color:'FFFFFF', fontFace:FONT });
+  s1.addText('PC', { x:1.62, y:1.9, w:2, h:0.7, fontSize:36, bold:true, color:C.accent, fontFace:FONT });
+  s1.addText('Content Performance Report', { x:0.6, y:2.58, w:10, h:0.5, fontSize:24, bold:true, color:'FFFFFF', fontFace:FONT });
   s1.addText(month.charAt(0).toUpperCase() + month.slice(1).toLowerCase() + ' 2026', {
-    x:0.6, y:3.05, w:6, h:0.38, fontSize:16, color: C.muted, fontFace:FONT
+    x:0.6, y:3.1, w:6, h:0.38, fontSize:15, color:C.faint, fontFace:FONT
   });
-  // KPI Status pill
-  const statusColor = ins.kpi_color === 'green' ? C.green : ins.kpi_color === 'yellow' ? C.yellow : C.red;
-  s1.addShape(prs.ShapeType.roundRect, { x:0.6, y:3.6, w:5, h:0.5, rectRadius:0.25, fill:{color:'1E3A5F'} });
-  s1.addText('📊  ' + stripHtmlTags(ins.kpi_status || ''), {
-    x:0.6, y:3.6, w:5, h:0.5, fontSize:11, bold:true, color:statusColor, fontFace:FONT, align:'center', valign:'middle'
+  // KPI status pill
+  const pillColor = ins.kpi_color === 'green' ? C.accent : ins.kpi_color === 'yellow' ? C.amber : C.warn;
+  s1.addShape(prs.ShapeType.roundRect, { x:0.6, y:3.62, w:5.2, h:0.5, rectRadius:0.25, fill:{color:'27272A'} });
+  s1.addText(stripHtmlTags(ins.kpi_status || ''), {
+    x:0.85, y:3.62, w:4.7, h:0.5, fontSize:11, bold:true, color:pillColor, fontFace:FONT, align:'left', valign:'middle'
   });
   s1.addText('Generated by EasyPC Content Dashboard', {
-    x:0.6, y:6.8, w:10, h:0.3, fontSize:9, color:'64748B', fontFace:FONT
+    x:0.6, y:6.85, w:10, h:0.3, fontSize:9, color:C.faint, fontFace:FONT
   });
 
   // ══════════════════════════════════════════════════════════
-  // SLIDE 2 — KPI SNAPSHOT (cards + bar chart)
+  // SLIDE 2 — KPI SNAPSHOT
   // ══════════════════════════════════════════════════════════
   const s2 = slide();
-  sectionTitle(s2, 'KPI Snapshot', `${month} Performance at a Glance`);
+  sectionTitle(s2, 'KPI Snapshot', `${month} performance at a glance`);
 
   const kpiItems = [
-    { label:'Total Views',        val: fmt(s.views||0),                      color: C.cyan   },
-    { label:'Thruplays',          val: fmt(s.thruplays||0),                   color: C.purple },
-    { label:'Winning Videos',     val: String(s.winning||0),                  color: C.green  },
-    { label:'Videos Submitted',   val: String(s.videos_submitted||0),         color: C.yellow },
-    { label:'Avg Thruplay Rate',  val: (s.avg_thruplay_rate||0) + '%',        color: C.blue   },
-    { label:'Avg Hook Rate',      val: (s.avg_hook_rate||0) + '%',            color: C.green  },
-    { label:'Avg Hold Rate',      val: (s.avg_hold_rate||0) + '%',            color: C.cyan   },
-    { label:'AI Tagged',          val: String(s.ai_tagged||0),                color: C.yellow },
+    { label:'Total Views',        val: fmt(s.views||0) },
+    { label:'Thruplays',          val: fmt(s.thruplays||0) },
+    { label:'Winning Videos',     val: String(s.winning||0) },
+    { label:'Videos Submitted',   val: String(s.videos_submitted||0) },
+    { label:'Avg Thruplay Rate',  val: (s.avg_thruplay_rate||0) + '%' },
+    { label:'Avg Hook Rate',      val: (s.avg_hook_rate||0) + '%' },
+    { label:'Avg Hold Rate',      val: (s.avg_hold_rate||0) + '%' },
+    { label:'AI Tagged',          val: String(s.ai_tagged||0) },
   ];
 
-  const cw = 1.52, ch = 1.0, gap = 0.12, startX = 0.35, startY = 1.12;
+  const cw = 1.52, ch = 1.0, gap = 0.12, startX = 0.35, startY = 1.15;
   kpiItems.forEach((k, i) => {
-    kpiCard(s2, k.label, k.val, k.color, startX + i*(cw+gap), startY, cw, ch);
+    kpiCard(s2, k.label, k.val, startX + i*(cw+gap), startY, cw, ch);
   });
 
-  // Progress bars for the 3 KPI targets
   const pBarData = [
-    { label:`Views — ${fmt(s.views||0)} / ${fmt(s.views_target||3000000)} target`, pct: Math.min(s.views_pct||0, 100), color: C.cyan },
-    { label:`Thruplays — ${fmt(s.thruplays||0)} / ${fmt(s.thruplays_target||1800000)} target`, pct: Math.min(s.thruplays_pct||0, 100), color: C.purple },
-    { label:`Winning — ${s.winning||0} / ${s.winning_target||20} target`, pct: Math.min(s.winning_pct||0, 100), color: C.green },
+    { label:`Views — ${fmt(s.views||0)} / ${fmt(s.views_target||3000000)} target`, pct: Math.min(s.views_pct||0, 100) },
+    { label:`Thruplays — ${fmt(s.thruplays||0)} / ${fmt(s.thruplays_target||1800000)} target`, pct: Math.min(s.thruplays_pct||0, 100) },
+    { label:`Winning — ${s.winning||0} / ${s.winning_target||20} target`, pct: Math.min(s.winning_pct||0, 100) },
   ];
   pBarData.forEach((pb, i) => {
-    const by = 2.38 + i * 0.62;
-    s2.addText(pb.label, { x:0.4, y:by, w:7, h:0.22, fontSize:9, color:C.slate, fontFace:FONT });
-    s2.addShape(prs.ShapeType.rect, { x:0.4, y:by+0.22, w:10.5, h:0.22, fill:{color:C.border} });
+    const by = 2.42 + i * 0.62;
+    s2.addText(pb.label, { x:0.4, y:by, w:7, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
+    s2.addShape(prs.ShapeType.rect, { x:0.4, y:by+0.22, w:10.5, h:0.2, fill:{color:C.border} });
     const barW = Math.max(0.2, 10.5 * pb.pct / 100);
-    s2.addShape(prs.ShapeType.rect, { x:0.4, y:by+0.22, w:barW, h:0.22, fill:{color:pb.color} });
-    s2.addText(pb.pct + '%', { x:11.1, y:by+0.22, w:0.8, h:0.22, fontSize:9, bold:true, color:pb.color, fontFace:FONT, align:'right' });
+    s2.addShape(prs.ShapeType.rect, { x:0.4, y:by+0.22, w:barW, h:0.2, fill:{color:C.accent} });
+    s2.addText(pb.pct + '%', { x:11.1, y:by+0.2, w:0.8, h:0.22, fontSize:9, bold:true, color:C.ink, fontFace:FONT, align:'right' });
   });
 
   // ══════════════════════════════════════════════════════════
   // SLIDE 3 — HIGHLIGHTS vs PREVIOUS MONTH
   // ══════════════════════════════════════════════════════════
   const s3 = slide();
-  sectionTitle(s3, 'Month-over-Month Performance', `vs Previous Month`);
-
-  // Green highlights box
-  s3.addShape(prs.ShapeType.roundRect, { x:0.4, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'F0FDF4'}, line:{color:'BBF7D0', width:1} });
-  s3.addText('📈  HIGHLIGHTS', { x:0.5, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.green, fontFace:FONT });
-  bulletList(s3, ins.mom_highlights, 0.5, 1.54, 5.7, 5.2);
-
-  // Red lowlights box
-  s3.addShape(prs.ShapeType.roundRect, { x:7.03, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'FFF1F2'}, line:{color:'FECDD3', width:1} });
-  s3.addText('📉  LOWLIGHTS', { x:7.13, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.red, fontFace:FONT });
-  bulletList(s3, ins.mom_lowlights, 7.13, 1.54, 5.7, 5.2);
+  sectionTitle(s3, 'Month-over-Month Performance', 'vs previous month');
+  twoColCard(s3, 0.4, C.accent, 'HIGHLIGHTS', ins.mom_highlights);
+  twoColCard(s3, 7.03, C.warn, 'LOWLIGHTS', ins.mom_lowlights);
 
   // ══════════════════════════════════════════════════════════
   // SLIDE 4 — WHAT'S WORKING / NOT WORKING
   // ══════════════════════════════════════════════════════════
   const s4 = slide();
   sectionTitle(s4, "What's Working & What's Not", 'Content performance diagnosis');
-
-  s4.addShape(prs.ShapeType.roundRect, { x:0.4, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'F0FDF4'}, line:{color:'BBF7D0', width:1} });
-  s4.addText("✓  WHAT'S WORKING", { x:0.5, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.green, fontFace:FONT });
-  bulletList(s4, ins.working, 0.5, 1.54, 5.7, 5.2);
-
-  s4.addShape(prs.ShapeType.roundRect, { x:7.03, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'FFF1F2'}, line:{color:'FECDD3', width:1} });
-  s4.addText("✗  WHAT'S NOT WORKING", { x:7.13, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.red, fontFace:FONT });
-  bulletList(s4, ins.not_working, 7.13, 1.54, 5.7, 5.2);
+  twoColCard(s4, 0.4, C.accent, "WHAT'S WORKING", ins.working);
+  twoColCard(s4, 7.03, C.warn, "WHAT'S NOT WORKING", ins.not_working);
 
   // ══════════════════════════════════════════════════════════
-  // SLIDE 5 — HOOK RATE ANALYSIS (with mini bar chart)
+  // SLIDE 5 — HOOK RATE ANALYSIS
   // ══════════════════════════════════════════════════════════
   const s5 = slide();
-  sectionTitle(s5, '🪝 Hook Rate Analysis', `Avg Hook Rate: ${s.avg_hook_rate||0}% this ${month}`);
+  sectionTitle(s5, 'Hook Rate Analysis', `Avg hook rate: ${s.avg_hook_rate||0}% this ${month}`);
 
-  // Hook rate benchmark legend
-  const hookBands = [
-    { label:'Excellent (60%+)', color:C.green }, { label:'Very Strong (50-59%)', color:C.cyan },
-    { label:'Good (40-49%)', color:C.purple }, { label:'Average (30-39%)', color:C.yellow },
-    { label:'Weak (<30%)', color:C.red }
+  const rateBands = [
+    { label:'Excellent (60%+)', color:C.accent }, { label:'Very Strong (50-59%)', color:'52525B' },
+    { label:'Good (40-49%)', color:C.muted }, { label:'Average (30-39%)', color:C.faint },
+    { label:'Weak (<30%)', color:C.warn }
   ];
-  hookBands.forEach((b, i) => {
-    s5.addShape(prs.ShapeType.rect, { x: 0.5 + i*2.58, y:1.06, w:0.18, h:0.18, fill:{color:b.color} });
-    s5.addText(b.label, { x:0.72 + i*2.58, y:1.05, w:2.3, h:0.2, fontSize:8, color:C.slate, fontFace:FONT });
+  rateBands.forEach((b, i) => {
+    s5.addShape(prs.ShapeType.ellipse, { x: 0.5 + i*2.58, y:1.07, w:0.16, h:0.16, fill:{color:b.color} });
+    s5.addText(b.label, { x:0.74 + i*2.58, y:1.05, w:2.3, h:0.2, fontSize:8, color:C.muted, fontFace:FONT });
   });
 
-  // Avg hook rate gauge bar
   const hr = s.avg_hook_rate || 0;
-  const hrColor = hr>=60?C.green:hr>=50?C.cyan:hr>=40?C.purple:hr>=30?C.yellow:C.red;
-  s5.addText('Monthly Avg', { x:0.5, y:1.34, w:2, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
-  s5.addShape(prs.ShapeType.rect, { x:0.5, y:1.56, w:10.5, h:0.35, fill:{color:C.border} });
-  s5.addShape(prs.ShapeType.rect, { x:0.5, y:1.56, w:Math.max(0.2, 10.5 * Math.min(hr,100) / 100), h:0.35, fill:{color:hrColor} });
-  s5.addText(hr + '%', { x:11.1, y:1.56, w:0.8, h:0.35, fontSize:11, bold:true, color:hrColor, fontFace:FONT, align:'right', valign:'middle' });
+  const hrColor = hr>=60?C.accent:hr>=50?'52525B':hr>=40?C.muted:hr>=30?C.faint:C.warn;
+  s5.addText('Monthly Avg', { x:0.5, y:1.36, w:2, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
+  s5.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:10.5, h:0.32, fill:{color:C.border} });
+  s5.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:Math.max(0.2, 10.5 * Math.min(hr,100) / 100), h:0.32, fill:{color:hrColor} });
+  s5.addText(hr + '%', { x:11.1, y:1.58, w:0.8, h:0.32, fontSize:11, bold:true, color:C.ink, fontFace:FONT, align:'right', valign:'middle' });
 
-  bulletList(s5, ins.hook_recs, 0.5, 2.08, 12.3, 5.1);
+  bulletList(s5, ins.hook_recs, 0.5, 2.1, 12.3, 5.1);
 
   // ══════════════════════════════════════════════════════════
   // SLIDE 6 — HOLD RATE ANALYSIS
   // ══════════════════════════════════════════════════════════
   const s6 = slide();
-  sectionTitle(s6, '⏱️ Hold Rate Analysis', `Avg Hold Rate: ${s.avg_hold_rate||0}% this ${month}`);
+  sectionTitle(s6, 'Hold Rate Analysis', `Avg hold rate: ${s.avg_hold_rate||0}% this ${month}`);
 
-  hookBands.forEach((b, i) => {
-    s6.addShape(prs.ShapeType.rect, { x: 0.5 + i*2.58, y:1.06, w:0.18, h:0.18, fill:{color:b.color} });
-    s6.addText(b.label, { x:0.72 + i*2.58, y:1.05, w:2.3, h:0.2, fontSize:8, color:C.slate, fontFace:FONT });
+  rateBands.forEach((b, i) => {
+    s6.addShape(prs.ShapeType.ellipse, { x: 0.5 + i*2.58, y:1.07, w:0.16, h:0.16, fill:{color:b.color} });
+    s6.addText(b.label, { x:0.74 + i*2.58, y:1.05, w:2.3, h:0.2, fontSize:8, color:C.muted, fontFace:FONT });
   });
 
   const hold = s.avg_hold_rate || 0;
-  const holdColor = hold>=60?C.green:hold>=50?C.cyan:hold>=40?C.purple:hold>=30?C.yellow:C.red;
-  s6.addText('Monthly Avg', { x:0.5, y:1.34, w:2, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
-  s6.addShape(prs.ShapeType.rect, { x:0.5, y:1.56, w:10.5, h:0.35, fill:{color:C.border} });
-  s6.addShape(prs.ShapeType.rect, { x:0.5, y:1.56, w:Math.max(0.2, 10.5 * Math.min(hold,100) / 100), h:0.35, fill:{color:holdColor} });
-  s6.addText(hold + '%', { x:11.1, y:1.56, w:0.8, h:0.35, fontSize:11, bold:true, color:holdColor, fontFace:FONT, align:'right', valign:'middle' });
+  const holdColor = hold>=60?C.accent:hold>=50?'52525B':hold>=40?C.muted:hold>=30?C.faint:C.warn;
+  s6.addText('Monthly Avg', { x:0.5, y:1.36, w:2, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
+  s6.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:10.5, h:0.32, fill:{color:C.border} });
+  s6.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:Math.max(0.2, 10.5 * Math.min(hold,100) / 100), h:0.32, fill:{color:holdColor} });
+  s6.addText(hold + '%', { x:11.1, y:1.58, w:0.8, h:0.32, fontSize:11, bold:true, color:C.ink, fontFace:FONT, align:'right', valign:'middle' });
 
-  bulletList(s6, ins.hold_recs, 0.5, 2.08, 12.3, 5.1);
+  bulletList(s6, ins.hold_recs, 0.5, 2.1, 12.3, 5.1);
 
   // ══════════════════════════════════════════════════════════
   // SLIDE 7 — ACTION ITEMS
   // ══════════════════════════════════════════════════════════
   const s7 = slide();
   sectionTitle(s7, 'Action Items & Recommendations', 'Priority actions for next month');
-
-  s7.addShape(prs.ShapeType.roundRect, { x:0.4, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'EFF6FF'}, line:{color:'BFDBFE', width:1} });
-  s7.addText('🎯  DO THIS MONTH', { x:0.5, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.blue, fontFace:FONT });
-  const doItems = (ins.actions||[]).map((item, i) => `${i+1}. ${stripHtmlTags(item)}`).join('\n') || 'No action items.';
-  s7.addText(doItems, { x:0.5, y:1.54, w:5.7, h:5.2, fontSize:10, color:C.slate, fontFace:FONT, valign:'top', wrap:true, lineSpacingMultiple:1.3 });
-
-  s7.addShape(prs.ShapeType.roundRect, { x:7.03, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'FFF7ED'}, line:{color:'FED7AA', width:1} });
-  s7.addText('🚫  STOP DOING', { x:7.13, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.yellow, fontFace:FONT });
-  bulletList(s7, ins.dont, 7.13, 1.54, 5.7, 5.2);
+  const doItems = (ins.actions||[]).map(i => stripHtmlTags(i));
+  twoColCard(s7, 0.4, C.accent, 'DO THIS MONTH', doItems);
+  twoColCard(s7, 7.03, C.warn, 'STOP DOING', ins.dont);
 
   // ══════════════════════════════════════════════════════════
   // SLIDE 8 — OPPORTUNITIES & CREATOR NOTES
   // ══════════════════════════════════════════════════════════
   const s8 = slide();
   sectionTitle(s8, 'Opportunities & Creator Notes', 'Growth areas and team-level insights');
-
-  s8.addShape(prs.ShapeType.roundRect, { x:0.4, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'F5F3FF'}, line:{color:'DDD6FE', width:1} });
-  s8.addText('💡  OPPORTUNITIES', { x:0.5, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.purple, fontFace:FONT });
-  bulletList(s8, ins.opportunities, 0.5, 1.54, 5.7, 5.2);
-
-  s8.addShape(prs.ShapeType.roundRect, { x:7.03, y:1.08, w:5.9, h:5.8, rectRadius:0.12, fill:{color:'ECFDF5'}, line:{color:'A7F3D0', width:1} });
-  s8.addText('👥  CREATOR NOTES', { x:7.13, y:1.18, w:5.7, h:0.32, fontSize:10, bold:true, color:C.green, fontFace:FONT });
-  bulletList(s8, ins.creator_notes, 7.13, 1.54, 5.7, 5.2);
+  twoColCard(s8, 0.4, C.accent, 'OPPORTUNITIES', ins.opportunities);
+  twoColCard(s8, 7.03, '52525B', 'CREATOR NOTES', ins.creator_notes);
 
   // ══════════════════════════════════════════════════════════
-  // SLIDE 9 — CLOSING
+  // SLIDE 9 — CLOSING (dark, mirrors the cover)
   // ══════════════════════════════════════════════════════════
   const s9 = prs.addSlide();
-  s9.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{color:C.navy} });
-  s9.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:0.12, fill:{color:C.accent} });
-  s9.addText('Thank You', { x:1, y:2.2, w:11.33, h:0.9, fontSize:40, bold:true, color:C.white, fontFace:FONT, align:'center' });
+  s9.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{color:C.dark} });
+  s9.addText('Thank You', { x:1, y:2.3, w:11.33, h:0.9, fontSize:38, bold:true, color:'FFFFFF', fontFace:FONT, align:'center' });
   s9.addText(`${month} 2026 Content Performance Report`, {
-    x:1, y:3.18, w:11.33, h:0.4, fontSize:14, color:C.muted, fontFace:FONT, align:'center'
+    x:1, y:3.25, w:11.33, h:0.4, fontSize:13, color:C.faint, fontFace:FONT, align:'center'
   });
   s9.addText('EasyPC Content Dashboard  ·  Confidential', {
-    x:1, y:7.1, w:11.33, h:0.25, fontSize:8.5, color:'475569', fontFace:FONT, align:'center'
+    x:1, y:7.1, w:11.33, h:0.25, fontSize:8.5, color:C.faint, fontFace:FONT, align:'center'
   });
 
   // ── Save ──
