@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EasyPC Content Dashboard 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -1103,6 +1102,26 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
 <div class="main-area">
 
+<div id="manusPromptModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,11,13,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#141416;border:1px solid var(--border);border-radius:16px;max-width:820px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#fff;">🤖 Manus Presentation Prompt</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;">Copy this and paste it into Manus to generate your presentation</div>
+      </div>
+      <button onclick="closeManusPromptModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+    </div>
+    <textarea id="manusPromptText" readonly style="flex:1;min-height:420px;background:#0B0B0D;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
+      <span id="manusPromptStatus" style="font-size:11.5px;color:var(--text3);"></span>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeManusPromptModal()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:9px 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
+        <button onclick="copyManusPrompt()" style="background:#a855f7;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copy Prompt</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,11,13,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
   <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.08);border-top:4px solid #3B82F6;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
   <div id="loadingMsg" style="color:#A1A1AA;font-size:13px;font-weight:500;letter-spacing:0.5px;">Loading live data...</div>
@@ -1409,8 +1428,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <button onclick="generateInsights()" id="generateBtn" style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;border:none;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;">
           <span id="generateBtnIcon">✦</span> Generate Insights
         </button>
-        <button onclick="exportInsightsToPPT()" id="exportPptBtn" style="background:#fff;color:#1e293b;border:1px solid #e2e8f0;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:none;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-          📊 Export to PowerPoint
+        <button onclick="generateManusPrompt()" id="manusPromptBtn" style="background:#fff;color:#1e293b;border:1px solid #e2e8f0;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:none;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+          🤖 Generate Manus Prompt
         </button>
       </div>
     </div>
@@ -2510,7 +2529,10 @@ async function saveCurrentInsights() {
     opportunities:    stripArr(ins.opportunities),
     creator_notes:    stripArr(ins.creator_notes),
     hook_recs:        stripArr(ins.hook_recs),
-    hold_recs:        stripArr(ins.hold_recs)
+    hold_recs:        stripArr(ins.hold_recs),
+
+    // Manus presentation prompt (if generated before saving)
+    manus_prompt:     ins.manus_prompt || ''
   };
 
   records[month] = record;
@@ -2550,6 +2572,13 @@ async function saveCurrentInsights() {
     btn.innerHTML = '💾 Save Analysis';
     btn.style.background = '#a855f7';
   }, 4000);
+
+  // If the Manus prompt modal is open, reflect that it's now part of the saved record
+  const manusStatusEl = document.getElementById('manusPromptStatus');
+  if (manusStatusEl && ins.manus_prompt) {
+    manusStatusEl.textContent = '✓ Saved with this month\'s record.';
+    manusStatusEl.style.color = '#22c55e';
+  }
 }
 
 function renderInsightRecords() {
@@ -2601,6 +2630,7 @@ function renderInsightRecords() {
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius:99px;">📊 ${r.kpi_status}</span>
+          ${r.manus_prompt ? `<button onclick="copyRecordManusPrompt('${r.month}')" style="background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.25);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">🤖 Copy Manus Prompt</button>` : ''}
           <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">🗑 Delete</button>
         </div>
       </div>
@@ -3104,8 +3134,8 @@ function renderInsightsOutput(ins, hasPrev) {
   // Store for PPT export
   lastInsights = ins;
   lastInsightsMonth = document.getElementById('monthSelect') ? document.getElementById('monthSelect').value : '';
-  const pptBtn = document.getElementById('exportPptBtn');
-  if (pptBtn) pptBtn.style.display = 'flex';
+  const manusBtn = document.getElementById('manusPromptBtn');
+  if (manusBtn) manusBtn.style.display = 'flex';
 
   const bannerColors = { green:'#22c55e', yellow:'#eab308', red:'#ef4444' };
   const bannerBg = { green:'rgba(34,197,94,0.08)', yellow:'rgba(234,179,8,0.08)', red:'rgba(239,68,68,0.08)' };
@@ -3155,11 +3185,16 @@ function renderInsightsOutput(ins, hasPrev) {
     if (gems.length > 0) {
       gemsHtml += `<div style="margin-bottom:16px;"><div style="font-size:11px;color:#F59E0B;font-weight:700;margin-bottom:10px;">💎 Hidden Gems — Weak Hook, Strong Hold (rewrite the opening)</div>`;
       gems.forEach(v => {
-        gemsHtml += `<div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div style="font-size:12.5px;color:#fff;font-weight:500;flex:1;">${v.title.substring(0,60)}${v.title.length>60?'...':''}</div>
-          <div style="display:flex;gap:8px;flex-shrink:0;">
-            <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
-            <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+        const linkHTML = v.link ? `<a href="${v.link}" target="_blank" style="color:#F59E0B;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">▶ Watch</a>` : '';
+        gemsHtml += `<div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+          <div style="font-size:12.5px;color:#fff;font-weight:500;margin-bottom:8px;line-height:1.4;">${v.title}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span style="background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.1);padding:3px 9px;border-radius:99px;font-size:11px;">👤 ${v.creator || 'Unknown'}</span>
+            <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+              ${linkHTML}
+              <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
+              <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+            </div>
           </div>
         </div>`;
       });
@@ -3168,11 +3203,16 @@ function renderInsightsOutput(ins, hasPrev) {
     if (wasted.length > 0) {
       gemsHtml += `<div><div style="font-size:11px;color:#EF4444;font-weight:700;margin-bottom:10px;">⚠️ Wasted Hooks — Strong Hook, Weak Hold (fix the content body)</div>`;
       wasted.forEach(v => {
-        gemsHtml += `<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div style="font-size:12.5px;color:#fff;font-weight:500;flex:1;">${v.title.substring(0,60)}${v.title.length>60?'...':''}</div>
-          <div style="display:flex;gap:8px;flex-shrink:0;">
-            <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
-            <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+        const linkHTML = v.link ? `<a href="${v.link}" target="_blank" style="color:#EF4444;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">▶ Watch</a>` : '';
+        gemsHtml += `<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+          <div style="font-size:12.5px;color:#fff;font-weight:500;margin-bottom:8px;line-height:1.4;">${v.title}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span style="background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.1);padding:3px 9px;border-radius:99px;font-size:11px;">👤 ${v.creator || 'Unknown'}</span>
+            <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+              ${linkHTML}
+              <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
+              <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+            </div>
           </div>
         </div>`;
       });
@@ -3191,226 +3231,156 @@ function stripHtmlTags(str) {
   return (str || '').replace(/<[^>]*>/g, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ').trim();
 }
 
-function exportInsightsToPPT() {
-  if (!lastInsights) { alert('Generate insights muna bago mag-export.'); return; }
+function generateManusPrompt() {
+  if (!lastInsights) { alert('Generate insights muna bago gumawa ng prompt.'); return; }
 
   const ins = lastInsights;
   const month = lastInsightsMonth || 'This Month';
   const s = ins.snapshot || {};
-  const prs = new PptxGenJS();
+  const monthLabel = month ? (month.charAt(0).toUpperCase() + month.slice(1).toLowerCase()) : 'This Month';
 
-  // ── Presentation metadata ──
-  prs.layout = 'LAYOUT_WIDE'; // 13.33" x 7.5"
-  prs.title  = `EasyPC Content Insights — ${month}`;
-  prs.author = 'EasyPC Content Dashboard';
-
-  // ── Design tokens — minimalist zinc + emerald, matches the dashboard's own palette ──
-  const C = {
-    bg:      'FFFFFF', card:    'FFFFFF', dark: '18181B',
-    ink:     '18181B', body:    '3F3F46',
-    muted:   '71717A', faint:   'A1A1AA',
-    border:  'E4E4E7',
-    accent:  '10B981',   // emerald — positive / primary accent
-    warn:    'DC2626',   // muted red — negative signal only
-    amber:   'D97706'    // caution state for the cover KPI pill
-  };
-  const FONT = 'Calibri';
-
-  let slideNum = 1;
-
-  // ── Shared helpers ──
-  const slide = () => {
-    slideNum++;
-    const sl = prs.addSlide();
-    sl.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{ color: C.bg } });
-    sl.addText(String(slideNum - 1).padStart(2,'0'), {
-      x:11.9, y:0.28, w:1.0, h:0.5, fontSize:20, bold:true, color:C.faint, fontFace:FONT, align:'right'
-    });
-    sl.addText(`EasyPC Content Dashboard  ·  ${month} Insights`, {
-      x:0.5, y:7.42, w:10, h:0.2, fontSize:7.5, color:C.faint, fontFace:FONT
-    });
-    return sl;
+  const clean = arr => (arr || []).map(x => stripHtmlTags(x)).filter(Boolean);
+  const listOrNone = arr => {
+    const c = clean(arr);
+    return c.length ? c.map(x => '- ' + x).join('\n') : '- No data available.';
   };
 
-  const sectionTitle = (sl, title, subtitle) => {
-    sl.addText(title, { x:0.5, y:0.35, w:10.8, h:0.5, fontSize:24, bold:true, color:C.ink, fontFace:FONT });
-    if (subtitle) sl.addText(subtitle, { x:0.5, y:0.83, w:10.8, h:0.28, fontSize:10.5, color:C.muted, fontFace:FONT });
-  };
+  const prompt =
+`Create a professional, minimalist business presentation titled "EasyPC Content Performance Report — ${monthLabel} 2026".
 
-  const bulletList = (sl, items, x, y, w, h) => {
-    const clean = (items||[]).map(i => '–  ' + stripHtmlTags(i)).filter(Boolean);
-    if (!clean.length) clean.push('–  No data available.');
-    sl.addText(clean.join('\n'), {
-      x, y, w, h, fontSize:10.5, color:C.body, fontFace:FONT,
-      valign:'top', wrap:true, lineSpacingMultiple:1.35
-    });
-  };
+BRAND & STYLE DIRECTION
+- Modern corporate design, widescreen 16:9.
+- Cover and closing slides: dark charcoal background (#18181B) with white text.
+- Content slides: white background with dark ink text (#18181B / #3F3F46).
+- Primary accent color: emerald green (#10B981) for positive signals, KPI bars, and highlights.
+- Use muted red (#DC2626) only for negative/lowlight signals.
+- Company wordmark "EasyPC" styled as "EASY" (white/black) + "PC" (emerald accent).
+- Clean sans-serif font (e.g. Calibri or Inter), generous white space, rounded card elements for data.
 
-  const kpiCard = (sl, label, val, x, y, w, h) => {
-    sl.addShape(prs.ShapeType.roundRect, { x, y, w, h, rectRadius:0.08, fill:{color:C.card}, line:{color:C.border, width:1} });
-    sl.addText(val, { x, y:y+0.12, w, h:h*0.55, fontSize:21, bold:true, color:C.ink, fontFace:FONT, align:'center', valign:'middle' });
-    sl.addText(label, { x, y:y+h*0.58, w, h:h*0.35, fontSize:7.8, color:C.muted, fontFace:FONT, align:'center', valign:'top' });
-  };
+SLIDE 1 — COVER (dark background)
+- Title: "EasyPC Content Performance Report"
+- Subtitle: "${monthLabel} 2026"
+- Status pill/badge showing: "${stripHtmlTags(ins.kpi_status || '')}"
+- Footer text: "Generated by EasyPC Content Dashboard"
 
-  // Two-column card with a colored icon-dot label — the repeated visual motif across the deck
-  const twoColCard = (sl, x, dotColor, label, items) => {
-    sl.addShape(prs.ShapeType.roundRect, { x, y:1.12, w:5.9, h:5.78, rectRadius:0.1, fill:{color:C.card}, line:{color:C.border, width:1} });
-    sl.addShape(prs.ShapeType.ellipse, { x:x+0.28, y:1.36, w:0.28, h:0.28, fill:{color:dotColor} });
-    sl.addText(label, { x:x+0.7, y:1.32, w:4.9, h:0.36, fontSize:11, bold:true, color:C.ink, fontFace:FONT, valign:'middle' });
-    bulletList(sl, items, x+0.3, 1.86, 5.3, 4.9);
-  };
+SLIDE 2 — KPI SNAPSHOT
+Show 8 metric cards in a row:
+- Total Views: ${fmt(s.views || 0)}
+- Thruplays: ${fmt(s.thruplays || 0)}
+- Winning Videos: ${s.winning || 0}
+- Videos Submitted: ${s.videos_submitted || 0}
+- Avg Thruplay Rate: ${s.avg_thruplay_rate || 0}%
+- Avg Hook Rate: ${s.avg_hook_rate || 0}%
+- Avg Hold Rate: ${s.avg_hold_rate || 0}%
+- AI Tagged: ${s.ai_tagged || 0}
 
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 1 — TITLE / COVER (dark, sandwiches with the light content slides)
-  // ══════════════════════════════════════════════════════════
-  const s1 = prs.addSlide();
-  s1.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{ color: C.dark } });
-  s1.addText('EASY', { x:0.6, y:1.9, w:2.3, h:0.7, fontSize:36, bold:true, color:'FFFFFF', fontFace:FONT });
-  s1.addText('PC', { x:1.62, y:1.9, w:2, h:0.7, fontSize:36, bold:true, color:C.accent, fontFace:FONT });
-  s1.addText('Content Performance Report', { x:0.6, y:2.58, w:10, h:0.5, fontSize:24, bold:true, color:'FFFFFF', fontFace:FONT });
-  s1.addText(month.charAt(0).toUpperCase() + month.slice(1).toLowerCase() + ' 2026', {
-    x:0.6, y:3.1, w:6, h:0.38, fontSize:15, color:C.faint, fontFace:FONT
+Below the cards, show 3 progress bars against targets:
+- Views: ${fmt(s.views || 0)} / ${fmt(s.views_target || 3000000)} target (${s.views_pct || 0}%)
+- Thruplays: ${fmt(s.thruplays || 0)} / ${fmt(s.thruplays_target || 1800000)} target (${s.thruplays_pct || 0}%)
+- Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
+
+SLIDE 3 — MONTH-OVER-MONTH PERFORMANCE (two-column layout)
+Left column "HIGHLIGHTS" (vs previous month):
+${listOrNone(ins.mom_highlights)}
+
+Right column "LOWLIGHTS" (vs previous month):
+${listOrNone(ins.mom_lowlights)}
+
+SLIDE 4 — WHAT'S WORKING & WHAT'S NOT (two-column layout)
+Left column "WHAT'S WORKING":
+${listOrNone(ins.working)}
+
+Right column "WHAT'S NOT WORKING":
+${listOrNone(ins.not_working)}
+
+SLIDE 5 — HOOK RATE ANALYSIS
+- Headline: Avg hook rate this month is ${s.avg_hook_rate || 0}%.
+- Include a horizontal scale/legend: Excellent (60%+), Very Strong (50-59%), Good (40-49%), Average (30-39%), Weak (<30%).
+- Recommendations:
+${listOrNone(ins.hook_recs)}
+
+SLIDE 6 — HOLD RATE ANALYSIS
+- Headline: Avg hold rate this month is ${s.avg_hold_rate || 0}%.
+- Include the same scale/legend as the hook rate slide.
+- Recommendations:
+${listOrNone(ins.hold_recs)}
+
+SLIDE 7 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
+Left column "DO THIS MONTH":
+${listOrNone(ins.actions)}
+
+Right column "STOP DOING":
+${listOrNone(ins.dont)}
+
+SLIDE 8 — OPPORTUNITIES & CREATOR NOTES (two-column layout)
+Left column "OPPORTUNITIES":
+${listOrNone(ins.opportunities)}
+
+Right column "CREATOR NOTES":
+${listOrNone(ins.creator_notes)}
+
+SLIDE 9 — CLOSING (dark background)
+- Headline: "Thank You"
+- Subtitle: "${monthLabel} 2026 Content Performance Report"
+- Footer: "EasyPC Content Dashboard · Confidential"
+
+TONE
+Keep all text concise and data-driven, matching the tone of a monthly marketing/content performance report for a Philippine computer retail brand.`;
+
+  // Persist onto the in-memory insight object so it rides along with Save Analysis
+  lastInsights.manus_prompt = prompt;
+  if (_currentInsightsData && _currentInsightsData.ins) _currentInsightsData.ins.manus_prompt = prompt;
+
+  const ta = document.getElementById('manusPromptText');
+  if (ta) ta.value = prompt;
+  const statusEl = document.getElementById('manusPromptStatus');
+  if (statusEl) statusEl.textContent = 'Not yet saved — click "Save Analysis" to keep this with your record.';
+  const modal = document.getElementById('manusPromptModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeManusPromptModal() {
+  const modal = document.getElementById('manusPromptModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function copyManusPrompt() {
+  const ta = document.getElementById('manusPromptText');
+  if (!ta) return;
+  ta.select();
+  ta.setSelectionRange(0, 999999);
+  const statusEl = document.getElementById('manusPromptStatus');
+  navigator.clipboard.writeText(ta.value).then(() => {
+    if (statusEl) { statusEl.textContent = '✓ Copied to clipboard!'; statusEl.style.color = '#22c55e'; }
+  }).catch(() => {
+    try {
+      document.execCommand('copy');
+      if (statusEl) { statusEl.textContent = '✓ Copied to clipboard!'; statusEl.style.color = '#22c55e'; }
+    } catch(e) {
+      if (statusEl) { statusEl.textContent = '⚠ Copy failed — select the text manually.'; statusEl.style.color = '#F59E0B'; }
+    }
   });
-  // KPI status pill
-  const pillColor = ins.kpi_color === 'green' ? C.accent : ins.kpi_color === 'yellow' ? C.amber : C.warn;
-  s1.addShape(prs.ShapeType.roundRect, { x:0.6, y:3.62, w:5.2, h:0.5, rectRadius:0.25, fill:{color:'27272A'} });
-  s1.addText(stripHtmlTags(ins.kpi_status || ''), {
-    x:0.85, y:3.62, w:4.7, h:0.5, fontSize:11, bold:true, color:pillColor, fontFace:FONT, align:'left', valign:'middle'
+}
+
+function copyRecordManusPrompt(month) {
+  const records = loadInsightRecords();
+  const r = records[month];
+  if (!r || !r.manus_prompt) { alert('Walang saved Manus prompt para sa buwang ito. I-generate at i-save ulit ang analysis.'); return; }
+  navigator.clipboard.writeText(r.manus_prompt).then(() => {
+    alert('✓ Manus prompt copied to clipboard!');
+  }).catch(() => {
+    try {
+      const tmp = document.createElement('textarea');
+      tmp.value = r.manus_prompt;
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand('copy');
+      document.body.removeChild(tmp);
+      alert('✓ Manus prompt copied to clipboard!');
+    } catch(e) {
+      alert('Hindi ma-copy. Subukan mo ulit o i-check ang browser permissions.');
+    }
   });
-  s1.addText('Generated by EasyPC Content Dashboard', {
-    x:0.6, y:6.85, w:10, h:0.3, fontSize:9, color:C.faint, fontFace:FONT
-  });
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 2 — KPI SNAPSHOT
-  // ══════════════════════════════════════════════════════════
-  const s2 = slide();
-  sectionTitle(s2, 'KPI Snapshot', `${month} performance at a glance`);
-
-  const kpiItems = [
-    { label:'Total Views',        val: fmt(s.views||0) },
-    { label:'Thruplays',          val: fmt(s.thruplays||0) },
-    { label:'Winning Videos',     val: String(s.winning||0) },
-    { label:'Videos Submitted',   val: String(s.videos_submitted||0) },
-    { label:'Avg Thruplay Rate',  val: (s.avg_thruplay_rate||0) + '%' },
-    { label:'Avg Hook Rate',      val: (s.avg_hook_rate||0) + '%' },
-    { label:'Avg Hold Rate',      val: (s.avg_hold_rate||0) + '%' },
-    { label:'AI Tagged',          val: String(s.ai_tagged||0) },
-  ];
-
-  const cw = 1.52, ch = 1.0, gap = 0.12, startX = 0.35, startY = 1.15;
-  kpiItems.forEach((k, i) => {
-    kpiCard(s2, k.label, k.val, startX + i*(cw+gap), startY, cw, ch);
-  });
-
-  const pBarData = [
-    { label:`Views — ${fmt(s.views||0)} / ${fmt(s.views_target||3000000)} target`, pct: Math.min(s.views_pct||0, 100) },
-    { label:`Thruplays — ${fmt(s.thruplays||0)} / ${fmt(s.thruplays_target||1800000)} target`, pct: Math.min(s.thruplays_pct||0, 100) },
-    { label:`Winning — ${s.winning||0} / ${s.winning_target||20} target`, pct: Math.min(s.winning_pct||0, 100) },
-  ];
-  pBarData.forEach((pb, i) => {
-    const by = 2.42 + i * 0.62;
-    s2.addText(pb.label, { x:0.4, y:by, w:7, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
-    s2.addShape(prs.ShapeType.rect, { x:0.4, y:by+0.22, w:10.5, h:0.2, fill:{color:C.border} });
-    const barW = Math.max(0.2, 10.5 * pb.pct / 100);
-    s2.addShape(prs.ShapeType.rect, { x:0.4, y:by+0.22, w:barW, h:0.2, fill:{color:C.accent} });
-    s2.addText(pb.pct + '%', { x:11.1, y:by+0.2, w:0.8, h:0.22, fontSize:9, bold:true, color:C.ink, fontFace:FONT, align:'right' });
-  });
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 3 — HIGHLIGHTS vs PREVIOUS MONTH
-  // ══════════════════════════════════════════════════════════
-  const s3 = slide();
-  sectionTitle(s3, 'Month-over-Month Performance', 'vs previous month');
-  twoColCard(s3, 0.4, C.accent, 'HIGHLIGHTS', ins.mom_highlights);
-  twoColCard(s3, 7.03, C.warn, 'LOWLIGHTS', ins.mom_lowlights);
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 4 — WHAT'S WORKING / NOT WORKING
-  // ══════════════════════════════════════════════════════════
-  const s4 = slide();
-  sectionTitle(s4, "What's Working & What's Not", 'Content performance diagnosis');
-  twoColCard(s4, 0.4, C.accent, "WHAT'S WORKING", ins.working);
-  twoColCard(s4, 7.03, C.warn, "WHAT'S NOT WORKING", ins.not_working);
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 5 — HOOK RATE ANALYSIS
-  // ══════════════════════════════════════════════════════════
-  const s5 = slide();
-  sectionTitle(s5, 'Hook Rate Analysis', `Avg hook rate: ${s.avg_hook_rate||0}% this ${month}`);
-
-  const rateBands = [
-    { label:'Excellent (60%+)', color:C.accent }, { label:'Very Strong (50-59%)', color:'52525B' },
-    { label:'Good (40-49%)', color:C.muted }, { label:'Average (30-39%)', color:C.faint },
-    { label:'Weak (<30%)', color:C.warn }
-  ];
-  rateBands.forEach((b, i) => {
-    s5.addShape(prs.ShapeType.ellipse, { x: 0.5 + i*2.58, y:1.07, w:0.16, h:0.16, fill:{color:b.color} });
-    s5.addText(b.label, { x:0.74 + i*2.58, y:1.05, w:2.3, h:0.2, fontSize:8, color:C.muted, fontFace:FONT });
-  });
-
-  const hr = s.avg_hook_rate || 0;
-  const hrColor = hr>=60?C.accent:hr>=50?'52525B':hr>=40?C.muted:hr>=30?C.faint:C.warn;
-  s5.addText('Monthly Avg', { x:0.5, y:1.36, w:2, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
-  s5.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:10.5, h:0.32, fill:{color:C.border} });
-  s5.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:Math.max(0.2, 10.5 * Math.min(hr,100) / 100), h:0.32, fill:{color:hrColor} });
-  s5.addText(hr + '%', { x:11.1, y:1.58, w:0.8, h:0.32, fontSize:11, bold:true, color:C.ink, fontFace:FONT, align:'right', valign:'middle' });
-
-  bulletList(s5, ins.hook_recs, 0.5, 2.1, 12.3, 5.1);
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 6 — HOLD RATE ANALYSIS
-  // ══════════════════════════════════════════════════════════
-  const s6 = slide();
-  sectionTitle(s6, 'Hold Rate Analysis', `Avg hold rate: ${s.avg_hold_rate||0}% this ${month}`);
-
-  rateBands.forEach((b, i) => {
-    s6.addShape(prs.ShapeType.ellipse, { x: 0.5 + i*2.58, y:1.07, w:0.16, h:0.16, fill:{color:b.color} });
-    s6.addText(b.label, { x:0.74 + i*2.58, y:1.05, w:2.3, h:0.2, fontSize:8, color:C.muted, fontFace:FONT });
-  });
-
-  const hold = s.avg_hold_rate || 0;
-  const holdColor = hold>=60?C.accent:hold>=50?'52525B':hold>=40?C.muted:hold>=30?C.faint:C.warn;
-  s6.addText('Monthly Avg', { x:0.5, y:1.36, w:2, h:0.22, fontSize:9, color:C.muted, fontFace:FONT });
-  s6.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:10.5, h:0.32, fill:{color:C.border} });
-  s6.addShape(prs.ShapeType.rect, { x:0.5, y:1.58, w:Math.max(0.2, 10.5 * Math.min(hold,100) / 100), h:0.32, fill:{color:holdColor} });
-  s6.addText(hold + '%', { x:11.1, y:1.58, w:0.8, h:0.32, fontSize:11, bold:true, color:C.ink, fontFace:FONT, align:'right', valign:'middle' });
-
-  bulletList(s6, ins.hold_recs, 0.5, 2.1, 12.3, 5.1);
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 7 — ACTION ITEMS
-  // ══════════════════════════════════════════════════════════
-  const s7 = slide();
-  sectionTitle(s7, 'Action Items & Recommendations', 'Priority actions for next month');
-  const doItems = (ins.actions||[]).map(i => stripHtmlTags(i));
-  twoColCard(s7, 0.4, C.accent, 'DO THIS MONTH', doItems);
-  twoColCard(s7, 7.03, C.warn, 'STOP DOING', ins.dont);
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 8 — OPPORTUNITIES & CREATOR NOTES
-  // ══════════════════════════════════════════════════════════
-  const s8 = slide();
-  sectionTitle(s8, 'Opportunities & Creator Notes', 'Growth areas and team-level insights');
-  twoColCard(s8, 0.4, C.accent, 'OPPORTUNITIES', ins.opportunities);
-  twoColCard(s8, 7.03, '52525B', 'CREATOR NOTES', ins.creator_notes);
-
-  // ══════════════════════════════════════════════════════════
-  // SLIDE 9 — CLOSING (dark, mirrors the cover)
-  // ══════════════════════════════════════════════════════════
-  const s9 = prs.addSlide();
-  s9.addShape(prs.ShapeType.rect, { x:0, y:0, w:'100%', h:'100%', fill:{color:C.dark} });
-  s9.addText('Thank You', { x:1, y:2.3, w:11.33, h:0.9, fontSize:38, bold:true, color:'FFFFFF', fontFace:FONT, align:'center' });
-  s9.addText(`${month} 2026 Content Performance Report`, {
-    x:1, y:3.25, w:11.33, h:0.4, fontSize:13, color:C.faint, fontFace:FONT, align:'center'
-  });
-  s9.addText('EasyPC Content Dashboard  ·  Confidential', {
-    x:1, y:7.1, w:11.33, h:0.25, fontSize:8.5, color:C.faint, fontFace:FONT, align:'center'
-  });
-
-  // ── Save ──
-  const fileName = `EasyPC_Content_Insights_${month}_2026.pptx`;
-  prs.writeFile({ fileName });
 }
 
 
