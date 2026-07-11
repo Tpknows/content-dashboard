@@ -1667,8 +1667,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlDlrch4raEz4foQM-TycNyU-AI93vDzcSza9gsb_unt2x6xHrX-5T5X38IzRMVkMB/exec";
 // Separate backend for Weekly Topics History — does NOT touch the KPI dashboard sheet above.
 const TOPICS_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDKK0JCkwES-4wkly2nTubSFxfhSBhCAtv3M36WRhU6j11eejSfxB25-wCWoWH_Gm5A/exec";
-// Insights — uses the same Apps Script as Topics; actions: saveInsight / listInsights
-const INSIGHTS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDKK0JCkwES-4wkly2nTubSFxfhSBhCAtv3M36WRhU6j11eejSfxB25-wCWoWH_Gm5A/exec";
+// AI Insights — dedicated sheet: 1BY0JEB1GkytqlxMPHOvcsQ_mRjO9X3jJt1N1DeHsgCQ
+// Actions: POST { action:"save", ...record } | GET ?action=list
+const INSIGHTS_SCRIPT_URL = "PASTE_YOUR_NEW_INSIGHTS_SCRIPT_URL_HERE";
 // Content Calendar — separate backend/sheet. Replace with your own Apps Script Web App URL (see setup instructions).
 // Actions used: ?action=list (GET), { action:"add" }, { action:"update" }, { action:"delete" } (POST)
 const CALENDAR_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3R07juun2SwRgi0TMwJBN0NpjTkrTrjt1omfDek1WE0Du0wr6ljIbWmt9meXDbG0-/exec";
@@ -2572,7 +2573,7 @@ async function saveCurrentInsights() {
     const response = await fetch(INSIGHTS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'saveInsight', record })
+      body: JSON.stringify({ action: 'save', ...record })
     });
     const result = await response.json();
     if (result.status === 'error') {
@@ -2746,7 +2747,7 @@ async function loadInsightsFromSheet() {
   statusEl.style.color = 'var(--text3)';
 
   try {
-    const response = await fetch(INSIGHTS_SCRIPT_URL + '?action=listInsights');
+    const response = await fetch(INSIGHTS_SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
     const result = await response.json();
 
     if (result.status === 'error') {
@@ -2766,9 +2767,54 @@ async function loadInsightsFromSheet() {
       return;
     }
 
+    // Remap Sheet column-header keys → camelCase JS fields
+    const remapped = sheetRecords.map(r => {
+      const splitBullets = v => typeof v === 'string' && v ? v.replace(/^• /,'').split('\n• ') : [];
+      return {
+        month:              r['Month'] || r.month || '',
+        savedAt:            r['Saved At'] || r.savedAt || '',
+        kpi_status:         r['KPI Status'] || r.kpi_status || '',
+        kpi_color:          r['KPI Color'] || r.kpi_color || '',
+        mom_highlights:     splitBullets(r['Highlights vs Prev Month'] || r.mom_highlights),
+        mom_lowlights:      splitBullets(r['Lowlights vs Prev Month'] || r.mom_lowlights),
+        working:            splitBullets(r["What's Working"] || r.working),
+        not_working:        splitBullets(r["What's Not Working"] || r.not_working),
+        actions:            splitBullets(r['Action Plan'] || r.actions),
+        dont:               splitBullets(r['What NOT To Do'] || r.dont),
+        top_videos_insight: r['Top Performing Content'] || r.top_videos_insight || '',
+        opportunities:      splitBullets(r['Content Opportunities'] || r.opportunities),
+        creator_notes:      splitBullets(r['Creator Performance Notes'] || r.creator_notes),
+        hook_recs:          splitBullets(r['Hook Rate Analysis'] || r.hook_recs),
+        snapshot: {
+          views:               r['Views'] || 0,
+          views_target:        r['Views Target'] || 0,
+          views_pct:           r['Views % of Target'] || 0,
+          thruplays:           r['Thruplays'] || 0,
+          thruplays_target:    r['Thruplays Target'] || 0,
+          thruplays_pct:       r['Thruplays % of Target'] || 0,
+          winning:             r['Winning Videos'] || 0,
+          winning_target:      r['Winning Target'] || 0,
+          winning_pct:         r['Winning % of Target'] || 0,
+          videos_submitted:    r['Videos Submitted'] || 0,
+          avg_thruplay_rate:   r['Avg Thruplay Rate %'] || 0,
+          avg_hook_rate:       r['Avg Hook Rate %'] || 0,
+          ai_tagged:           r['AI Tagged'] || 0,
+          win_rate_pct:        r['Win Rate %'] || 0,
+          ai_win_rate_pct:     r['AI Win Rate %'] || 0,
+          total_videos:        r['Total Videos'] || 0,
+          best_pillar:         r['Best Pillar'] || '',
+          best_pillar_avg_views: r['Best Pillar Avg Views'] || 0,
+          worst_pillar:        r['Worst Pillar'] || '',
+          top_creator:         r['Top Creator'] || '',
+          top_video_title:     r['Top Video Title'] || '',
+          top_video_views:     r['Top Video Views'] || 0,
+        }
+      };
+    });
+
     // Merge Sheet records into localStorage (Sheet wins for same month)
     const local = loadInsightRecords();
-    sheetRecords.forEach(r => { if (r.month) local[r.month] = r; });
+    remapped.forEach(r => { if (r.month) local[r.month] = r; });
     saveInsightRecords(local);
 
     statusEl.textContent = `✓ Loaded ${sheetRecords.length} insight record${sheetRecords.length !== 1 ? 's' : ''} from Google Sheet.`;
