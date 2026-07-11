@@ -1281,6 +1281,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
             <option>Filming/Design</option>
             <option>Ready to post</option>
             <option>Posted</option>
+            <option>Done</option>
           </select>
         </div>
       </div>
@@ -1331,6 +1332,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <option>Filming/Design</option>
           <option>Ready to post</option>
           <option>Posted</option>
+          <option>Done</option>
         </select>
         <select id="calendarFilterSavedBy" onchange="renderContentCalendar()" class="filter-select">
           <option value="all">Everyone</option>
@@ -4279,7 +4281,8 @@ function calendarStatusColor(status) {
     'Scripting': '#F59E0B',
     'Filming/Design': '#8B5CF6',
     'Ready to post': '#06B6D4',
-    'Posted': '#22C55E'
+    'Posted': '#22C55E',
+    'Done': '#3B82F6'
   };
   return map[status] || '#71717A';
 }
