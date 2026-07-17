@@ -482,7 +482,7 @@ html { overflow-x: hidden; }
 
 .win-badge { background: rgba(34,197,94,0.1);   color: var(--green);  border: 1px solid rgba(34,197,94,0.2);   padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; }
 .ai-tag    { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; }
-.creator-tag { background: var(--surface); border: 1px solid var(--border2); padding: 3px 9px; border-radius: 99px; font-size: 10px; color: var(--text2); white-space: nowrap; }
+.creator-tag { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 600; color: rgb(34,197,94); white-space: nowrap; letter-spacing: 0.2px; }
 .fb-link { color: var(--accent); font-size: 11px; text-decoration: none; transition: color 0.2s; }
 .fb-link:hover { color: var(--cyan); }
 
@@ -4668,9 +4668,10 @@ function renderContentCalendar() {
 
       const pill = document.createElement('div');
       pill.className = 'cal-entry-pill';
-      pill.style.background = isDone ? '#22C55E' : color + '26';
-      pill.style.color = isDone ? '#fff' : color;
+      pill.style.background = isDone ? 'rgba(34,197,94,0.15)' : color + '26';
+      pill.style.color = isDone ? 'rgb(34,197,94)' : color;
       pill.style.fontWeight = isDone ? '700' : '';
+      pill.style.border = isDone ? '1px solid rgba(34,197,94,0.25)' : '';
       pill.style.display = 'flex';
       pill.style.alignItems = 'center';
       pill.style.justifyContent = 'space-between';
@@ -4700,7 +4701,7 @@ function renderContentCalendar() {
         linkIcon.rel = 'noopener noreferrer';
         linkIcon.textContent = '↗';
         linkIcon.title = 'Open link';
-        linkIcon.style.cssText = `flex-shrink:0;font-size:11px;opacity:0.85;color:${isDone ? '#fff' : color};text-decoration:none;padding:0 2px;`;
+        linkIcon.style.cssText = `flex-shrink:0;font-size:11px;opacity:0.85;color:${isDone ? 'rgb(34,197,94)' : color};text-decoration:none;padding:0 2px;`;
         linkIcon.onclick = (ev) => ev.stopPropagation();
         pill.appendChild(linkIcon);
       }
