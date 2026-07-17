@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EasyPC Content Dashboard 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -181,7 +182,7 @@ html { overflow-x: hidden; }
   box-shadow: 0 0 0 1px rgba(59,130,246,0.06) inset;
 }
 .sidebar-item.active:hover { background: rgba(59,130,246,0.16); color: #BFDBFE; }
-.sidebar-item-icon { font-size: 12px; width: 15px; text-align: center; flex-shrink: 0; opacity: 0.8; }
+.sidebar-item-icon { font-size: 15px; width: 16px; text-align: center; flex-shrink: 0; opacity: 0.75; line-height: 1; }
 
 .main-area {
   flex: 1;
@@ -1183,13 +1184,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span class="sidebar-group-chevron">▸</span>
     </div>
     <div class="sidebar-subitems">
-      <div class="sidebar-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-icon">▦</span>Overview</div>
-      <div class="sidebar-item" onclick="switchTab('top10', this)"><span class="sidebar-item-icon">🏆</span>Top 20 Content</div>
-      <div class="sidebar-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon">✦</span>AI Content</div>
-      <div class="sidebar-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon">🪝</span>Hook Rate</div>
-      <div class="sidebar-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon">⏱️</span>Hold Rate</div>
-      <div class="sidebar-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon">🗓️</span>Content Calendar</div>
-      <div class="sidebar-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon">🔥</span>Viral Topics</div>
+      <div class="sidebar-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-icon"><i class="ph ph-squares-four"></i></span>Overview</div>
+      <div class="sidebar-item" onclick="switchTab('top10', this)"><span class="sidebar-item-icon"><i class="ph ph-trophy"></i></span>Top 20 Content</div>
+      <div class="sidebar-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon"><i class="ph ph-sparkle"></i></span>AI Content</div>
+      <div class="sidebar-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon"><i class="ph ph-fish-simple"></i></span>Hook Rate</div>
+      <div class="sidebar-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon"><i class="ph ph-timer"></i></span>Hold Rate</div>
+      <div class="sidebar-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon"><i class="ph ph-calendar-dots"></i></span>Content Calendar</div>
+      <div class="sidebar-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon"><i class="ph ph-trend-up"></i></span>Viral Topics</div>
     </div>
   </div>
 
@@ -1199,9 +1200,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span class="sidebar-group-chevron">▸</span>
     </div>
     <div class="sidebar-subitems">
-      <div class="sidebar-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon">📅</span>Monthly Results</div>
-      <div class="sidebar-item" onclick="switchTab('insights', this)" id="insightsTab"><span class="sidebar-item-icon">✦</span>AI Insights</div>
-      <div class="sidebar-item" onclick="switchTab('news', this)" id="newsTab"><span class="sidebar-item-icon">📰</span>Tech News<span id="newsBadgeDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#EF4444;margin-left:auto;"></span></div>
+      <div class="sidebar-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon"><i class="ph ph-chart-bar"></i></span>Monthly Results</div>
+      <div class="sidebar-item" onclick="switchTab('insights', this)" id="insightsTab"><span class="sidebar-item-icon"><i class="ph ph-brain"></i></span>AI Insights</div>
+      <div class="sidebar-item" onclick="switchTab('news', this)" id="newsTab"><span class="sidebar-item-icon"><i class="ph ph-newspaper"></i></span>Tech News<span id="newsBadgeDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#EF4444;margin-left:auto;"></span></div>
     </div>
   </div>
 </div>
@@ -1278,7 +1279,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()">
         <span class="toggle-slider"></span>
       </label>
-      <button onclick="manualRefresh()" style="display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:99px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.22);color:#93C5FD;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;" onmouseover="this.style.background='rgba(59,130,246,0.18)'" onmouseout="this.style.background='rgba(59,130,246,0.1)'">↻ Refresh</button>
+      <button onclick="manualRefresh()" style="display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:99px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.22);color:#93C5FD;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;" onmouseover="this.style.background='rgba(59,130,246,0.18)'" onmouseout="this.style.background='rgba(59,130,246,0.1)'"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
     </div>
     <span id="lastRefreshed" style="font-size:10.5px;color:var(--text3);">Not refreshed yet</span>
   </div>
@@ -1287,16 +1288,16 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 <!-- MOBILE NAV (auto-shows on small screens, mirrors sidebar tabs) -->
 <div class="mobile-nav">
   <div class="mobile-nav-track">
-    <div class="sidebar-item mobile-nav-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-icon">▦</span>Overview</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('top10', this)"><span class="sidebar-item-icon">🏆</span>Top 20</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon">✦</span>AI Content</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon">🪝</span>Hook Rate</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon">⏱️</span>Hold Rate</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon">🗓️</span>Calendar</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon">🔥</span>Viral Topics</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon">📅</span>Monthly</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('insights', this)"><span class="sidebar-item-icon">✦</span>AI Insights</div>
-    <div class="sidebar-item mobile-nav-item" onclick="switchTab('news', this)"><span class="sidebar-item-icon">📰</span>Tech News</div>
+    <div class="sidebar-item mobile-nav-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-icon"><i class="ph ph-squares-four"></i></span>Overview</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('top10', this)"><span class="sidebar-item-icon"><i class="ph ph-trophy"></i></span>Top 20</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon"><i class="ph ph-sparkle"></i></span>AI Content</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon"><i class="ph ph-fish-simple"></i></span>Hook Rate</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon"><i class="ph ph-timer"></i></span>Hold Rate</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon"><i class="ph ph-calendar-dots"></i></span>Calendar</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon"><i class="ph ph-trend-up"></i></span>Viral Topics</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon"><i class="ph ph-chart-bar"></i></span>Monthly</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('insights', this)"><span class="sidebar-item-icon"><i class="ph ph-brain"></i></span>AI Insights</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('news', this)"><span class="sidebar-item-icon"><i class="ph ph-newspaper"></i></span>Tech News</div>
   </div>
 </div>
 <div class="content">
@@ -1375,47 +1376,19 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">Plan upcoming posts — every entry saves straight to Google Sheets for reference</div>
       </div>
       <button onclick="openCalendarForm()" id="calendarAddBtn" style="background:var(--accent);color:#fff;border:none;padding:11px 22px;border-radius:12px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
-        + Add to Calendar
+        <i class="ph ph-plus"></i> Add to Calendar
       </button>
     </div>
 
     <!-- ── LEGEND ── -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 20px;">
-      <span style="font-size:9.5px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--text3);margin-right:4px;">Status Legend</span>
-      <div style="width:1px;height:16px;background:var(--border2);margin-right:4px;"></div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:10px;height:10px;border-radius:3px;background:rgba(113,113,122,0.25);border:1px solid rgba(113,113,122,0.4);flex-shrink:0;display:inline-block;"></span>
-        <span style="font-size:11px;color:#A1A1AA;font-weight:500;">💡 Idea</span>
-        <span style="font-size:10px;color:var(--text3);">— Just a concept, not yet started</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:10px;height:10px;border-radius:3px;background:rgba(245,158,11,0.25);border:1px solid rgba(245,158,11,0.4);flex-shrink:0;display:inline-block;"></span>
-        <span style="font-size:11px;color:#F59E0B;font-weight:500;">✏️ Scripting</span>
-        <span style="font-size:10px;color:var(--text3);">— Script in progress</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:10px;height:10px;border-radius:3px;background:rgba(139,92,246,0.25);border:1px solid rgba(139,92,246,0.4);flex-shrink:0;display:inline-block;"></span>
-        <span style="font-size:11px;color:#8B5CF6;font-weight:500;">🎬 Filming/Design</span>
-        <span style="font-size:10px;color:var(--text3);">— Being produced</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:10px;height:10px;border-radius:3px;background:rgba(6,182,212,0.25);border:1px solid rgba(6,182,212,0.4);flex-shrink:0;display:inline-block;"></span>
-        <span style="font-size:11px;color:#06B6D4;font-weight:500;">🚀 Ready to post</span>
-        <span style="font-size:10px;color:var(--text3);">— Edited &amp; approved</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:10px;height:10px;border-radius:3px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.35);flex-shrink:0;display:inline-block;"></span>
-        <span style="font-size:11px;color:rgb(34,197,94);font-weight:500;">✅ Posted</span>
-        <span style="font-size:10px;color:var(--text3);">— Live on platform</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:10px;height:10px;border-radius:3px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.35);flex-shrink:0;display:inline-block;"></span>
-        <span style="font-size:11px;color:rgb(34,197,94);font-weight:500;">✔ Done</span>
-        <span style="font-size:10px;color:var(--text3);">— Completed &amp; archived</span>
-      </div>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--text3);">
-        <span>💡</span><span>Click any entry to edit · Click empty date to add</span>
-      </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:20px;">
+      <span style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">STATUS</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-lightbulb"></i> Idea</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(245,158,11,0.08);color:#F59E0B;border:1px solid rgba(245,158,11,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-pencil-simple"></i> Scripting</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(139,92,246,0.08);color:#8B5CF6;border:1px solid rgba(139,92,246,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-video-camera"></i> Filming</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(6,182,212,0.08);color:#06B6D4;border:1px solid rgba(6,182,212,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-rocket-launch"></i> Ready</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-circle"></i> Posted</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.05);color:#4ade80;border:1px solid rgba(34,197,94,0.12);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-fat"></i> Done</span>
     </div>
 
     <!-- Add / edit form (hidden by default) -->
@@ -1487,7 +1460,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
       <div style="display:flex;align-items:center;gap:8px;">
         <button onclick="calendarGoToday()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Today</button>
-        <button onclick="loadContentCalendar()" title="Refresh from Sheet" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄</button>
+        <button onclick="loadContentCalendar()" title="Refresh from Sheet" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;"><i class="ph ph-arrows-clockwise"></i></button>
         <button onclick="calendarChangeMonth(-1)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius:10px;font-size:14px;cursor:pointer;">‹</button>
         <button onclick="calendarChangeMonth(1)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius:10px;font-size:14px;cursor:pointer;">›</button>
         <div id="calendarMonthLabel" style="font-size:16px;font-weight:700;color:var(--text);margin-left:6px;"></div>
@@ -1538,7 +1511,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">AI-generated content angles based on the patterns of our own top-performing videos (All Year) — not external news</div>
       </div>
       <button onclick="generateViralTopics()" id="generateViralBtn" style="background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;padding:11px 22px;border-radius:12px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
-        <span id="generateViralBtnIcon">🔥</span> Generate Viral Topic Ideas
+        <span id="generateViralBtnIcon"><i class="ph ph-lightning"></i></span> Generate Viral Topic Ideas
       </button>
     </div>
     <div id="viralTopicsStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:20px;"></div>
@@ -1620,14 +1593,14 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <!-- Sub-tab pills -->
         <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;">
-          <button id="insightsSubGenerate" onclick="switchInsightsView('generate')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:#fff;color:#0B0B0D;font-family:inherit;">✦ Generate</button>
-          <button id="insightsSubRecords" onclick="switchInsightsView('records')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:transparent;color:var(--text3);font-family:inherit;">📂 Saved Records</button>
+          <button id="insightsSubGenerate" onclick="switchInsightsView('generate')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:#fff;color:#0B0B0D;font-family:inherit;display:inline-flex;align-items:center;gap:6px;"><i class="ph ph-sparkle"></i> Generate</button>
+          <button id="insightsSubRecords" onclick="switchInsightsView('records')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius:9px;cursor:pointer;background:transparent;color:var(--text3);font-family:inherit;display:inline-flex;align-items:center;gap:6px;"><i class="ph ph-archive"></i> Saved Records</button>
         </div>
         <button onclick="generateInsights()" id="generateBtn" style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;border:none;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;">
-          <span id="generateBtnIcon">✦</span> Generate Insights
+          <span id="generateBtnIcon"><i class="ph ph-sparkle"></i></span> Generate Insights
         </button>
         <button onclick="generateManusPrompt()" id="manusPromptBtn" style="background:#fff;color:#1e293b;border:1px solid #e2e8f0;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:none;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-          🤖 Generate Manus Prompt
+          <i class="ph ph-robot"></i> Generate Manus Prompt
         </button>
       </div>
     </div>
@@ -1639,11 +1612,11 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div id="insightsOutput" style="display:none;">
         <!-- Save bar -->
         <div id="insightsSaveBar" style="display:flex;align-items:center;justify-content:space-between;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:14px 20px;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-          <div style="font-size:12.5px;color:#ccc;">💾 Looks good? Save this analysis to your records for future reference.</div>
+          <div style="font-size:12.5px;color:#ccc;display:flex;align-items:center;gap:6px;"><i class="ph ph-floppy-disk"></i> Looks good? Save this analysis to your records for future reference.</div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span id="insightsSaveStatus" style="font-size:11.5px;color:var(--text3);"></span>
             <button id="saveInsightsBtn" onclick="saveCurrentInsights()" style="background:#a855f7;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-              💾 Save Analysis
+              <i class="ph ph-floppy-disk"></i> Save Analysis
             </button>
           </div>
         </div>
