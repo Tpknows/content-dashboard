@@ -1103,21 +1103,49 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
 <div class="main-area">
 
-<div id="manusPromptModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,11,13,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#141416;border:1px solid var(--border);border-radius:16px;max-width:820px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);">
-      <div>
-        <div style="font-size:16px;font-weight:800;color:#fff;">🤖 Manus Presentation Prompt</div>
-        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;">Copy this and paste it into Manus to generate your presentation</div>
+<div id="manusPromptModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,7,15,0.92);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#0F172A;border:1px solid #1E293B;border-radius:20px;max-width:900px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6);">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid #1E293B;background:linear-gradient(135deg,#0F172A 0%,#1a1f35 100%);">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#8B5CF6,#3B82F6);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤖</div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.3px;">Manus Presentation Prompt</div>
+          <div style="font-size:11px;color:#64748B;margin-top:2px;">Premium · 10-slide · Boardroom-quality design instructions</div>
+        </div>
       </div>
-      <button onclick="closeManusPromptModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="font-size:10px;font-weight:600;color:#10B981;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);padding:4px 10px;border-radius:99px;">✦ PREMIUM PROMPT</div>
+        <button onclick="closeManusPromptModal()" style="background:rgba(255,255,255,0.06);border:1px solid #1E293B;color:#64748B;font-size:16px;cursor:pointer;line-height:1;padding:6px 10px;border-radius:8px;transition:all 0.15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#64748B'">✕</button>
+      </div>
     </div>
-    <textarea id="manusPromptText" readonly style="flex:1;min-height:420px;background:#0B0B0D;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
-      <span id="manusPromptStatus" style="font-size:11.5px;color:var(--text3);"></span>
+
+    <!-- Info strip -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #1E293B;">
+      <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;border-right:1px solid #1E293B;">
+        <span style="font-size:14px;">📊</span><span style="font-size:11px;color:#94A3B8;">10 detailed slides</span>
+      </div>
+      <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;border-right:1px solid #1E293B;">
+        <span style="font-size:14px;">🎨</span><span style="font-size:11px;color:#94A3B8;">Full design system included</span>
+      </div>
+      <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;border-right:1px solid #1E293B;">
+        <span style="font-size:14px;">📐</span><span style="font-size:11px;color:#94A3B8;">16:9 widescreen format</span>
+      </div>
+      <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:14px;">⚡</span><span style="font-size:11px;color:#94A3B8;">Ready to paste into Manus</span>
+      </div>
+    </div>
+
+    <!-- Prompt textarea -->
+    <textarea id="manusPromptText" readonly style="flex:1;min-height:380px;background:#080D1A;color:#CBD5E1;border:none;padding:24px 28px;font-family:'SF Mono',Consolas,'Courier New',monospace;font-size:12px;line-height:1.75;resize:none;outline:none;letter-spacing:0.1px;"></textarea>
+
+    <!-- Footer -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-top:1px solid #1E293B;background:#0A0F1E;gap:12px;flex-wrap:wrap;">
+      <span id="manusPromptStatus" style="font-size:11px;color:#64748B;display:flex;align-items:center;gap:6px;"></span>
       <div style="display:flex;gap:10px;">
-        <button onclick="closeManusPromptModal()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:9px 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
-        <button onclick="copyManusPrompt()" style="background:#a855f7;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copy Prompt</button>
+        <button onclick="closeManusPromptModal()" style="background:transparent;border:1px solid #1E293B;color:#64748B;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;" onmouseover="this.style.borderColor='#334155';this.style.color='#fff'" onmouseout="this.style.borderColor='#1E293B';this.style.color='#64748B'">Close</button>
+        <button onclick="copyManusPrompt()" style="background:linear-gradient(135deg,#8B5CF6,#3B82F6);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(139,92,246,0.35);transition:all 0.15s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(139,92,246,0.45)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 14px rgba(139,92,246,0.35)'">📋 Copy Prompt</button>
       </div>
     </div>
   </div>
@@ -1298,6 +1326,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div style="margin-bottom:18px;">
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Notes / Caption draft</label>
         <textarea id="calFieldNotes" rows="3" placeholder="Optional notes, hooks, or caption draft..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
+
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;margin-top:14px;">🔗 Link (optional — paste Facebook/YouTube/TikTok post URL)</label>
+        <input type="url" id="calFieldLink" placeholder="https://facebook.com/..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
       </div>
       <div id="calFieldHistoryWrap" style="display:none;margin-bottom:18px;">
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
@@ -3315,86 +3346,259 @@ function generateManusPrompt() {
   };
 
   const prompt =
-`Create a professional, minimalist business presentation titled "EasyPC Content Performance Report — ${monthLabel} 2026".
+`You are a world-class presentation designer. Create a stunning, premium, data-rich business presentation for EasyPC — a leading computer hardware retail brand in the Philippines.
 
-BRAND & STYLE DIRECTION
-- Modern corporate design, widescreen 16:9.
-- Cover and closing slides: dark charcoal background (#18181B) with white text.
-- Content slides: white background with dark ink text (#18181B / #3F3F46).
-- Primary accent color: emerald green (#10B981) for positive signals, KPI bars, and highlights.
-- Use muted red (#DC2626) only for negative/lowlight signals.
-- Company wordmark "EasyPC" styled as "EASY" (white/black) + "PC" (emerald accent).
-- Clean sans-serif font (e.g. Calibri or Inter), generous white space, rounded card elements for data.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRESENTATION TITLE: "EasyPC Content Performance Report — ${monthLabel} 2026"
+FORMAT: Widescreen 16:9, exactly 10 slides, PowerPoint-quality output
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-SLIDE 1 — COVER (dark background)
-- Title: "EasyPC Content Performance Report"
-- Subtitle: "${monthLabel} 2026"
-- Status pill/badge showing: "${stripHtmlTags(ins.kpi_status || '')}"
-- Footer text: "Generated by EasyPC Content Dashboard"
+═══════════════════════════════════════════
+VISUAL IDENTITY & DESIGN SYSTEM
+═══════════════════════════════════════════
 
-SLIDE 2 — KPI SNAPSHOT
-Show 8 metric cards in a row:
-- Total Views: ${fmt(s.views || 0)}
-- Thruplays: ${fmt(s.thruplays || 0)}
-- Winning Videos: ${s.winning || 0}
-- Videos Submitted: ${s.videos_submitted || 0}
-- Avg Thruplay Rate: ${s.avg_thruplay_rate || 0}%
-- Avg Hook Rate: ${s.avg_hook_rate || 0}%
-- Avg Hold Rate: ${s.avg_hold_rate || 0}%
-- AI Tagged: ${s.ai_tagged || 0}
+COLOR PALETTE
+- Background Dark:    #0F172A (navy-black — cover, section dividers, closing)
+- Background Light:   #FFFFFF (content slides)
+- Surface/Card:       #F8FAFC (light gray card backgrounds)
+- Border:             #E2E8F0
+- Text Primary:       #0F172A
+- Text Secondary:     #64748B
+- Accent Green:       #10B981 (positive metrics, wins, progress bars, highlights)
+- Accent Purple:      #8B5CF6 (thruplays, secondary data points)
+- Accent Blue:        #3B82F6 (neutral metrics, info pills)
+- Warning Amber:      #F59E0B (average performance indicators)
+- Alert Red:          #EF4444 (lowlights, weak metrics, stop-doing items)
+- White:              #FFFFFF
 
-Below the cards, show 3 progress bars against targets:
-- Views: ${fmt(s.views || 0)} / ${fmt(s.views_target || 3000000)} target (${s.views_pct || 0}%)
-- Thruplays: ${fmt(s.thruplays || 0)} / ${fmt(s.thruplays_target || 1800000)} target (${s.thruplays_pct || 0}%)
-- Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
+TYPOGRAPHY
+- Headings:           Inter Bold or Calibri Bold — 28–36pt for slide titles
+- Subheadings:        Inter SemiBold — 16–20pt
+- Body/Data:          Inter Regular — 11–13pt
+- Metric Numbers:     Inter ExtraBold or Black — 32–48pt, accent colored
+- Labels/Captions:    Inter Medium — 9–11pt, #64748B
 
-SLIDE 3 — MONTH-OVER-MONTH PERFORMANCE (two-column layout)
-Left column "HIGHLIGHTS" (vs previous month):
+LAYOUT PRINCIPLES
+- All content slides: white background, 48px left/right margin
+- Dark slides (#0F172A): full bleed, centered content
+- Cards: 12–16px border-radius, 1px border #E2E8F0, subtle shadow (0 2px 8px rgba(0,0,0,0.06))
+- Section labels: small ALL-CAPS text in accent color above each slide title (e.g. "KPI OVERVIEW")
+- Progress bars: 8px height, rounded caps, accent green fill, gray track
+- Divider lines: 1px #E2E8F0
+- EasyPC Logo wordmark: "EASY" in white (dark slides) or #0F172A (light slides) + "PC" in #10B981, bold, top-left of every slide
+- Slide number: bottom-right, 10pt, #94A3B8
+- Status pills/badges: rounded-full, 10pt bold, colored background with matching text
+
+═══════════════════════════════════════════
+SLIDE-BY-SLIDE CONTENT
+═══════════════════════════════════════════
+
+──────────────────────────────────────────
+SLIDE 1 — COVER  [Dark: #0F172A]
+──────────────────────────────────────────
+Layout: Full dark background with subtle diagonal grid texture (very faint, #1E293B lines). Content centered vertically.
+
+Top-left: EasyPC logo wordmark
+Top-right: Small pill badge — KPI Status: "${stripHtmlTags(ins.kpi_status || 'Calculating...')}" (green if positive, amber if mixed, red if poor)
+
+Center block:
+- Overline text (small caps, #10B981, 12pt): "CONTENT PERFORMANCE REPORT"
+- Main title (white, 42pt, ExtraBold, line-height 1.1): "EasyPC
+  ${monthLabel} 2026"
+- Thin horizontal rule (2px, gradient from #10B981 to #8B5CF6), width 120px, centered, margin 24px vertical
+- Subtitle (white, 60% opacity, 14pt): "Facebook Content Analytics · ${monthLabel} 2026"
+
+Bottom bar (full-width, #1E293B background):
+- Left: "Prepared by EasyPC Content Dashboard"
+- Right: "Confidential — Internal Use Only"
+
+──────────────────────────────────────────
+SLIDE 2 — EXECUTIVE SUMMARY  [Light]
+──────────────────────────────────────────
+Layout: Two-column (60% left, 40% right)
+
+Section label (top, #10B981, 10pt caps): "EXECUTIVE SUMMARY"
+Slide title (28pt, bold): "Month at a Glance — ${monthLabel} 2026"
+
+LEFT COLUMN — KPI Status Card (full-height card, accent left-border 4px #10B981):
+- Large status badge centered: "${stripHtmlTags(ins.kpi_status || '')}"
+- Below it, 3 progress rings or compact horizontal bars:
+  • Views: ${fmt(s.views || 0)} / ${fmt(s.views_target || 3000000)} (${s.views_pct || 0}% of target)
+  • Thruplays: ${fmt(s.thruplays || 0)} / ${fmt(s.thruplays_target || 1800000)} (${s.thruplays_pct || 0}% of target)
+  • Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} (${s.winning_pct || 0}% of target)
+- Each bar: label left, number right, green fill if ≥100%, amber if ≥75%, red if <75%
+
+RIGHT COLUMN — Quick Stats (2×2 grid of mini cards):
+- 📹 Videos Submitted: ${s.videos_submitted || 0}
+- 🏆 Winning Videos: ${s.winning || 0}
+- 🤖 AI-Tagged: ${s.ai_tagged || 0}
+- 👁 Avg Thruplay Rate: ${s.avg_thruplay_rate || 0}%
+
+──────────────────────────────────────────
+SLIDE 3 — KPI METRICS DEEP DIVE  [Light]
+──────────────────────────────────────────
+Layout: 4-column grid of large metric cards (2 rows × 4 columns)
+
+Section label: "PERFORMANCE METRICS"
+Slide title: "Key Numbers — ${monthLabel} 2026"
+
+8 cards, each containing:
+- Metric name (11pt, #64748B, caps)
+- Large number (40pt, ExtraBold, accent colored)
+- Trend indicator (small arrow + delta vs prev month if available)
+- Bottom colored bar (4px, accent color based on category)
+
+Card data:
+1. TOTAL VIEWS · ${fmt(s.views || 0)} · color: #3B82F6
+2. THRUPLAYS · ${fmt(s.thruplays || 0)} · color: #8B5CF6
+3. WINNING VIDEOS · ${s.winning || 0} · color: #10B981
+4. VIDEOS SUBMITTED · ${s.videos_submitted || 0} · color: #64748B
+5. AVG THRUPLAY RATE · ${s.avg_thruplay_rate || 0}% · color: #10B981
+6. AVG HOOK RATE · ${s.avg_hook_rate || 0}% · color: #F59E0B
+7. AVG HOLD RATE · ${s.avg_hold_rate || 0}% · color: #8B5CF6
+8. AI-TAGGED VIDEOS · ${s.ai_tagged || 0} · color: #3B82F6
+
+──────────────────────────────────────────
+SLIDE 4 — MONTH-OVER-MONTH COMPARISON  [Light]
+──────────────────────────────────────────
+Layout: Two equal columns with a subtle vertical divider
+
+Section label: "MOM PERFORMANCE"
+Slide title: "Highlights & Lowlights vs. Previous Month"
+
+LEFT COLUMN (header: "📈 HIGHLIGHTS", #10B981 accent):
 ${listOrNone(ins.mom_highlights)}
+Each item: green check icon (✓) + text, 12pt, card background #F0FDF4, left border 3px #10B981
 
-Right column "LOWLIGHTS" (vs previous month):
+RIGHT COLUMN (header: "📉 LOWLIGHTS", #EF4444 accent):
 ${listOrNone(ins.mom_lowlights)}
+Each item: red dot (●) + text, 12pt, card background #FEF2F2, left border 3px #EF4444
 
-SLIDE 4 — WHAT'S WORKING & WHAT'S NOT (two-column layout)
-Left column "WHAT'S WORKING":
+──────────────────────────────────────────
+SLIDE 5 — CONTENT PERFORMANCE ANALYSIS  [Light]
+──────────────────────────────────────────
+Layout: Two equal columns
+
+Section label: "CONTENT ANALYSIS"
+Slide title: "What's Working & What's Not"
+
+LEFT COLUMN (header: "✅ WHAT'S WORKING", bold, #10B981):
 ${listOrNone(ins.working)}
+Style: numbered list, each item in a white card with green left accent border
 
-Right column "WHAT'S NOT WORKING":
+RIGHT COLUMN (header: "❌ WHAT'S NOT WORKING", bold, #EF4444):
 ${listOrNone(ins.not_working)}
+Style: numbered list, each item in a white card with red left accent border
 
-SLIDE 5 — HOOK RATE ANALYSIS
-- Headline: Avg hook rate this month is ${s.avg_hook_rate || 0}%.
-- Include a horizontal scale/legend: Excellent (60%+), Very Strong (50-59%), Good (40-49%), Average (30-39%), Weak (<30%).
-- Recommendations:
+──────────────────────────────────────────
+SLIDE 6 — HOOK RATE ANALYSIS  [Light]
+──────────────────────────────────────────
+Layout: Full-width with performance scale at top, recommendations below
+
+Section label: "HOOK RATE ANALYSIS"
+Slide title: "Stopping Power — Did the Content Hook the Audience?"
+
+Top section — large metric callout:
+- Headline number: "${s.avg_hook_rate || 0}%" (52pt, ExtraBold, color based on value)
+- Label below: "Average Hook Rate — ${monthLabel} 2026"
+
+Performance scale bar (full-width, segmented, labeled):
+| ❌ Weak | ~ Average | ✓ Good | ⚡ Very Strong | 🔥 Excellent |
+| <30%    | 30–39%    | 40–49% | 50–59%         | 60%+          |
+Color: red → amber → blue → teal → green
+Marker/arrow pointing to current value: ${s.avg_hook_rate || 0}%
+
+Recommendations section (3-column card grid):
 ${listOrNone(ins.hook_recs)}
+Each card: icon + bold title + 1–2 sentence detail, white card, blue left border
 
-SLIDE 6 — HOLD RATE ANALYSIS
-- Headline: Avg hold rate this month is ${s.avg_hold_rate || 0}%.
-- Include the same scale/legend as the hook rate slide.
-- Recommendations:
+──────────────────────────────────────────
+SLIDE 7 — HOLD RATE ANALYSIS  [Light]
+──────────────────────────────────────────
+Layout: Same structure as Slide 6
+
+Section label: "HOLD RATE ANALYSIS"
+Slide title: "Retention Power — Did the Content Keep Viewers Watching?"
+
+Top section:
+- Headline number: "${s.avg_hold_rate || 0}%" (52pt, ExtraBold, color based on value)
+- Label: "Average Hold Rate — ${monthLabel} 2026"
+
+Same performance scale bar as Slide 6, marker at: ${s.avg_hold_rate || 0}%
+
+Recommendations:
 ${listOrNone(ins.hold_recs)}
+Card style: white card, purple (#8B5CF6) left border
 
-SLIDE 7 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
-Left column "DO THIS MONTH":
+──────────────────────────────────────────
+SLIDE 8 — ACTION PLAN  [Light]
+──────────────────────────────────────────
+Layout: Two columns + full-width opportunities row below
+
+Section label: "ACTION PLAN"
+Slide title: "What to Do Next — Priorities for Execution"
+
+TOP ROW — Two columns:
+LEFT (header: "🟢 DO MORE OF THIS", #10B981):
 ${listOrNone(ins.actions)}
+Each item: numbered, bold first word, green pill number badge
 
-Right column "STOP DOING":
+RIGHT (header: "🔴 STOP DOING THIS", #EF4444):
 ${listOrNone(ins.dont)}
+Each item: numbered, red X icon, red pill number badge
 
-SLIDE 8 — OPPORTUNITIES & CREATOR NOTES (two-column layout)
-Left column "OPPORTUNITIES":
+BOTTOM ROW (full-width card, amber accent #F59E0B):
+Header: "💡 OPPORTUNITIES TO EXPLORE"
 ${listOrNone(ins.opportunities)}
+Style: horizontal pill tags or 3-column layout with amber left borders
 
-Right column "CREATOR NOTES":
+──────────────────────────────────────────
+SLIDE 9 — CREATOR NOTES  [Light]
+──────────────────────────────────────────
+Layout: Full-width, editorial/magazine style
+
+Section label: "CREATOR NOTES"
+Slide title: "Coaching Notes & Creator Feedback"
+
+Content displayed as styled quote cards or editorial callout boxes:
 ${listOrNone(ins.creator_notes)}
+Style: Each note in a card with quotation mark icon (large, faded, #E2E8F0 behind), italic body text, creator attribution line, subtle gradient card background
 
-SLIDE 9 — CLOSING (dark background)
-- Headline: "Thank You"
-- Subtitle: "${monthLabel} 2026 Content Performance Report"
-- Footer: "EasyPC Content Dashboard · Confidential"
+Bottom of slide — thin strip (full-width, #F8FAFC):
+"These notes are intended to help creators improve content quality and engagement performance."
 
-TONE
-Keep all text concise and data-driven, matching the tone of a monthly marketing/content performance report for a Philippine computer retail brand.`;
+──────────────────────────────────────────
+SLIDE 10 — CLOSING  [Dark: #0F172A]
+──────────────────────────────────────────
+Layout: Full dark background, matching cover style
+
+Center block:
+- Small overline (#10B981, caps, 11pt): "THANK YOU"
+- Main text (white, 36pt, ExtraBold): "Let's Build on
+  This Month's Learnings"
+- Thin gradient rule (same as cover)
+- Subtext (white 60% opacity, 14pt): "${monthLabel} 2026 · EasyPC Content Performance Report"
+
+Bottom-left: "EasyPC Content Dashboard"
+Bottom-right: "Confidential · Internal Use Only"
+Decorative: subtle geometric shapes or dot grid in bottom-right corner (#1E293B)
+
+═══════════════════════════════════════════
+EXECUTION INSTRUCTIONS FOR MANUS
+═══════════════════════════════════════════
+
+1. Apply the design system STRICTLY — do not use default themes or templates.
+2. Every slide must display the EasyPC wordmark ("EASY" + "PC" in green) top-left.
+3. All metric numbers must be large, bold, and colored — never plain black.
+4. Cards must have rounded corners (12–16px), subtle shadows, and proper padding (20–24px).
+5. Performance scale bars (Slides 6–7) must be visually segmented with color-coded zones.
+6. Lowlight items must use red/amber styling — do NOT use green for these.
+7. Section label (small caps, accent color) must appear above EVERY slide title.
+8. Maintain consistent 48px left/right margins on all light slides.
+9. Use Inter or Calibri as the primary font throughout — NO decorative or serif fonts.
+10. Output should be production-ready, boardroom-quality — as if made by a senior designer at a top agency.
+
+BRAND VOICE: Professional, data-driven, clear, confident. This is an internal marketing/content performance report for a Philippine computer retail brand targeting gamers, students, and tech enthusiasts.`;
 
   // Persist onto the in-memory insight object so it rides along with Save Analysis
   lastInsights.manus_prompt = prompt;
@@ -4219,6 +4423,7 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldTitle').value = entry ? entry.title : '';
   document.getElementById('calFieldSavedBy').value = entry ? (entry.savedBy || '') : lastSavedByName;
   document.getElementById('calFieldNotes').value = entry ? entry.notes : '';
+  document.getElementById('calFieldLink').value = entry ? (entry.link || '') : '';
   document.getElementById('calendarSaveBtn').textContent = entry ? 'Update Entry' : 'Save to Sheet';
   renderCalendarHistory(entry);
   document.getElementById('calendarFormCard').style.display = 'block';
@@ -4267,7 +4472,8 @@ async function submitCalendarEntry() {
     status: document.getElementById('calFieldStatus').value,
     title: title,
     savedBy: document.getElementById('calFieldSavedBy').value.trim(),
-    notes: document.getElementById('calFieldNotes').value.trim()
+    notes: document.getElementById('calFieldNotes').value.trim(),
+    link: document.getElementById('calFieldLink').value.trim()
   };
 
   if (payload.savedBy) lastSavedByName = payload.savedBy;
@@ -4457,12 +4663,48 @@ function renderContentCalendar() {
     entriesWrap.className = 'cal-entries';
     (byDate[dateStr] || []).forEach(entry => {
       const color = calendarStatusColor(entry.status);
+      const isDone = entry.status === 'Posted' || entry.status === 'Done';
+      const hasLink = entry.link && entry.link.trim();
+
       const pill = document.createElement('div');
       pill.className = 'cal-entry-pill';
-      pill.style.background = color + '26';
-      pill.style.color = color;
-      pill.title = `${entry.title} \u00b7 ${entry.platform} \u00b7 ${entry.status}`;
-      pill.textContent = entry.title;
+      pill.style.background = isDone ? '#22C55E' : color + '26';
+      pill.style.color = isDone ? '#fff' : color;
+      pill.style.fontWeight = isDone ? '700' : '';
+      pill.style.display = 'flex';
+      pill.style.alignItems = 'center';
+      pill.style.justifyContent = 'space-between';
+      pill.style.gap = '4px';
+      pill.title = `${entry.title} · ${entry.platform} · ${entry.status}`;
+
+      // Left side: title + savedBy name
+      const leftDiv = document.createElement('div');
+      leftDiv.style.cssText = 'flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = entry.title;
+      titleSpan.style.cssText = 'display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      leftDiv.appendChild(titleSpan);
+      if (entry.savedBy) {
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = entry.savedBy;
+        nameSpan.style.cssText = `display:block;font-size:9px;opacity:0.75;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
+        leftDiv.appendChild(nameSpan);
+      }
+      pill.appendChild(leftDiv);
+
+      // Right side: link icon if has link
+      if (hasLink) {
+        const linkIcon = document.createElement('a');
+        linkIcon.href = entry.link;
+        linkIcon.target = '_blank';
+        linkIcon.rel = 'noopener noreferrer';
+        linkIcon.textContent = '↗';
+        linkIcon.title = 'Open link';
+        linkIcon.style.cssText = `flex-shrink:0;font-size:11px;opacity:0.85;color:${isDone ? '#fff' : color};text-decoration:none;padding:0 2px;`;
+        linkIcon.onclick = (ev) => ev.stopPropagation();
+        pill.appendChild(linkIcon);
+      }
+
       pill.onclick = (ev) => { ev.stopPropagation(); openCalendarForm(entry); };
       entriesWrap.appendChild(pill);
     });
