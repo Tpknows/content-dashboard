@@ -154,7 +154,6 @@ html { overflow-x: hidden; }
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
-  padding-left: 8px;
   padding-top: 4px;
 }
 .sidebar-group.open .sidebar-subitems { max-height: 400px; }
@@ -1180,7 +1179,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
   <div class="sidebar-group open" id="group-content">
     <div class="sidebar-group-header" onclick="toggleSidebarGroup('content')">
-      <span>📁 Content</span>
+      <span><i class="ph ph-stack"></i> Content</span>
       <span class="sidebar-group-chevron">▸</span>
     </div>
     <div class="sidebar-subitems">
@@ -1196,7 +1195,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
   <div class="sidebar-group open" id="group-reports">
     <div class="sidebar-group-header" onclick="toggleSidebarGroup('reports')">
-      <span>📊 Reports</span>
+      <span><i class="ph ph-chart-bar"></i> Reports</span>
       <span class="sidebar-group-chevron">▸</span>
     </div>
     <div class="sidebar-subitems">
@@ -1215,31 +1214,31 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid #1E293B;background:linear-gradient(135deg,#0F172A 0%,#1a1f35 100%);">
       <div style="display:flex;align-items:center;gap:14px;">
-        <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#8B5CF6,#3B82F6);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤖</div>
+        <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#8B5CF6,#3B82F6);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;"><i class="ph ph-robot" style="font-size:22px;color:#fff"></i></div>
         <div>
           <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.3px;">Manus Presentation Prompt</div>
           <div style="font-size:11px;color:#64748B;margin-top:2px;">Premium · 10-slide · Boardroom-quality design instructions</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <div style="font-size:10px;font-weight:600;color:#10B981;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);padding:4px 10px;border-radius:99px;">✦ PREMIUM PROMPT</div>
-        <button onclick="closeManusPromptModal()" style="background:rgba(255,255,255,0.06);border:1px solid #1E293B;color:#64748B;font-size:16px;cursor:pointer;line-height:1;padding:6px 10px;border-radius:8px;transition:all 0.15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#64748B'">✕</button>
+        <div style="font-size:10px;font-weight:600;color:#10B981;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);padding:4px 10px;border-radius:99px;"><i class="ph ph-sparkle"></i> PREMIUM PROMPT</div>
+        <button onclick="closeManusPromptModal()" style="background:rgba(255,255,255,0.06);border:1px solid #1E293B;color:#64748B;font-size:16px;cursor:pointer;line-height:1;padding:6px 10px;border-radius:8px;transition:all 0.15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#64748B'"><i class="ph ph-x"></i></button>
       </div>
     </div>
 
     <!-- Info strip -->
     <div style="display:flex;gap:0;border-bottom:1px solid #1E293B;">
       <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;border-right:1px solid #1E293B;">
-        <span style="font-size:14px;">📊</span><span style="font-size:11px;color:#94A3B8;">10 detailed slides</span>
+        <span style="font-size:14px;"><i class="ph ph-presentation-chart"></i></span><span style="font-size:11px;color:#94A3B8;">10 detailed slides</span>
       </div>
       <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;border-right:1px solid #1E293B;">
-        <span style="font-size:14px;">🎨</span><span style="font-size:11px;color:#94A3B8;">Full design system included</span>
+        <span style="font-size:16px;"><i class="ph ph-paint-brush"></i></span><span style="font-size:11px;color:#94A3B8;">Full design system included</span>
       </div>
       <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;border-right:1px solid #1E293B;">
-        <span style="font-size:14px;">📐</span><span style="font-size:11px;color:#94A3B8;">16:9 widescreen format</span>
+        <span style="font-size:16px;"><i class="ph ph-frame-corners"></i></span><span style="font-size:11px;color:#94A3B8;">16:9 widescreen format</span>
       </div>
       <div style="flex:1;padding:10px 20px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:14px;">⚡</span><span style="font-size:11px;color:#94A3B8;">Ready to paste into Manus</span>
+        <span style="font-size:14px;"><i class="ph ph-lightning"></i></span><span style="font-size:11px;color:#94A3B8;">Ready to paste into Manus</span>
       </div>
     </div>
 
@@ -1251,7 +1250,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span id="manusPromptStatus" style="font-size:11px;color:#64748B;display:flex;align-items:center;gap:6px;"></span>
       <div style="display:flex;gap:10px;">
         <button onclick="closeManusPromptModal()" style="background:transparent;border:1px solid #1E293B;color:#64748B;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;" onmouseover="this.style.borderColor='#334155';this.style.color='#fff'" onmouseout="this.style.borderColor='#1E293B';this.style.color='#64748B'">Close</button>
-        <button onclick="copyManusPrompt()" style="background:linear-gradient(135deg,#8B5CF6,#3B82F6);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(139,92,246,0.35);transition:all 0.15s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(139,92,246,0.45)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 14px rgba(139,92,246,0.35)'">📋 Copy Prompt</button>
+        <button onclick="copyManusPrompt()" style="background:linear-gradient(135deg,#8B5CF6,#3B82F6);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(139,92,246,0.35);transition:all 0.15s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(139,92,246,0.45)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 14px rgba(139,92,246,0.35)'"><i class="ph ph-copy"></i> Copy Prompt</button>
       </div>
     </div>
   </div>
@@ -1338,7 +1337,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   <div id="tab-hook" class="tab-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;">
       <div>
-        <div style="font-size:16px;font-weight:700;color:#fff;">🪝 Top 20 by Hook Rate</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;"><i class="ph ph-fish-simple"></i> Top 20 by Hook Rate</div>
         <div style="font-size:11px;color:#555;margin-top:6px;">Ranked by how well each video stops the scroll in the first few seconds</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;">
@@ -1355,7 +1354,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   <div id="tab-hold" class="tab-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;">
       <div>
-        <div style="font-size:16px;font-weight:700;color:#fff;">⏱️ Top 20 by Hold Rate</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;"><i class="ph ph-timer"></i> Top 20 by Hold Rate</div>
         <div style="font-size:11px;color:#555;margin-top:6px;">Ranked by how well each video keeps viewers watching through to the end</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;">
@@ -1372,7 +1371,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   <div id="tab-calendar" class="tab-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div>
-        <div class="monthly-results-title">🗓️ Content Calendar</div>
+        <div class="monthly-results-title"><i class="ph ph-calendar-dots"></i> Content Calendar</div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">Plan upcoming posts — every entry saves straight to Google Sheets for reference</div>
       </div>
       <button onclick="openCalendarForm()" id="calendarAddBtn" style="background:var(--accent);color:#fff;border:none;padding:11px 22px;border-radius:12px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
@@ -1444,11 +1443,11 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Notes / Caption draft</label>
         <textarea id="calFieldNotes" rows="3" placeholder="Optional notes, hooks, or caption draft..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
 
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;margin-top:14px;">🔗 Link (optional — paste Facebook/YouTube/TikTok post URL)</label>
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;margin-top:14px;"><i class="ph ph-link"></i> Link (optional — paste Facebook/YouTube/TikTok post URL)</label>
         <input type="url" id="calFieldLink" placeholder="https://facebook.com/..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
       </div>
       <div id="calFieldHistoryWrap" style="display:none;margin-bottom:18px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;"><i class="ph ph-clock-clockwise"></i> Status history</label>
         <div id="calFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
       </div>
       <div style="display:flex;gap:10px;">
@@ -1507,7 +1506,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   <div id="tab-viral" class="tab-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div>
-        <div class="monthly-results-title">🔥 Viral Topic Ideas</div>
+        <div class="monthly-results-title"><i class="ph ph-lightning"></i> Viral Topic Ideas</div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">AI-generated content angles based on the patterns of our own top-performing videos (All Year) — not external news</div>
       </div>
       <button onclick="generateViralTopics()" id="generateViralBtn" style="background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;padding:11px 22px;border-radius:12px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
@@ -1516,7 +1515,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
     <div id="viralTopicsStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:20px;"></div>
     <div id="viralTopicsEmpty" style="text-align:center;padding:60px 20px;color:var(--text3);">
-      <div style="font-size:40px;margin-bottom:14px;">🔥</div>
+      <div style="font-size:40px;margin-bottom:14px;"><i class="ph ph-lightning" style="color:var(--orange)"></i></div>
       <div style="font-size:13px;">Pindutin ang "Generate Viral Topic Ideas" para makita ang mga AI-suggested topics batay sa pinaka-successful nating videos this year.</div>
     </div>
     <div class="top10-list" id="viralTopicsGrid"></div>
@@ -1628,11 +1627,11 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div id="insightsMoMSection" style="margin-bottom:20px;display:none;">
           <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
             <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);padding:22px;">
-              <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">🔆 Highlights vs Previous Month</div>
+              <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><i class="ph ph-arrow-up-right"></i> Highlights vs Previous Month</div>
               <div id="insightsMoMHighlights" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
             </div>
             <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius);padding:22px;">
-              <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">🔅 Lowlights vs Previous Month</div>
+              <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><i class="ph ph-arrow-down-right"></i> Lowlights vs Previous Month</div>
               <div id="insightsMoMLowlights" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
             </div>
           </div>
@@ -1641,54 +1640,54 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <!-- Cards row -->
         <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
-            <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">✓ What's Working</div>
+            <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><i class="ph ph-check-circle"></i> What's Working</div>
             <div id="insightsWorking" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
-            <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">✗ What's Not Working</div>
+            <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><i class="ph ph-x-circle"></i> What's Not Working</div>
             <div id="insightsNotWorking" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
           </div>
         </div>
 
         <!-- Action items -->
         <div style="background:var(--card);border:1px solid rgba(139,92,246,0.15);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
-          <div style="font-size:11px;color:#a855f7;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">✦ Action Plan to Hit KPI</div>
+          <div style="font-size:11px;color:#a855f7;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;"><i class="ph ph-target"></i> Action Plan to Hit KPI</div>
           <div id="insightsActions" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
         </div>
 
         <!-- Don't do -->
         <div style="background:var(--card);border:1px solid rgba(239,68,68,0.15);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
-          <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">⚠ What NOT To Do</div>
+          <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;"><i class="ph ph-warning"></i> What NOT To Do</div>
           <div id="insightsDont" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
         </div>
 
         <!-- Top performers + opportunities -->
         <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
-            <div style="font-size:11px;color:#00d4ff;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">🏆 Top Performing Content</div>
+            <div style="font-size:11px;color:#00d4ff;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><i class="ph ph-trophy"></i> Top Performing Content</div>
             <div id="insightsTopVideos" style="font-size:12px;color:#ccc;line-height:1.8;"></div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
-            <div style="font-size:11px;color:#eab308;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">💡 Content Opportunities</div>
+            <div style="font-size:11px;color:#eab308;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><i class="ph ph-lightbulb"></i> Content Opportunities</div>
             <div id="insightsOpportunities" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
           </div>
         </div>
 
         <!-- Creator insights -->
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
-          <div style="font-size:11px;color:#ec4899;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">👤 Creator Performance Notes</div>
+          <div style="font-size:11px;color:#ec4899;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><i class="ph ph-users"></i> Creator Performance Notes</div>
           <div id="insightsCreators" style="font-size:13px;color:#ccc;line-height:1.7;"></div>
         </div>
 
         <!-- Hook + Hold Rate side by side -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="insight-pair-grid">
           <div style="background:#1a1d2e;border:1px solid #22c55e33;border-radius:12px;padding:22px;">
-            <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🪝 Hook Rate Analysis & Recommendations</div>
+            <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-fish-simple"></i> Hook Rate Analysis & Recommendations</div>
             <div style="font-size:10px;color:#444;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Based on benchmarks: &lt;30% Weak · 30–39% Average · 40–49% Good · 50–59% Very Strong · 60%+ Excellent</div>
             <div id="insightsHookRate" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
           </div>
           <div style="background:#1a1d2e;border:1px solid rgba(6,182,212,0.25);border-radius:12px;padding:22px;">
-            <div style="font-size:11px;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⏱️ Hold Rate Analysis & Recommendations</div>
+            <div style="font-size:11px;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-timer"></i> Hold Rate Analysis & Recommendations</div>
             <div style="font-size:10px;color:#444;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Based on benchmarks: &lt;30% Weak · 30–39% Average · 40–49% Good · 50–59% Very Strong · 60%+ Excellent</div>
             <div id="insightsHoldRate" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
           </div>
@@ -1696,7 +1695,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
         <!-- Hidden Gems & Wasted Hooks -->
         <div id="insightsHiddenGems" style="margin-top:20px;background:#1a1d2e;border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:22px;display:none;">
-          <div style="font-size:11px;color:#F59E0B;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🔍 Hook vs Hold Mismatch — Actionable Videos</div>
+          <div style="font-size:11px;color:#F59E0B;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;"><i class="ph ph-magnifying-glass"></i> Hook vs Hold Mismatch — Actionable Videos</div>
           <div style="font-size:10px;color:#444;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Hidden gems need a better opening · Wasted hooks need better content body</div>
           <div id="insightsHiddenGemsBody"></div>
         </div>
@@ -1710,7 +1709,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
       <!-- Empty state -->
       <div id="insightsEmpty" style="text-align:center;padding:60px 20px;color:var(--text3);">
-        <div style="font-size:40px;margin-bottom:16px;">✦</div>
+        <div style="font-size:40px;margin-bottom:16px;"><i class="ph ph-sparkle" style="color:var(--purple)"></i></div>
         <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:8px;">Ready to analyze</div>
         <div style="font-size:12px;color:var(--text3);">Select a month and click "Generate Insights" to get AI-powered analysis and recommendations.</div>
       </div>
@@ -1725,14 +1724,14 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <div style="font-size:11px;color:var(--text3);margin-top:4px;">Insights are saved to Google Sheet so you can access them from any device.</div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-          <button onclick="loadInsightsFromSheet()" id="loadFromSheetBtn" style="background:rgba(59,130,246,0.12);color:#93C5FD;border:1px solid rgba(59,130,246,0.25);padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">☁ Load from Sheet</button>
-          <button onclick="clearAllInsightRecords()" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">🗑 Clear All Records</button>
+          <button onclick="loadInsightsFromSheet()" id="loadFromSheetBtn" style="background:rgba(59,130,246,0.12);color:#93C5FD;border:1px solid rgba(59,130,246,0.25);padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"><i class="ph ph-cloud-arrow-down"></i> Load from Sheet</button>
+          <button onclick="clearAllInsightRecords()" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"><i class="ph ph-trash"></i> Clear All Records</button>
         </div>
       </div>
       <div id="sheetLoadStatus" style="font-size:12px;color:var(--text3);margin-bottom:14px;display:none;"></div>
       <div id="insightsRecordsList"></div>
       <div id="insightsRecordsEmpty" style="text-align:center;padding:60px 20px;color:var(--text3);display:none;">
-        <div style="font-size:36px;margin-bottom:14px;">📂</div>
+        <div style="font-size:36px;margin-bottom:14px;"><i class="ph ph-archive" style="color:var(--text3)"></i></div>
         <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:8px;">No saved records yet</div>
         <div style="font-size:12px;">Generate an insight and hit "Save Analysis" to build your monthly archive.</div>
       </div>
@@ -1749,8 +1748,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
 
     <div style="display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px;margin-bottom:28px;width:fit-content;">
-      <div class="news-subtab active" id="newsSubtabLatest" onclick="switchNewsSubtab('latest')" style="padding:10px 20px;font-size:12px;font-weight:600;color:#0B0B0D;background:#FFFFFF;border-radius:10px;cursor:pointer;white-space:nowrap;">📰 Latest</div>
-      <div class="news-subtab" id="newsSubtabTopics" onclick="switchNewsSubtab('topics')" style="padding:10px 20px;font-size:12px;font-weight:600;color:var(--text3);border-radius:10px;cursor:pointer;white-space:nowrap;">💡 Weekly Topics</div>
+      <div class="news-subtab active" id="newsSubtabLatest" onclick="switchNewsSubtab('latest')" style="padding:10px 20px;font-size:12px;font-weight:600;color:#0B0B0D;background:#FFFFFF;border-radius:10px;cursor:pointer;white-space:nowrap;"><i class="ph ph-newspaper"></i> Latest</div>
+      <div class="news-subtab" id="newsSubtabTopics" onclick="switchNewsSubtab('topics')" style="padding:10px 20px;font-size:12px;font-weight:600;color:var(--text3);border-radius:10px;cursor:pointer;white-space:nowrap;"><i class="ph ph-lightbulb"></i> Weekly Topics</div>
     </div>
 
     <div id="newsSubpanel-latest" class="news-subpanel" style="display:block;">
@@ -1761,7 +1760,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
             <input type="checkbox" id="relevantOnlyToggle" onchange="toggleRelevantOnly()">
             <span class="toggle-slider"></span>
           </label>
-          <span style="font-size:12px;color:var(--text2);font-weight:500;">⭐ Show relevant to EasyPC only</span>
+          <span style="font-size:12px;color:var(--text2);font-weight:500;"><i class="ph ph-star"></i> Show relevant to EasyPC only</span>
         </label>
       </div>
       <div class="filter-row" id="newsFilterRow" style="gap:10px;margin-bottom:20px;"></div>
@@ -1774,14 +1773,14 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div id="newsSubpanel-topics" class="news-subpanel" style="display:none;">
       <div style="display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px;margin-bottom:24px;width:fit-content;">
         <div class="topics-view-tab active" id="topicsViewSuggestions" onclick="switchTopicsView('suggestions')" style="padding:9px 18px;font-size:11.5px;font-weight:600;color:#0B0B0D;background:#FFFFFF;border-radius:9px;cursor:pointer;">This Week's Suggestions</div>
-        <div class="topics-view-tab" id="topicsViewHistory" onclick="switchTopicsView('history')" style="padding:9px 18px;font-size:11.5px;font-weight:600;color:var(--text3);border-radius:9px;cursor:pointer;">📂 History</div>
+        <div class="topics-view-tab" id="topicsViewHistory" onclick="switchTopicsView('history')" style="padding:9px 18px;font-size:11.5px;font-weight:600;color:var(--text3);border-radius:9px;cursor:pointer;"><i class="ph ph-archive"></i> History</div>
       </div>
 
       <div id="topicsView-suggestions" style="display:block;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px;">
           <div style="font-size:12px;color:var(--text3);">AI-generated content angles from hardware/gadget sources — priority: TechPowerUp, Back2Gaming, Engadget</div>
           <button onclick="generateWeeklyTopics()" id="generateTopicsBtn" style="background:var(--accent);color:#fff;border:none;padding:11px 22px;border-radius:12px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
-            <span id="generateTopicsBtnIcon">✦</span> Generate This Week's Topics
+            <span id="generateTopicsBtnIcon"><i class="ph ph-sparkle"></i></span> Generate This Week's Topics
           </button>
         </div>
         <div id="topicsStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:20px;"></div>
@@ -1792,7 +1791,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px;">
           <div style="font-size:12px;color:var(--text3);">Saved topics from previous weeks</div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <button onclick="markSelectedAsUsed()" id="bulkMarkUsedBtn" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:9px 16px;border-radius:10px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;" disabled>✓ Mark selected as used (<span id="selectedCount">0</span>)</button>
+            <button onclick="markSelectedAsUsed()" id="bulkMarkUsedBtn" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:9px 16px;border-radius:10px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;" disabled><i class="ph ph-check"></i> Mark selected as used (<span id="selectedCount">0</span>)</button>
             <div class="filter-row" style="margin-bottom:0;">
               <select id="historyFilterSelect" onchange="renderTopicsHistory()" class="filter-select">
                 <option value="all">All</option>
@@ -1986,14 +1985,14 @@ async function fetchLiveData() {
     const monthSelect = document.getElementById('monthSelect');
     const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
     const available = MONTHS_ORDER.filter(m => DATA[m] && DATA[m].videos > 0);
-    monthSelect.innerHTML = `<option value="ALL_YEAR">📊 All Year</option>` + available.map(m => `<option value="${m}">${m.charAt(0)+m.slice(1).toLowerCase()}</option>`).join('');
+    monthSelect.innerHTML = `<option value="ALL_YEAR"><i class="ph ph-calendar"></i> All Year</option>` + available.map(m => `<option value="${m}">${m.charAt(0)+m.slice(1).toLowerCase()}</option>`).join('');
     if (available.length > 0) monthSelect.value = available[available.length - 1];
     buildMonthPills(available);
 
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-    document.getElementById('lastRefreshed').textContent = '🟢 Last refreshed: ' + dateStr + ' · ' + timeStr;
+    document.getElementById('lastRefreshed').textContent = '● Last refreshed: ' + dateStr + ' · ' + timeStr;
     const stampEl = document.getElementById('lastUpdatedStamp');
     const stampVal = document.getElementById('lastUpdatedValue');
     if (stampEl && stampVal) { stampEl.style.display = 'inline'; stampVal.textContent = dateStr + ' at ' + timeStr; }
@@ -2013,7 +2012,7 @@ function buildMonthPills(available) {
   const activeStyle = `padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:600;border:none;background:var(--text);color:#0B0B0D;cursor:pointer;font-family:inherit;white-space:nowrap;`;
   const allYearStyle = `padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:600;border:none;background:linear-gradient(90deg,#3B82F6,#a855f7);color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;`;
   const cur = document.getElementById('monthSelect').value;
-  const allYearBtn = `<button style="${cur === 'ALL_YEAR' ? allYearStyle : pillStyle}" onclick="selectMonthPill('ALL_YEAR',this)">📊 All Year</button>`;
+  const allYearBtn = `<button style="${cur === 'ALL_YEAR' ? allYearStyle : pillStyle}" onclick="selectMonthPill('ALL_YEAR',this)"><i class="ph ph-calendar"></i> All Year</button>`;
   const monthBtns = available.filter(m => m !== 'ALL_YEAR').map(m => {
     const label = m.charAt(0) + m.slice(1,3).toLowerCase();
     const isActive = m === cur;
@@ -2072,7 +2071,7 @@ function updateDashboard() {
   syncCalendarToMonthFilter(month);
   if (month === 'ALL_YEAR') {
     // For All Year: only refresh the four content tabs, hide KPI section
-    document.getElementById('kpiGrid').innerHTML = `<div style="grid-column:1/-1;padding:28px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);text-align:center;color:var(--text3);font-size:13px;">📊 <strong style="color:#fff">All Year view</strong> — KPI cards show per-month targets. Select a month to see KPIs.</div>`;
+    document.getElementById('kpiGrid').innerHTML = `<div style="grid-column:1/-1;padding:28px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);text-align:center;color:var(--text3);font-size:13px;"><i class="ph ph-calendar"></i> <strong style="color:#fff">All Year view</strong> — KPI cards show per-month targets. Select a month to see KPIs.</div>`;
     renderTop10(month);
     renderAI(month);
     renderHook(month);
@@ -2142,14 +2141,14 @@ function updateDashboard() {
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#22c55e,#00d4ff)"></div>
       <div class="kpi-label">Avg Hook Rate</div>
       <div class="kpi-value" style="color:${d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444'}">${d.avg_hook_rate}%</div>
-      <div class="kpi-sub">${d.avg_hook_rate>=60?'🔥 Excellent':d.avg_hook_rate>=50?'⚡ Very Strong':d.avg_hook_rate>=40?'✓ Good':d.avg_hook_rate>=30?'~ Average':'✗ Needs Work'}</div>
+      <div class="kpi-sub">${d.avg_hook_rate>=60?'<i class="ph ph-fire"></i> Excellent':d.avg_hook_rate>=50?'<i class="ph ph-lightning"></i> Very Strong':d.avg_hook_rate>=40?'✓ Good':d.avg_hook_rate>=30?'~ Average':'✗ Needs Work'}</div>
       ${delta(d.avg_hook_rate, prev?.avg_hook_rate)}
     </div>
     <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#a855f7,#ec4899)"></div>
       <div class="kpi-label">Avg Hold Rate</div>
       <div class="kpi-value" style="color:${d.avg_hold_rate>=60?'#22c55e':d.avg_hold_rate>=50?'#00d4ff':d.avg_hold_rate>=40?'#a855f7':d.avg_hold_rate>=30?'#eab308':'#ef4444'}">${d.avg_hold_rate}%</div>
-      <div class="kpi-sub">${d.avg_hold_rate>=60?'🔥 Excellent':d.avg_hold_rate>=50?'⚡ Very Strong':d.avg_hold_rate>=40?'✓ Good':d.avg_hold_rate>=30?'~ Average':'✗ Needs Work'}</div>
+      <div class="kpi-sub">${d.avg_hold_rate>=60?'<i class="ph ph-fire"></i> Excellent':d.avg_hold_rate>=50?'<i class="ph ph-lightning"></i> Very Strong':d.avg_hold_rate>=40?'✓ Good':d.avg_hold_rate>=30?'~ Average':'✗ Needs Work'}</div>
       ${delta(d.avg_hold_rate, prev?.avg_hold_rate)}
     </div>
     <div class="kpi-card yellow">
@@ -2240,7 +2239,7 @@ function renderTop10(month) {
   sorted.forEach((v, i) => {
     const rank = i + 1;
     const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-    const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+    const rankIcon = rank === 1 ? '<i class="ph ph-medal" style="color:#F59E0B"></i>' : rank === 2 ? '<i class="ph ph-medal" style="color:#A1A1AA"></i>' : rank === 3 ? '<i class="ph ph-medal" style="color:#CD7C2F"></i>' : `#${rank}`;
     const viewsClass = v.views >= TARGET ? 'views-hit' : 'views-miss';
     const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
     html += `
@@ -2255,7 +2254,7 @@ function renderTop10(month) {
         <div class="top10-title">${v.title}</div>
         <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
           <span class="top10-creator">${v.creator}</span>
-          ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+          ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);"><i class="ph ph-calendar-blank"></i> ${v.datePosted}</span>` : ''}
         </div>
         <div class="top10-meta">
           ${getPillarBadge(v.pillar)}
@@ -2293,7 +2292,7 @@ function renderAI(month) {
     sorted.forEach((v, i) => {
       const rank = i + 1;
       const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-      const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const rankIcon = rank === 1 ? '<i class="ph ph-medal" style="color:#F59E0B"></i>' : rank === 2 ? '<i class="ph ph-medal" style="color:#A1A1AA"></i>' : rank === 3 ? '<i class="ph ph-medal" style="color:#CD7C2F"></i>' : `#${rank}`;
       const viewsClass = v.views >= TARGET ? 'views-hit' : 'views-miss';
       const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
       html += `
@@ -2309,7 +2308,7 @@ function renderAI(month) {
           <div class="top10-title">${v.title}</div>
           <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
             <span class="top10-creator">${v.creator}</span>
-            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);"><i class="ph ph-calendar-blank"></i> ${v.datePosted}</span>` : ''}
           </div>
           <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
@@ -2370,7 +2369,7 @@ function renderMonthlyResults() {
     <div class="msb-item"><div class="msb-val" style="color:#00d4ff">${fmt(d.views)}</div><div class="msb-label">Total Views</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#a855f7">${fmt(d.thruplays)}</div><div class="msb-label">Thruplays</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#f97316">${d.avg_rate}%</div><div class="msb-label">Avg Rate</div></div>
-    <div class="msb-item"><div class="msb-val" style="color:${d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444'}">${d.avg_hook_rate}%</div><div class="msb-label">🪝 Avg Hook Rate</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:${d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444'}">${d.avg_hook_rate}%</div><div class="msb-label"><i class="ph ph-fish-simple"></i> Avg Hook Rate</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#22c55e">${d.winning}</div><div class="msb-label">Winning</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#eab308">${d.kpi_submitted}</div><div class="msb-label">Videos Submitted</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#ec4899">${d.ai}</div><div class="msb-label">AI Tagged</div></div>
@@ -2416,8 +2415,8 @@ function renderMonthlyResults() {
 
 function getHookBadge(r) {
   if (!r || r <= 0) return '<span class="hook-none">N/A</span>';
-  if (r >= 60) return `<span class="hook-excellent">🔥 ${r}% Excellent</span>`;
-  if (r >= 50) return `<span class="hook-strong">⚡ ${r}% Very Strong</span>`;
+  if (r >= 60) return `<span class="hook-excellent"><i class="ph ph-fire"></i> ${r}% Excellent</span>`;
+  if (r >= 50) return `<span class="hook-strong"><i class="ph ph-lightning"></i> ${r}% Very Strong</span>`;
   if (r >= 40) return `<span class="hook-good">✓ ${r}% Good</span>`;
   if (r >= 30) return `<span class="hook-average">~ ${r}% Average</span>`;
   return `<span class="hook-weak">✗ ${r}% Weak</span>`;
@@ -2434,8 +2433,8 @@ function getHookOverlayClass(r) {
 
 function getHoldBadge(r) {
   if (!r || r <= 0) return '<span class="hold-none">N/A</span>';
-  if (r >= 60) return `<span class="hold-excellent">🔥 ${r}% Excellent</span>`;
-  if (r >= 50) return `<span class="hold-strong">⚡ ${r}% Very Strong</span>`;
+  if (r >= 60) return `<span class="hold-excellent"><i class="ph ph-fire"></i> ${r}% Excellent</span>`;
+  if (r >= 50) return `<span class="hold-strong"><i class="ph ph-lightning"></i> ${r}% Very Strong</span>`;
   if (r >= 40) return `<span class="hold-good">✓ ${r}% Good</span>`;
   if (r >= 30) return `<span class="hold-average">~ ${r}% Average</span>`;
   return `<span class="hold-weak">✗ ${r}% Weak</span>`;
@@ -2467,9 +2466,9 @@ function renderHook(month) {
   const avgHook    = sorted.length > 0 ? Math.round(sorted.reduce((s,v) => s+v.hook_rate, 0) / sorted.length * 10) / 10 : 0;
 
   document.getElementById('hookSummary').innerHTML = `
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#22c55e">${excellent}</div><div class="hook-stat-label">🔥 Excellent (60%+)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hook-stat-label">⚡ Very Strong (50–59%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#a855f7">${good}</div><div class="hook-stat-label">✓ Good (40–49%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#22c55e">${excellent}</div><div class="hook-stat-label"><i class="ph ph-fire"></i> Excellent (60%+)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hook-stat-label"><i class="ph ph-lightning"></i> Very Strong (50–59%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#a855f7">${good}</div><div class="hook-stat-label"><i class="ph ph-check"></i> Good (40–49%)</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#eab308">${average}</div><div class="hook-stat-label">~ Average (30–39%)</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#f97316">${avgHook}%</div><div class="hook-stat-label">Avg Hook Rate</div></div>
   `;
@@ -2483,7 +2482,7 @@ function renderHook(month) {
     sorted.forEach((v, i) => {
       const rank = i + 1;
       const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-      const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const rankIcon = rank === 1 ? '<i class="ph ph-medal" style="color:#F59E0B"></i>' : rank === 2 ? '<i class="ph ph-medal" style="color:#A1A1AA"></i>' : rank === 3 ? '<i class="ph ph-medal" style="color:#CD7C2F"></i>' : `#${rank}`;
       const viewsClass = v.views >= TARGET_VIEWS ? 'views-hit' : 'views-miss';
       const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
       const overlayClass = getHookOverlayClass(v.hook_rate);
@@ -2493,14 +2492,14 @@ function renderHook(month) {
           <div class="top10-rank-badge">${rankIcon}</div>
           <div class="top10-play-icon">▶</div>
           <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
-          <div class="hook-rate-overlay ${overlayClass}">🪝 ${v.hook_rate}%</div>
+          <div class="hook-rate-overlay ${overlayClass}"><i class="ph ph-fish-simple"></i> ${v.hook_rate}%</div>
           ${v.winning ? '<div style="position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid #22c55e55;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;">WIN</div>' : ''}
         </div>
         <div class="top10-body">
           <div class="top10-title">${v.title}</div>
           <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
             <span class="top10-creator">${v.creator}</span>
-            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);"><i class="ph ph-calendar-blank"></i> ${v.datePosted}</span>` : ''}
           </div>
           <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
@@ -2532,9 +2531,9 @@ function renderHold(month) {
   const avgHold    = sorted.length > 0 ? Math.round(sorted.reduce((s,v) => s+v.hold_rate, 0) / sorted.length * 10) / 10 : 0;
 
   document.getElementById('holdSummary').innerHTML = `
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#22c55e">${excellent}</div><div class="hold-stat-label">🔥 Excellent (60%+)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hold-stat-label">⚡ Very Strong (50–59%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#a855f7">${good}</div><div class="hold-stat-label">✓ Good (40–49%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#22c55e">${excellent}</div><div class="hold-stat-label"><i class="ph ph-fire"></i> Excellent (60%+)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hold-stat-label"><i class="ph ph-lightning"></i> Very Strong (50–59%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#a855f7">${good}</div><div class="hold-stat-label"><i class="ph ph-check"></i> Good (40–49%)</div></div>
     <div class="hold-stat"><div class="hold-stat-val" style="color:#eab308">${average}</div><div class="hold-stat-label">~ Average (30–39%)</div></div>
     <div class="hold-stat"><div class="hold-stat-val" style="color:#f97316">${avgHold}%</div><div class="hold-stat-label">Avg Hold Rate</div></div>
   `;
@@ -2548,7 +2547,7 @@ function renderHold(month) {
     sorted.forEach((v, i) => {
       const rank = i + 1;
       const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-      const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const rankIcon = rank === 1 ? '<i class="ph ph-medal" style="color:#F59E0B"></i>' : rank === 2 ? '<i class="ph ph-medal" style="color:#A1A1AA"></i>' : rank === 3 ? '<i class="ph ph-medal" style="color:#CD7C2F"></i>' : `#${rank}`;
       const viewsClass = v.views >= TARGET_VIEWS ? 'views-hit' : 'views-miss';
       const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;">▶ Watch</a>` : '';
       const overlayClass = getHoldOverlayClass(v.hold_rate);
@@ -2558,14 +2557,14 @@ function renderHold(month) {
           <div class="top10-rank-badge">${rankIcon}</div>
           <div class="top10-play-icon">▶</div>
           <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
-          <div class="hold-rate-overlay ${overlayClass}">⏱️ ${v.hold_rate}%</div>
+          <div class="hold-rate-overlay ${overlayClass}"><i class="ph ph-timer"></i> ${v.hold_rate}%</div>
           ${v.winning ? '<div style="position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid #22c55e55;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;">WIN</div>' : ''}
         </div>
         <div class="top10-body">
           <div class="top10-title">${v.title}</div>
           <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px;">
             <span class="top10-creator">${v.creator}</span>
-            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);">📅 ${v.datePosted}</span>` : ''}
+            ${v.datePosted ? `<span style="font-size:10px;color:var(--text3);"><i class="ph ph-calendar-blank"></i> ${v.datePosted}</span>` : ''}
           </div>
           <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
@@ -2625,7 +2624,7 @@ function renderInsightsSnapshot(month) {
     { label:'Winning Videos',    val: d.winning,                 pct: winPct,   color:'#22c55e' },
     { label:'Videos Submitted',  val: d.kpi_submitted,           pct: null,     color:'#f97316' },
     { label:'Avg Thruplay Rate', val: d.avg_rate + '%',          pct: null,     color:'#ec4899' },
-    { label:'🪝 Avg Hook Rate',  val: (d.avg_hook_rate||0) + '%', pct: null,    color: hookColor },
+    { label:'<i class="ph ph-fish-simple"></i> Avg Hook Rate',  val: (d.avg_hook_rate||0) + '%', pct: null,    color: hookColor },
     { label:'AI Tagged',         val: d.ai,                      pct: null,     color:'#eab308' },
   ];
   document.getElementById('insightsSnapshot').innerHTML = snap.map(s => `
@@ -2713,7 +2712,7 @@ async function saveCurrentInsights() {
   const statusEl = document.getElementById('insightsSaveStatus');
   const btn = document.getElementById('saveInsightsBtn');
   btn.disabled = true;
-  btn.innerHTML = '⏳ Saving...';
+  btn.innerHTML = '<i class="ph ph-hourglass"></i> Saving...';
   btn.style.background = '#555';
 
   // Also save to Google Sheet so insights are accessible from any device
@@ -2741,7 +2740,7 @@ async function saveCurrentInsights() {
   btn.disabled = false;
   setTimeout(() => {
     statusEl.textContent = '';
-    btn.innerHTML = '💾 Save Analysis';
+    btn.innerHTML = '<i class="ph ph-floppy-disk"></i> Save Analysis';
     btn.style.background = '#a855f7';
   }, 4000);
 
@@ -2801,9 +2800,9 @@ function renderInsightRecords() {
           <div style="font-size:11px;color:var(--text3);margin-top:3px;">Saved ${dt}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius:99px;">📊 ${r.kpi_status}</span>
-          ${r.manus_prompt ? `<button onclick="copyRecordManusPrompt('${r.month}')" style="background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.25);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">🤖 Copy Manus Prompt</button>` : ''}
-          <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">🗑 Delete</button>
+          <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius:99px;">${r.kpi_status}</span>
+          ${r.manus_prompt ? `<button onclick="copyRecordManusPrompt('${r.month}')" style="background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.25);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><i class="ph ph-robot"></i> Copy Manus Prompt</button>` : ''}
+          <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><i class="ph ph-trash"></i> Delete</button>
         </div>
       </div>
 
@@ -2812,11 +2811,11 @@ function renderInsightRecords() {
       ${hasMoM ? `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
         <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:12px;padding:14px;">
-          <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔆 Highlights vs Prev Month</div>
+          <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;"><i class="ph ph-arrow-up-right"></i> Highlights vs Prev Month</div>
           <div style="font-size:12px;color:#ccc;">${toList(r.mom_highlights)}</div>
         </div>
         <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:14px;">
-          <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔅 Lowlights vs Prev Month</div>
+          <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;"><i class="ph ph-arrow-down-right"></i> Lowlights vs Prev Month</div>
           <div style="font-size:12px;color:#ccc;">${toList(r.mom_lowlights)}</div>
         </div>
       </div>` : ''}
@@ -2827,43 +2826,43 @@ function renderInsightRecords() {
         </summary>
         <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.1);border-radius:10px;padding:14px;">
-            <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✓ What's Working</div>
+            <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-check-circle"></i> What's Working</div>
             <div style="font-size:12px;color:#ccc;">${toList(r.working)}</div>
           </div>
           <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.1);border-radius:10px;padding:14px;">
-            <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✗ What's Not Working</div>
+            <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-x-circle"></i> What's Not Working</div>
             <div style="font-size:12px;color:#ccc;">${toList(r.not_working)}</div>
           </div>
         </div>
         <div style="margin-top:14px;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.1);border-radius:10px;padding:14px;">
-          <div style="font-size:10px;color:#a855f7;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✦ Action Plan to Hit KPI</div>
+          <div style="font-size:10px;color:#a855f7;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-target"></i> Action Plan to Hit KPI</div>
           <div style="font-size:12px;color:#ccc;">${(r.actions||[]).map((x,i)=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;background:#a855f722;color:#a855f7;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">${i+1}</span><span>${x}</span></div>`).join('')}</div>
         </div>
         <div style="margin-top:14px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.08);border-radius:10px;padding:14px;">
-          <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⚠ What NOT To Do</div>
+          <div style="font-size:10px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-warning"></i> What NOT To Do</div>
           <div style="font-size:12px;color:#ccc;">${toList(r.dont)}</div>
         </div>
         <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);border-radius:10px;padding:14px;">
-            <div style="font-size:10px;color:#00d4ff;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🏆 Top Performing Content</div>
+            <div style="font-size:10px;color:#00d4ff;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-trophy"></i> Top Performing Content</div>
             <div style="font-size:12px;color:#ccc;">${r.top_videos_insight || ''}</div>
           </div>
           <div style="background:rgba(234,179,8,0.05);border:1px solid rgba(234,179,8,0.1);border-radius:10px;padding:14px;">
-            <div style="font-size:10px;color:#eab308;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">💡 Opportunities</div>
+            <div style="font-size:10px;color:#eab308;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-lightbulb"></i> Opportunities</div>
             <div style="font-size:12px;color:#ccc;">${toList(r.opportunities)}</div>
           </div>
         </div>
         <div style="margin-top:14px;background:rgba(236,72,153,0.05);border:1px solid rgba(236,72,153,0.1);border-radius:10px;padding:14px;">
-          <div style="font-size:10px;color:#ec4899;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">👤 Creator Performance Notes</div>
+          <div style="font-size:10px;color:#ec4899;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-users"></i> Creator Performance Notes</div>
           <div style="font-size:12px;color:#ccc;">${toList(r.creator_notes)}</div>
         </div>
         <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div style="background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1);border-radius:10px;padding:14px;">
-            <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🪝 Hook Rate Analysis</div>
+            <div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-fish-simple"></i> Hook Rate Analysis</div>
             <div style="font-size:12px;color:#ccc;">${toList(r.hook_recs)}</div>
           </div>
           <div style="background:rgba(6,182,212,0.04);border:1px solid rgba(6,182,212,0.15);border-radius:10px;padding:14px;">
-            <div style="font-size:10px;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⏱️ Hold Rate Analysis</div>
+            <div style="font-size:10px;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><i class="ph ph-timer"></i> Hold Rate Analysis</div>
             <div style="font-size:12px;color:#ccc;">${(r.hold_recs && r.hold_recs.length > 0) ? toList(r.hold_recs) : '<div style="color:#555;font-size:11px;font-style:italic;">Re-generate and re-save to include hold rate data.</div>'}</div>
           </div>
         </div>
@@ -2889,7 +2888,7 @@ async function loadInsightsFromSheet() {
   const btn = document.getElementById('loadFromSheetBtn');
   const statusEl = document.getElementById('sheetLoadStatus');
   btn.disabled = true;
-  btn.innerHTML = '⏳ Loading...';
+  btn.innerHTML = '<i class="ph ph-hourglass"></i> Loading...';
   statusEl.style.display = 'block';
   statusEl.textContent = 'Fetching saved insights from Google Sheet...';
   statusEl.style.color = 'var(--text3)';
@@ -2902,7 +2901,7 @@ async function loadInsightsFromSheet() {
       statusEl.textContent = '⚠ Error from Sheet: ' + result.message;
       statusEl.style.color = '#F59E0B';
       btn.disabled = false;
-      btn.innerHTML = '☁ Load from Sheet';
+      btn.innerHTML = '<i class="ph ph-cloud-arrow-down"></i> Load from Sheet';
       return;
     }
 
@@ -2911,7 +2910,7 @@ async function loadInsightsFromSheet() {
       statusEl.textContent = 'No insights found in Google Sheet yet. Save an analysis first.';
       statusEl.style.color = 'var(--text3)';
       btn.disabled = false;
-      btn.innerHTML = '☁ Load from Sheet';
+      btn.innerHTML = '<i class="ph ph-cloud-arrow-down"></i> Load from Sheet';
       return;
     }
 
@@ -2974,7 +2973,7 @@ async function loadInsightsFromSheet() {
   }
 
   btn.disabled = false;
-  btn.innerHTML = '☁ Load from Sheet';
+  btn.innerHTML = '<i class="ph ph-cloud-arrow-down"></i> Load from Sheet';
   setTimeout(() => { statusEl.style.display = 'none'; }, 6000);
 }
 
@@ -3035,12 +3034,12 @@ function generateInsights() {
   document.getElementById('insightsOutput').style.display = 'none';
   document.getElementById('insightsLoading').style.display = 'block';
   document.getElementById('generateBtn').disabled = true;
-  document.getElementById('generateBtnIcon').textContent = '⏳';
+  document.getElementById('generateBtnIcon').innerHTML = '<i class="ph ph-hourglass"></i>';
   document.getElementById('insightsLoadingMsg').textContent = 'Analyzing your data...';
   // Reset save bar
   document.getElementById('insightsSaveStatus').textContent = '';
   const sBtn = document.getElementById('saveInsightsBtn');
-  sBtn.innerHTML = '💾 Save Analysis';
+  sBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> Save Analysis';
   sBtn.style.background = '#a855f7';
 
   // Resolve previous month
@@ -3062,10 +3061,10 @@ function generateInsights() {
     } catch(err) {
       document.getElementById('insightsLoading').style.display = 'none';
       document.getElementById('insightsEmpty').style.display = 'block';
-      document.getElementById('insightsEmpty').innerHTML = `<div style="font-size:48px;margin-bottom:16px;">⚠</div><div style="color:#ef4444;font-size:13px;font-weight:600">Analysis failed: ${err.message}</div>`;
+      document.getElementById('insightsEmpty').innerHTML = `<div style="font-size:48px;margin-bottom:16px;"><i class="ph ph-warning" style="color:#ef4444"></i></div><div style="color:#ef4444;font-size:13px;font-weight:600">Analysis failed: ${err.message}</div>`;
     }
     document.getElementById('generateBtn').disabled = false;
-    document.getElementById('generateBtnIcon').textContent = '✦';
+    document.getElementById('generateBtnIcon').innerHTML = '<i class="ph ph-sparkle"></i>';
   }, 600);
 }
 
@@ -3140,13 +3139,13 @@ function analyzeData(month, d) {
 
   // ACTION PLAN
   const actions = [];
-  if (winGap > 0) actions.push(`🎯 Need ${winGap} more winning videos — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
-  if (viewsGap > 0) actions.push(`📈 To close the ${fmt(viewsGap)} views gap, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
-  if (d.avg_rate < 10) actions.push(`⚡ Improve hooks in the first 3 seconds — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
-  if (aiVids.length < d.videos * 0.3) actions.push(`🤖 Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration, it correlates with better performance.`);
-  actions.push(`🔁 Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output this month.`);
-  if (winVids.length > 0) actions.push(`📋 Study the winning videos' hook types and pillar — replicate those exact formats with new topics.`);
-  actions.push(`📅 Submit content earlier in the month to allow more time for views to accumulate before month-end reporting.`);
+  if (winGap > 0) actions.push(`<i class="ph ph-target"></i> Need ${winGap} more winning videos — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
+  if (viewsGap > 0) actions.push(`<i class="ph ph-trend-up"></i> To close the ${fmt(viewsGap)} views gap, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
+  if (d.avg_rate < 10) actions.push(`<i class="ph ph-lightning"></i> Improve hooks in the first 3 seconds — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
+  if (aiVids.length < d.videos * 0.3) actions.push(`<i class="ph ph-robot"></i> Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration, it correlates with better performance.`);
+  actions.push(`<i class="ph ph-arrows-clockwise"></i> Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output this month.`);
+  if (winVids.length > 0) actions.push(`<i class="ph ph-clipboard-text"></i> Study the winning videos' hook types and pillar — replicate those exact formats with new topics.`);
+  actions.push(`<i class="ph ph-calendar-check"></i> Submit content earlier in the month to allow more time for views to accumulate before month-end reporting.`);
 
   // DON'T DO
   const dont = [];
@@ -3194,9 +3193,9 @@ function analyzeData(month, d) {
       .sort((a,b) => b.winRate - a.winRate)[0];
     const topByViews = creatorList[0];
     if (mostConsistent && topByViews && mostConsistent.name !== topByViews[0] && mostConsistent.winRate > 0) {
-      creator_notes.push(`🎯 <strong>Most consistent:</strong> <strong>${mostConsistent.name}</strong> has the highest win rate at <strong>${mostConsistent.winRate}%</strong> (${mostConsistent.wins} wins from ${mostConsistent.videos} videos) — more reliable than pure view count suggests. Prioritize their output for steady wins.`);
+      creator_notes.push(`<i class="ph ph-target"></i> <strong>Most consistent:</strong> <strong>${mostConsistent.name}</strong> has the highest win rate at <strong>${mostConsistent.winRate}%</strong> (${mostConsistent.wins} wins from ${mostConsistent.videos} videos) — more reliable than pure view count suggests. Prioritize their output for steady wins.`);
     } else if (mostConsistent && mostConsistent.winRate > 0) {
-      creator_notes.push(`🎯 <strong>${mostConsistent.name}</strong> is both your top creator AND most consistent with a <strong>${mostConsistent.winRate}%</strong> win rate — double down on their content.`);
+      creator_notes.push(`<i class="ph ph-target"></i> <strong>${mostConsistent.name}</strong> is both your top creator AND most consistent with a <strong>${mostConsistent.winRate}%</strong> win rate — double down on their content.`);
     }
   }
 
@@ -3219,27 +3218,27 @@ function analyzeData(month, d) {
 
     if (excellentH.length > 0) {
       const best = excellentH.sort((a,b)=>b.hook_rate-a.hook_rate)[0];
-      hookRecs.push(`🔥 <strong>${excellentH.length} Excellent hook${excellentH.length>1?'s':''} (60%+)</strong> — best is <em>"${best.title.substring(0,45)}${best.title.length>45?'...':''}"</em> by ${best.creator} at ${best.hook_rate}%. Study and replicate the opening pattern of these videos.`);
+      hookRecs.push(`<i class="ph ph-fire"></i> <strong>${excellentH.length} Excellent hook${excellentH.length>1?'s':''} (60%+)</strong> — best is <em>"${best.title.substring(0,45)}${best.title.length>45?'...':''}"</em> by ${best.creator} at ${best.hook_rate}%. Study and replicate the opening pattern of these videos.`);
     }
     if (veryStrongH.length > 0) {
-      hookRecs.push(`⚡ <strong>${veryStrongH.length} Very Strong hook${veryStrongH.length>1?'s':''} (50–59%)</strong> — these are scroll-stoppers. A/B test their hook style with new topics to scale wins.`);
+      hookRecs.push(`<i class="ph ph-lightning"></i> <strong>${veryStrongH.length} Very Strong hook${veryStrongH.length>1?'s':''} (50–59%)</strong> — these are scroll-stoppers. A/B test their hook style with new topics to scale wins.`);
     }
     if (weakH.length > 0) {
       const worstHook = weakH.sort((a,b)=>a.hook_rate-b.hook_rate)[0];
-      hookRecs.push(`✗ <strong>${weakH.length} Weak hook${weakH.length>1?'s':''} (&lt;30%)</strong> — lowest is <em>"${worstHook.title.substring(0,45)}${worstHook.title.length>45?'...':''}"</em> at ${worstHook.hook_rate}%. Avoid this opening style — rewrite the first 3 seconds with a stronger pattern interrupt.`);
+      hookRecs.push(`<i class="ph ph-x-circle"></i> <strong>${weakH.length} Weak hook${weakH.length>1?'s':''} (&lt;30%)</strong> — lowest is <em>"${worstHook.title.substring(0,45)}${worstHook.title.length>45?'...':''}"</em> at ${worstHook.hook_rate}%. Avoid this opening style — rewrite the first 3 seconds with a stronger pattern interrupt.`);
     }
     if (avgHook < 40) {
-      hookRecs.push(`📌 Overall hook performance is below the <strong>40% Good</strong> threshold. Focus on stronger opening lines: lead with curiosity, a bold claim, or a relatable problem before showing the product.`);
+      hookRecs.push(`<i class="ph ph-push-pin"></i> Overall hook performance is below the <strong>40% Good</strong> threshold. Focus on stronger opening lines: lead with curiosity, a bold claim, or a relatable problem before showing the product.`);
     }
     if (avgHook >= 50) {
-      hookRecs.push(`✅ Hook performance is strong this month. Maintain this standard and document what's working — share the top hook formats with all creators as a template.`);
+      hookRecs.push(`<i class="ph ph-check-circle"></i> Hook performance is strong this month. Maintain this standard and document what's working — share the top hook formats with all creators as a template.`);
     }
     // Correlation: do high hook rate = high views?
     const topHookViews = [...hookVids].sort((a,b)=>b.hook_rate-a.hook_rate).slice(0,5);
     const avgViewsTopHook = topHookViews.length ? Math.round(topHookViews.reduce((s,v)=>s+v.views,0)/topHookViews.length) : 0;
     const avgViewsAll = d.all_videos.length ? Math.round(d.all_videos.reduce((s,v)=>s+v.views,0)/d.all_videos.length) : 0;
     if (avgViewsTopHook > avgViewsAll * 1.2) {
-      hookRecs.push(`📈 Top 5 hook rate videos avg <strong>${fmt(avgViewsTopHook)} views</strong> vs overall avg of <strong>${fmt(avgViewsAll)}</strong> — strong hooks are directly correlating with more views. Keep prioritizing hook quality.`);
+      hookRecs.push(`<i class="ph ph-trend-up"></i> Top 5 hook rate videos avg <strong>${fmt(avgViewsTopHook)} views</strong> vs overall avg of <strong>${fmt(avgViewsAll)}</strong> — strong hooks are directly correlating with more views. Keep prioritizing hook quality.`);
     }
   }
 
@@ -3262,30 +3261,30 @@ function analyzeData(month, d) {
 
     if (excellentHo.length > 0) {
       const best = excellentHo.sort((a,b)=>b.hold_rate-a.hold_rate)[0];
-      holdRecs.push(`🔥 <strong>${excellentHo.length} Excellent hold${excellentHo.length>1?'s':''} (60%+)</strong> — best is <em>"${best.title.substring(0,45)}${best.title.length>45?'...':''}"</em> by ${best.creator} at ${best.hold_rate}%. Analyze the pacing and structure of these videos — they're keeping viewers engaged far longer than average.`);
+      holdRecs.push(`<i class="ph ph-fire"></i> <strong>${excellentHo.length} Excellent hold${excellentHo.length>1?'s':''} (60%+)</strong> — best is <em>"${best.title.substring(0,45)}${best.title.length>45?'...':''}"</em> by ${best.creator} at ${best.hold_rate}%. Analyze the pacing and structure of these videos — they're keeping viewers engaged far longer than average.`);
     }
     if (veryStrongHo.length > 0) {
-      holdRecs.push(`⚡ <strong>${veryStrongHo.length} Very Strong hold${veryStrongHo.length>1?'s':''} (50–59%)</strong> — these videos have strong mid-section retention. Use their structure as a template: study what happens in the first 10–15 seconds after the hook.`);
+      holdRecs.push(`<i class="ph ph-lightning"></i> <strong>${veryStrongHo.length} Very Strong hold${veryStrongHo.length>1?'s':''} (50–59%)</strong> — these videos have strong mid-section retention. Use their structure as a template: study what happens in the first 10–15 seconds after the hook.`);
     }
     if (goodHo.length > 0) {
-      holdRecs.push(`✓ <strong>${goodHo.length} Good hold${goodHo.length>1?'s':''} (40–49%)</strong> — solid retention. Focus on tightening the middle section to push these above 50%.`);
+      holdRecs.push(`<i class="ph ph-check-circle"></i> <strong>${goodHo.length} Good hold${goodHo.length>1?'s':''} (40–49%)</strong> — solid retention. Focus on tightening the middle section to push these above 50%.`);
     }
     if (weakHo.length > 0) {
       const worstHold = weakHo.sort((a,b)=>a.hold_rate-b.hold_rate)[0];
-      holdRecs.push(`✗ <strong>${weakHo.length} Weak hold${weakHo.length>1?'s':''} (&lt;30%)</strong> — lowest is <em>"${worstHold.title.substring(0,45)}${worstHold.title.length>45?'...':''}"</em> at ${worstHold.hold_rate}%. Viewers are dropping off quickly after the hook. Shorten intros, cut filler, and get to the value faster.`);
+      holdRecs.push(`<i class="ph ph-x-circle"></i> <strong>${weakHo.length} Weak hold${weakHo.length>1?'s':''} (&lt;30%)</strong> — lowest is <em>"${worstHold.title.substring(0,45)}${worstHold.title.length>45?'...':''}"</em> at ${worstHold.hold_rate}%. Viewers are dropping off quickly after the hook. Shorten intros, cut filler, and get to the value faster.`);
     }
     if (avgHold < 40) {
-      holdRecs.push(`📌 Overall hold rate is below the <strong>40% Good</strong> threshold. Focus on tighter scripting and faster pacing — eliminate slow intros, reduce transitions, and deliver value within the first 5 seconds after the hook.`);
+      holdRecs.push(`<i class="ph ph-push-pin"></i> Overall hold rate is below the <strong>40% Good</strong> threshold. Focus on tighter scripting and faster pacing — eliminate slow intros, reduce transitions, and deliver value within the first 5 seconds after the hook.`);
     }
     if (avgHold >= 50) {
-      holdRecs.push(`✅ Hold rate is strong this month. Document what's working in the structure of your top-retention videos and standardize it as a scripting template for all creators.`);
+      holdRecs.push(`<i class="ph ph-check-circle"></i> Hold rate is strong this month. Document what's working in the structure of your top-retention videos and standardize it as a scripting template for all creators.`);
     }
     // Correlation: do high hold rate = high views?
     const topHoldViews = [...holdVids].sort((a,b)=>b.hold_rate-a.hold_rate).slice(0,5);
     const avgViewsTopHold = topHoldViews.length ? Math.round(topHoldViews.reduce((s,v)=>s+v.views,0)/topHoldViews.length) : 0;
     const avgViewsAllH = d.all_videos.length ? Math.round(d.all_videos.reduce((s,v)=>s+v.views,0)/d.all_videos.length) : 0;
     if (avgViewsTopHold > avgViewsAllH * 1.2) {
-      holdRecs.push(`📈 Top 5 hold rate videos avg <strong>${fmt(avgViewsTopHold)} views</strong> vs overall avg of <strong>${fmt(avgViewsAllH)}</strong> — strong viewer retention is directly correlating with more views. Prioritize hold rate as a key quality signal.`);
+      holdRecs.push(`<i class="ph ph-trend-up"></i> Top 5 hold rate videos avg <strong>${fmt(avgViewsTopHold)} views</strong> vs overall avg of <strong>${fmt(avgViewsAllH)}</strong> — strong viewer retention is directly correlating with more views. Prioritize hold rate as a key quality signal.`);
     }
     // Hook vs Hold mismatch insights
     const bothVids = d.all_videos.filter(v => v.hook_rate > 0 && v.hold_rate > 0);
@@ -3295,19 +3294,19 @@ function analyzeData(month, d) {
         .sort((a,b) => b.hold_rate - a.hold_rate);
       if (hiddenGems.length > 0) {
         const gem = hiddenGems[0];
-        holdRecs.push(`💎 <strong>Hidden gem${hiddenGems.length>1?'s':''} detected (${hiddenGems.length} video${hiddenGems.length>1?'s':''})</strong> — weak hook but strong hold: <em>"${gem.title.substring(0,45)}${gem.title.length>45?'...':''}"</em> has only ${gem.hook_rate}% hook but ${gem.hold_rate}% hold. The content is good — viewers who get past the opening love it. <strong>Action: rewrite the first 3 seconds</strong> with a stronger pattern interrupt and repost.`);
+        holdRecs.push(`<i class="ph ph-diamond"></i> <strong>Hidden gem${hiddenGems.length>1?'s':''} detected (${hiddenGems.length} video${hiddenGems.length>1?'s':''})</strong> — weak hook but strong hold: <em>"${gem.title.substring(0,45)}${gem.title.length>45?'...':''}"</em> has only ${gem.hook_rate}% hook but ${gem.hold_rate}% hold. The content is good — viewers who get past the opening love it. <strong>Action: rewrite the first 3 seconds</strong> with a stronger pattern interrupt and repost.`);
       }
       // Wasted hooks: great hook but bad hold — clickbait problem
       const wastedHooks = bothVids.filter(v => v.hook_rate >= 50 && v.hold_rate < 30)
         .sort((a,b) => a.hold_rate - b.hold_rate);
       if (wastedHooks.length > 0) {
         const worst = wastedHooks[0];
-        holdRecs.push(`⚠️ <strong>Wasted hook${wastedHooks.length>1?'s':''} (${wastedHooks.length} video${wastedHooks.length>1?'s':''})</strong> — strong hook but weak hold: <em>"${worst.title.substring(0,45)}${worst.title.length>45?'...':''}"</em> has ${worst.hook_rate}% hook but only ${worst.hold_rate}% hold. The opening stops the scroll but the content doesn't deliver. <strong>Action: fix the body</strong> — tighten pacing, cut filler, and match the energy of the hook throughout.`);
+        holdRecs.push(`<i class="ph ph-warning"></i> <strong>Wasted hook${wastedHooks.length>1?'s':''} (${wastedHooks.length} video${wastedHooks.length>1?'s':''})</strong> — strong hook but weak hold: <em>"${worst.title.substring(0,45)}${worst.title.length>45?'...':''}"</em> has ${worst.hook_rate}% hook but only ${worst.hold_rate}% hold. The opening stops the scroll but the content doesn't deliver. <strong>Action: fix the body</strong> — tighten pacing, cut filler, and match the energy of the hook throughout.`);
       }
       // Perfect balance: both strong
       const highHookHighHold = bothVids.filter(v => v.hook_rate >= 50 && v.hold_rate >= 40);
       if (highHookHighHold.length > 0) {
-        holdRecs.push(`🔗 <strong>${highHookHighHold.length} video${highHookHighHold.length>1?'s':''}</strong> have both strong hook (50%+) AND good hold (40%+) — these are your most complete, high-quality videos. Replicate their full format, not just the opening.`);
+        holdRecs.push(`<i class="ph ph-link"></i> <strong>${highHookHighHold.length} video${highHookHighHold.length>1?'s':''}</strong> have both strong hook (50%+) AND good hold (40%+) — these are your most complete, high-quality videos. Replicate their full format, not just the opening.`);
       }
     }
   }
@@ -3360,7 +3359,7 @@ function renderInsightsOutput(ins, hasPrev) {
   const banner = document.getElementById('insightsBanner');
   banner.style.background = bannerBg[ins.kpi_color] || 'rgba(0,212,255,0.08)';
   banner.style.borderColor = bc + '44';
-  banner.innerHTML = `<span style="color:${bc};font-weight:700;font-size:14px">📊 ${ins.kpi_status}</span>`;
+  banner.innerHTML = `<span style="color:${bc};font-weight:700;font-size:14px">${ins.kpi_status}</span>`;
 
   // Highlights / Lowlights vs prev month
   const momSection = document.getElementById('insightsMoMSection');
@@ -3372,7 +3371,7 @@ function renderInsightsOutput(ins, hasPrev) {
     document.getElementById('insightsMoMLowlights').innerHTML  = toListMom(ins.mom_lowlights);
   } else if (!hasPrev) {
     momSection.style.display = 'block';
-    momSection.innerHTML = `<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius);padding:18px 22px;font-size:12.5px;color:#93C5FD;">📅 <strong>First month on record</strong> — no previous month to compare against. Month-over-month highlights will appear once you have data for a second month.</div>`;
+    momSection.innerHTML = `<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius);padding:18px 22px;font-size:12.5px;color:#93C5FD;"><i class="ph ph-calendar-blank"></i> <strong>First month on record</strong> — no previous month to compare against. Month-over-month highlights will appear once you have data for a second month.</div>`;
   } else {
     momSection.style.display = 'none';
   }
@@ -3400,17 +3399,17 @@ function renderInsightsOutput(ins, hasPrev) {
     gemsSection.style.display = 'block';
     let gemsHtml = '';
     if (gems.length > 0) {
-      gemsHtml += `<div style="margin-bottom:16px;"><div style="font-size:11px;color:#F59E0B;font-weight:700;margin-bottom:10px;">💎 Hidden Gems — Weak Hook, Strong Hold (rewrite the opening)</div>`;
+      gemsHtml += `<div style="margin-bottom:16px;"><div style="font-size:11px;color:#F59E0B;font-weight:700;margin-bottom:10px;"><i class="ph ph-diamond"></i> Hidden Gems — Weak Hook, Strong Hold (rewrite the opening)</div>`;
       gems.forEach(v => {
         const linkHTML = v.link ? `<a href="${v.link}" target="_blank" style="color:#F59E0B;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">▶ Watch</a>` : '';
         gemsHtml += `<div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
           <div style="font-size:12.5px;color:#fff;font-weight:500;margin-bottom:8px;line-height:1.4;">${v.title}</div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-            <span style="background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.1);padding:3px 9px;border-radius:99px;font-size:11px;">👤 ${v.creator || 'Unknown'}</span>
+            <span style="background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.1);padding:3px 9px;border-radius:99px;font-size:11px;"><i class="ph ph-user"></i> ${v.creator || 'Unknown'}</span>
             <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
               ${linkHTML}
-              <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
-              <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+              <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;"><i class="ph ph-fish-simple"></i> ${v.hook_rate}%</span>
+              <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;"><i class="ph ph-timer"></i> ${v.hold_rate}%</span>
             </div>
           </div>
         </div>`;
@@ -3418,17 +3417,17 @@ function renderInsightsOutput(ins, hasPrev) {
       gemsHtml += `</div>`;
     }
     if (wasted.length > 0) {
-      gemsHtml += `<div><div style="font-size:11px;color:#EF4444;font-weight:700;margin-bottom:10px;">⚠️ Wasted Hooks — Strong Hook, Weak Hold (fix the content body)</div>`;
+      gemsHtml += `<div><div style="font-size:11px;color:#EF4444;font-weight:700;margin-bottom:10px;"><i class="ph ph-warning"></i> Wasted Hooks — Strong Hook, Weak Hold (fix the content body)</div>`;
       wasted.forEach(v => {
         const linkHTML = v.link ? `<a href="${v.link}" target="_blank" style="color:#EF4444;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">▶ Watch</a>` : '';
         gemsHtml += `<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
           <div style="font-size:12.5px;color:#fff;font-weight:500;margin-bottom:8px;line-height:1.4;">${v.title}</div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-            <span style="background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.1);padding:3px 9px;border-radius:99px;font-size:11px;">👤 ${v.creator || 'Unknown'}</span>
+            <span style="background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.1);padding:3px 9px;border-radius:99px;font-size:11px;"><i class="ph ph-user"></i> ${v.creator || 'Unknown'}</span>
             <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
               ${linkHTML}
-              <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">🪝 ${v.hook_rate}%</span>
-              <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;">⏱️ ${v.hold_rate}%</span>
+              <span style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;"><i class="ph ph-fish-simple"></i> ${v.hook_rate}%</span>
+              <span style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;"><i class="ph ph-timer"></i> ${v.hold_rate}%</span>
             </div>
           </div>
         </div>`;
