@@ -550,8 +550,8 @@ html { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   gap: 3px;
-  overflow-y: auto;
-  max-height: 84px;
+  overflow: hidden;
+  flex: 1;
 }
 .cal-entry-pill {
   font-size: 10px;
@@ -562,6 +562,43 @@ html { overflow-x: hidden; }
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  line-height: 1.4;
+}
+.cal-more-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.cal-more-badge:hover { background: var(--border); color: var(--text2); }
+/* Day popover */
+.cal-day-popover {
+  position: fixed;
+  z-index: 8000;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  min-width: 240px;
+  max-width: 300px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cal-day-popover-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 @media (max-width: 900px) {
   .cal-day-cell { min-height: 76px; padding: 5px; }
@@ -4593,6 +4630,62 @@ function calendarGoToday() {
   renderContentCalendar();
 }
 
+function showDayPopover(ev, entries, dateStr) {
+  // Remove any existing popover
+  const existing = document.getElementById('calDayPopover');
+  if (existing) existing.remove();
+
+  const popover = document.createElement('div');
+  popover.id = 'calDayPopover';
+  popover.className = 'cal-day-popover';
+
+  const title = document.createElement('div');
+  title.className = 'cal-day-popover-title';
+  const d = new Date(dateStr + 'T00:00:00');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  title.innerHTML = `<span style="color:var(--text);">${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}</span> <span style="color:var(--text3);font-weight:500;">${entries.length} entries</span>`;
+  popover.appendChild(title);
+
+  entries.forEach(entry => {
+    const color = calendarStatusColor(entry.status);
+    const isDone = entry.status === 'Posted' || entry.status === 'Done';
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:8px;cursor:pointer;background:${isDone ? 'rgba(34,197,94,0.1)' : color + '18'};border:1px solid ${isDone ? 'rgba(34,197,94,0.2)' : color + '35'};`;
+    row.innerHTML = `
+      <span style="font-size:11px;font-weight:700;color:${isDone ? 'rgb(34,197,94)' : color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.title}</span>
+      <span style="font-size:10px;color:var(--text3);">${entry.savedBy || ''}${entry.savedBy && entry.platform ? ' · ' : ''}${entry.platform || ''} · <span style="color:${isDone ? 'rgb(34,197,94)' : color};font-weight:600;">${entry.status}</span></span>
+    `;
+    row.onclick = () => { popover.remove(); openCalendarForm(entry); };
+    popover.appendChild(row);
+  });
+
+  // Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Close';
+  closeBtn.style.cssText = 'margin-top:4px;background:transparent;border:1px solid var(--border);color:var(--text3);padding:6px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;';
+  closeBtn.onclick = () => popover.remove();
+  popover.appendChild(closeBtn);
+
+  document.body.appendChild(popover);
+
+  // Position near click, keep on screen
+  const rect = ev.target.getBoundingClientRect();
+  let top = rect.bottom + 6;
+  let left = rect.left;
+  if (left + 300 > window.innerWidth) left = window.innerWidth - 310;
+  if (top + 300 > window.innerHeight) top = rect.top - popover.offsetHeight - 6;
+  popover.style.top = top + 'px';
+  popover.style.left = left + 'px';
+
+  // Click outside to close
+  setTimeout(() => {
+    document.addEventListener('click', function handler(e) {
+      if (!popover.contains(e.target)) { popover.remove(); document.removeEventListener('click', handler); }
+    });
+  }, 50);
+}
+
 function renderContentCalendar() {
   const grid = document.getElementById('calendarMonthGrid');
   if (!grid) return;
@@ -4661,7 +4754,11 @@ function renderContentCalendar() {
 
     const entriesWrap = document.createElement('div');
     entriesWrap.className = 'cal-entries';
-    (byDate[dateStr] || []).forEach(entry => {
+
+    const dayEntries = byDate[dateStr] || [];
+    const MAX_VISIBLE = 2;
+
+    function buildPill(entry) {
       const color = calendarStatusColor(entry.status);
       const isDone = entry.status === 'Posted' || entry.status === 'Done';
       const hasLink = entry.link && entry.link.trim();
@@ -4671,29 +4768,27 @@ function renderContentCalendar() {
       pill.style.background = isDone ? 'rgba(34,197,94,0.15)' : color + '26';
       pill.style.color = isDone ? 'rgb(34,197,94)' : color;
       pill.style.fontWeight = isDone ? '700' : '';
-      pill.style.border = isDone ? '1px solid rgba(34,197,94,0.25)' : '';
+      pill.style.border = isDone ? '1px solid rgba(34,197,94,0.25)' : '1px solid ' + color + '40';
       pill.style.display = 'flex';
       pill.style.alignItems = 'center';
       pill.style.justifyContent = 'space-between';
       pill.style.gap = '4px';
       pill.title = `${entry.title} · ${entry.platform} · ${entry.status}`;
 
-      // Left side: title + savedBy name
       const leftDiv = document.createElement('div');
-      leftDiv.style.cssText = 'flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      leftDiv.style.cssText = 'flex:1;min-width:0;overflow:hidden;';
       const titleSpan = document.createElement('span');
       titleSpan.textContent = entry.title;
-      titleSpan.style.cssText = 'display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      titleSpan.style.cssText = 'display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;';
       leftDiv.appendChild(titleSpan);
       if (entry.savedBy) {
         const nameSpan = document.createElement('span');
         nameSpan.textContent = entry.savedBy;
-        nameSpan.style.cssText = `display:block;font-size:9px;opacity:0.75;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
+        nameSpan.style.cssText = `display:block;font-size:9px;opacity:0.7;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
         leftDiv.appendChild(nameSpan);
       }
       pill.appendChild(leftDiv);
 
-      // Right side: link icon if has link
       if (hasLink) {
         const linkIcon = document.createElement('a');
         linkIcon.href = entry.link;
@@ -4707,8 +4802,27 @@ function renderContentCalendar() {
       }
 
       pill.onclick = (ev) => { ev.stopPropagation(); openCalendarForm(entry); };
-      entriesWrap.appendChild(pill);
+      return pill;
+    }
+
+    // Show up to MAX_VISIBLE pills
+    dayEntries.slice(0, MAX_VISIBLE).forEach(entry => {
+      entriesWrap.appendChild(buildPill(entry));
     });
+
+    // "+N more" badge that opens a popover
+    if (dayEntries.length > MAX_VISIBLE) {
+      const remaining = dayEntries.length - MAX_VISIBLE;
+      const moreBadge = document.createElement('div');
+      moreBadge.className = 'cal-more-badge';
+      moreBadge.textContent = `+${remaining} more`;
+      moreBadge.onclick = (ev) => {
+        ev.stopPropagation();
+        showDayPopover(ev, dayEntries, dateStr);
+      };
+      entriesWrap.appendChild(moreBadge);
+    }
+
     cell.appendChild(entriesWrap);
 
     grid.appendChild(cell);
