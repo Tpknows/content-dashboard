@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EasyPC Content Dashboard 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -150,11 +151,13 @@ html { overflow-x: hidden; }
 .sidebar-subitems {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
   padding-top: 4px;
+  border-radius: 6px;
+  overflow: hidden;
 }
 .sidebar-group.open .sidebar-subitems { max-height: 400px; }
 
@@ -162,26 +165,75 @@ html { overflow-x: hidden; }
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 9px 12px;
-  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  border-radius: 0px;
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text3);
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s;
-  border: 1px solid transparent;
+  user-select: none;
+  border: none;
+  height: 34px;
+  background-color: rgba(0,0,0,0.18);
+  box-shadow: rgba(0,0,0,0.15) 0px 2px 1px 0px inset, rgba(255,255,255,0.07) 0px 1px 1px 0px;
+  transition: color 300ms cubic-bezier(0.25,0.8,0.25,1),
+              background-color 300ms cubic-bezier(0.25,0.8,0.25,1),
+              box-shadow 300ms cubic-bezier(0.25,0.8,0.25,1);
+  position: relative;
+  overflow: hidden;
 }
-.sidebar-item:hover { color: var(--text2); background: rgba(255,255,255,0.04); border-color: var(--border); }
+
+/* First item in each group gets top radius */
+.sidebar-subitems .sidebar-item:first-child {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+/* Last item in each group gets bottom radius */
+.sidebar-subitems .sidebar-item:last-child {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.sidebar-item .sidebar-item-inner {
+  pointer-events: none;
+  transition: transform 300ms cubic-bezier(0.25,0.8,0.25,1);
+  transform: translateY(0px);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+}
+
+.sidebar-item:hover {
+  background-color: #1e1e24;
+  color: rgba(255,255,255,0.85);
+  box-shadow: rgba(0,0,0,0.23) 0px -4px 1px 0px inset, rgba(255,255,255,0.07) 0px -1px 1px 0px, rgba(0,0,0,0.17) 0px 2px 4px 1px;
+}
+.sidebar-item:hover .sidebar-item-inner {
+  transform: translateY(-1px);
+}
+
 .sidebar-item.active {
-  background: var(--accent-dim);
+  background-color: rgba(59,130,246,0.22);
   color: #BFDBFE;
-  font-weight: 600;
-  border: 1px solid var(--accent-border);
-  box-shadow: 0 0 0 1px rgba(59,130,246,0.06) inset;
+  font-weight: 700;
+  box-shadow: rgba(0,0,0,0.28) 0px -4px 1px 0px inset, rgba(59,130,246,0.2) 0px -1px 1px 0px, rgba(0,0,0,0.2) 0px 2px 4px 1px;
 }
-.sidebar-item.active:hover { background: rgba(59,130,246,0.16); color: #BFDBFE; }
-.sidebar-item-icon { font-size: 15px; width: 16px; text-align: center; flex-shrink: 0; opacity: 0.75; line-height: 1; }
+.sidebar-item.active .sidebar-item-inner {
+  transform: translateY(-1px);
+}
+.sidebar-item.active:hover {
+  background-color: rgba(59,130,246,0.28);
+  box-shadow: rgba(0,0,0,0.3) 0px -4px 1px 0px inset, rgba(59,130,246,0.22) 0px -1px 1px 0px, rgba(0,0,0,0.18) 0px 3px 6px 2px;
+}
+
+.sidebar-item-icon { font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; line-height: 1; }
+
+/* Divider between stacked items */
+.sidebar-subitems .sidebar-item + .sidebar-item {
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
 
 .main-area {
   flex: 1;
@@ -370,8 +422,8 @@ html { overflow-x: hidden; }
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 24px;
   margin-top: 4px;
 }
 
@@ -379,11 +431,10 @@ html { overflow-x: hidden; }
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px 24px;
+  padding: 14px 16px;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s, box-shadow 0.2s;
   transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 .kpi-card:hover { transform: translateY(-2px); border-color: var(--border3); box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06) inset; }
@@ -408,18 +459,18 @@ html { overflow-x: hidden; }
 .kpi-card.yellow::before { background: linear-gradient(90deg, var(--yellow), transparent); }
 
 .kpi-label {
-  font-size: 11px;
+  font-size: 9.5px;
   color: var(--text3);
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
   font-weight: 600;
 }
 .kpi-value {
-  font-size: 34px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -1.5px;
+  letter-spacing: -1px;
   font-feature-settings: "tnum";
   color: var(--text);
 }
@@ -429,7 +480,7 @@ html { overflow-x: hidden; }
 .kpi-card.orange .kpi-value { color: var(--text); }
 .kpi-card.pink .kpi-value   { color: var(--text); }
 .kpi-card.yellow .kpi-value { color: var(--text); }
-.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 8px; font-weight: 400; letter-spacing: 0.1px; }
+.kpi-sub { font-size: 10px; color: var(--text3); margin-top: 6px; font-weight: 400; letter-spacing: 0.1px; }
 
 /* ── PROGRESS SECTION ── */
 .progress-section {
@@ -447,7 +498,8 @@ html { overflow-x: hidden; }
   margin-bottom: 28px;
   letter-spacing: 0.1px;
 }
-.progress-item { margin-bottom: 26px; }
+.progress-item { margin-bottom: 26px; margin-top: 12px; }
+.progress-item:first-child { margin-top: 0; }
 .progress-item:last-child { margin-bottom: 0; }
 .progress-label {
   display: flex;
@@ -458,19 +510,65 @@ html { overflow-x: hidden; }
   font-weight: 500;
 }
 .progress-bar {
-  height: 5px;
+  position: relative;
+  height: 8px;
   background: rgba(255,255,255,0.06);
   border-radius: 99px;
-  overflow: hidden;
+  overflow: visible;
 }
 .progress-fill {
   height: 100%;
   border-radius: 99px;
   transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
 }
-.fill-cyan   { background: linear-gradient(90deg, var(--cyan), #0891b2); }
-.fill-purple { background: linear-gradient(90deg, var(--purple), #7c3aed); }
-.fill-green  { background: linear-gradient(90deg, var(--green), #16a34a); }
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.fill-cyan   { background: linear-gradient(90deg, #06b6d4, #3b82f6); box-shadow: 0 0 10px rgba(6,182,212,0.45); }
+.fill-purple { background: linear-gradient(90deg, #8b5cf6, #d946ef); box-shadow: 0 0 10px rgba(139,92,246,0.45); }
+.fill-green  { background: linear-gradient(90deg, #22c55e, #10b981); box-shadow: 0 0 10px rgba(34,197,94,0.45); }
+.progress-target-marker {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: rgba(255,255,255,0.85);
+  z-index: 3;
+  border-radius: 2px;
+}
+.progress-target-marker::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid rgba(255,255,255,0.85);
+}
+.progress-target-label {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text3);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
 
 /* ── CHARTS ── */
 .charts-grid {
@@ -551,6 +649,49 @@ html { overflow-x: hidden; }
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 24px;
 }
+
+/* ── CALENDAR STAT STRIP ── */
+.cal-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.cal-stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.cal-stat-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cal-stat-box:hover { border-color: var(--border3); transform: translateY(-2px); }
+.cal-stat-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.cal-stat-text { flex: 1; min-width: 0; }
+.cal-stat-num { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; font-feature-settings: "tnum"; }
+.cal-stat-desc { font-size: 9px; color: var(--text3); font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; margin-top: 4px; }
 
 /* ── CONTENT CALENDAR MONTH VIEW ── */
 .cal-weekday-row {
@@ -669,15 +810,6 @@ html { overflow-x: hidden; }
 .top10-item {
   background: var(--card);
   border: 1px solid var(--border);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.top10-item:hover {
-  border-color: var(--border2);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-}
-.top10-item {
-  background: var(--card);
-  border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
   display: flex;
@@ -685,12 +817,26 @@ html { overflow-x: hidden; }
   box-shadow: var(--shadow-sm);
   transition: border-color 0.25s, transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  position: relative;
+}
+.top10-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 55%);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s;
 }
 .top10-item:hover {
-  border-color: rgba(59,130,246,0.35);
+  border-color: rgba(59,130,246,0.4);
   transform: translateY(-5px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.12) inset, 0 0 40px rgba(59,130,246,0.06);
 }
+.rank-1.top10-item:hover { border-color: rgba(245,158,11,0.45); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,158,11,0.12) inset, 0 0 40px rgba(245,158,11,0.08); }
+.rank-2.top10-item:hover { border-color: rgba(161,161,170,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(161,161,170,0.1) inset; }
+.rank-3.top10-item:hover { border-color: rgba(205,127,50,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(205,127,50,0.1) inset, 0 0 40px rgba(205,127,50,0.07); }
 .top10-thumb-area {
   position: relative;
   background: var(--surface2);
@@ -703,18 +849,39 @@ html { overflow-x: hidden; }
   position: absolute;
   top: 10px;
   left: 10px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 9px;
-  padding: 2px 9px;
+  padding: 3px 10px;
   border: 1px solid rgba(255,255,255,0.08);
+  letter-spacing: -0.5px;
 }
-.rank-1 .top10-rank-badge { color: #F59E0B; border-color: rgba(245,158,11,0.3); }
-.rank-2 .top10-rank-badge { color: #A1A1AA; border-color: rgba(161,161,170,0.3); }
-.rank-3 .top10-rank-badge { color: #CD7F32; border-color: rgba(205,127,50,0.3); }
+.rank-1 .top10-rank-badge {
+  color: #F59E0B;
+  border-color: rgba(245,158,11,0.4);
+  background: rgba(245,158,11,0.12);
+  box-shadow: 0 0 12px rgba(245,158,11,0.2);
+}
+.rank-2 .top10-rank-badge {
+  color: #C4C4C8;
+  border-color: rgba(196,196,200,0.3);
+  background: rgba(196,196,200,0.08);
+}
+.rank-3 .top10-rank-badge {
+  color: #E8924A;
+  border-color: rgba(232,146,74,0.3);
+  background: rgba(232,146,74,0.1);
+  box-shadow: 0 0 10px rgba(232,146,74,0.15);
+}
 .rank-other .top10-rank-badge { color: var(--text3); }
+
+/* Premium top accent line on podium cards */
+.rank-1.top10-item { border-top-color: rgba(245,158,11,0.35); }
+.rank-2.top10-item { border-top-color: rgba(196,196,200,0.25); }
+.rank-3.top10-item { border-top-color: rgba(232,146,74,0.3); }
 .top10-views-overlay {
   position: absolute;
   bottom: 10px;
@@ -782,19 +949,41 @@ html { overflow-x: hidden; }
 .ai-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 .ai-stat {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: 14px 14px 12px;
   text-align: center;
   box-shadow: var(--shadow-sm);
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
 }
-.ai-stat-val { font-size: 30px; font-weight: 700; color: var(--text); letter-spacing: -1px; }
-.ai-stat-label { font-size: 11px; color: var(--text3); margin-top: 10px; font-weight: 500; }
+.ai-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(90deg, var(--purple), transparent);
+}
+.ai-stat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(139,92,246,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.ai-stat:hover { border-color: rgba(139,92,246,0.3); transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,0.4), 0 0 0 1px rgba(139,92,246,0.06) inset; }
+.ai-stat-icon { font-size: 14px; margin-bottom: 7px; line-height: 1; color: var(--purple); }
+.ai-stat-val { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; font-feature-settings: "tnum"; line-height: 1; }
+.ai-stat-label { font-size: 9px; color: var(--text3); margin-top: 7px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.ai-stat-sub { font-size: 9px; color: var(--text3); margin-top: 3px; font-weight: 400; }
 
 /* ── TABLES ── */
 .ai-table { width: 100%; border-collapse: collapse; }
@@ -995,21 +1184,42 @@ html { overflow-x: hidden; }
 .hook-summary {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 22px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 .hook-stat {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 26px;
+  padding: 14px 14px 12px;
   text-align: center;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
 }
-.hook-stat:hover { border-color: var(--border2); transform: translateY(-2px); }
-.hook-stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-.hook-stat-label { font-size: 10.5px; color: var(--text3); margin-top: 10px; font-weight: 500; letter-spacing: 0.2px; }
+.hook-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--hook-stat-accent, rgba(255,255,255,0.08));
+  transition: opacity 0.3s;
+}
+.hook-stat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.025) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hook-stat:hover { border-color: var(--border3); transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset; }
+.hook-stat-icon { font-size: 14px; margin-bottom: 7px; line-height: 1; }
+.hook-stat-val { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; font-feature-settings: "tnum"; line-height: 1; }
+.hook-stat-label { font-size: 9px; color: var(--text3); margin-top: 7px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.hook-stat-sub { font-size: 9px; color: var(--text3); margin-top: 3px; font-weight: 400; }
 
 /* ── HOLD RATE ── */
 .hold-excellent { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.2);  padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
@@ -1022,21 +1232,41 @@ html { overflow-x: hidden; }
 .hold-summary {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 22px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 .hold-stat {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 26px;
+  padding: 14px 14px 12px;
   text-align: center;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
 }
-.hold-stat:hover { border-color: var(--border2); transform: translateY(-2px); }
-.hold-stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-.hold-stat-label { font-size: 10.5px; color: var(--text3); margin-top: 10px; font-weight: 500; letter-spacing: 0.2px; }
+.hold-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--hold-stat-accent, rgba(255,255,255,0.08));
+}
+.hold-stat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.025) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hold-stat:hover { border-color: var(--border3); transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset; }
+.hold-stat-icon { font-size: 14px; margin-bottom: 7px; line-height: 1; }
+.hold-stat-val { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; font-feature-settings: "tnum"; line-height: 1; }
+.hold-stat-label { font-size: 9px; color: var(--text3); margin-top: 7px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.hold-stat-sub { font-size: 9px; color: var(--text3); margin-top: 3px; font-weight: 400; }
 
 /* ── AI INSIGHTS TAB ── */
 #tab-insights .msb-item { min-width: 130px; }
@@ -1139,10 +1369,14 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   .ai-summary { grid-template-columns: repeat(2, 1fr); }
   .hook-summary { grid-template-columns: repeat(2, 1fr); }
   .hold-summary { grid-template-columns: repeat(2, 1fr); }
+  .cal-stat-strip { grid-template-columns: repeat(2, 1fr); }
   .content { padding: 16px; }
   .header { padding: 0 16px; }
   .tabs { padding: 12px 16px; }
   .insight-pair-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+  .cal-stat-strip { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 }
 @media (max-width: 900px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -1183,13 +1417,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span class="sidebar-group-chevron">▸</span>
     </div>
     <div class="sidebar-subitems">
-      <div class="sidebar-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-icon"><i class="ph ph-squares-four"></i></span>Overview</div>
-      <div class="sidebar-item" onclick="switchTab('top10', this)"><span class="sidebar-item-icon"><i class="ph ph-trophy"></i></span>Top 20 Content</div>
-      <div class="sidebar-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon"><i class="ph ph-sparkle"></i></span>AI Content</div>
-      <div class="sidebar-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon"><i class="ph ph-fish-simple"></i></span>Hook Rate</div>
-      <div class="sidebar-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon"><i class="ph ph-timer"></i></span>Hold Rate</div>
-      <div class="sidebar-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon"><i class="ph ph-calendar-dots"></i></span>Content Calendar</div>
-      <div class="sidebar-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon"><i class="ph ph-trend-up"></i></span>Viral Topics</div>
+      <div class="sidebar-item active" onclick="switchTab('overview', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-squares-four"></i></span>Overview</span></div>
+      <div class="sidebar-item" onclick="switchTab('top10', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-trophy"></i></span>Top 20 Content</span></div>
+      <div class="sidebar-item" onclick="switchTab('ai', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-sparkle"></i></span>AI Content</span></div>
+      <div class="sidebar-item" onclick="switchTab('hook', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-fish-simple"></i></span>Hook Rate</span></div>
+      <div class="sidebar-item" onclick="switchTab('hold', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-timer"></i></span>Hold Rate</span></div>
+      <div class="sidebar-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-calendar-dots"></i></span>Content Calendar</span></div>
+      <div class="sidebar-item" onclick="switchTab('viral', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-trend-up"></i></span>Viral Topics</span></div>
     </div>
   </div>
 
@@ -1199,9 +1433,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span class="sidebar-group-chevron">▸</span>
     </div>
     <div class="sidebar-subitems">
-      <div class="sidebar-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon"><i class="ph ph-chart-bar"></i></span>Monthly Results</div>
-      <div class="sidebar-item" onclick="switchTab('insights', this)" id="insightsTab"><span class="sidebar-item-icon"><i class="ph ph-brain"></i></span>AI Insights</div>
-      <div class="sidebar-item" onclick="switchTab('news', this)" id="newsTab"><span class="sidebar-item-icon"><i class="ph ph-newspaper"></i></span>Tech News<span id="newsBadgeDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#EF4444;margin-left:auto;"></span></div>
+      <div class="sidebar-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-chart-bar"></i></span>Monthly Results</span></div>
+      <div class="sidebar-item" onclick="switchTab('insights', this)" id="insightsTab"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-brain"></i></span>AI Insights</span></div>
+      <div class="sidebar-item" onclick="switchTab('news', this)" id="newsTab"><span class="sidebar-item-inner"><span class="sidebar-item-icon"><i class="ph ph-newspaper"></i></span>Tech News</span><span id="newsBadgeDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#EF4444;margin-left:auto;"></span></div>
     </div>
   </div>
 </div>
@@ -1388,6 +1622,38 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(6,182,212,0.08);color:#06B6D4;border:1px solid rgba(6,182,212,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-rocket-launch"></i> Ready</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-circle"></i> Posted</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.05);color:#4ade80;border:1px solid rgba(34,197,94,0.12);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-fat"></i> Done</span>
+    </div>
+
+    <!-- ── CALENDAR STAT STRIP ── -->
+    <div class="cal-stat-strip" id="calStatStrip">
+      <div class="cal-stat-box">
+        <div class="cal-stat-icon-wrap" style="background:rgba(59,130,246,0.12);color:var(--accent)"><i class="ph ph-calendar-check"></i></div>
+        <div class="cal-stat-text">
+          <div class="cal-stat-num" id="calStatTotal" style="color:var(--accent)">—</div>
+          <div class="cal-stat-desc">Total Scheduled</div>
+        </div>
+      </div>
+      <div class="cal-stat-box">
+        <div class="cal-stat-icon-wrap" style="background:rgba(34,197,94,0.12);color:var(--green)"><i class="ph ph-check-fat"></i></div>
+        <div class="cal-stat-text">
+          <div class="cal-stat-num" id="calStatDone" style="color:var(--green)">—</div>
+          <div class="cal-stat-desc">Done / Posted</div>
+        </div>
+      </div>
+      <div class="cal-stat-box">
+        <div class="cal-stat-icon-wrap" style="background:rgba(245,158,11,0.12);color:var(--yellow)"><i class="ph ph-hourglass-medium"></i></div>
+        <div class="cal-stat-text">
+          <div class="cal-stat-num" id="calStatInProg" style="color:var(--yellow)">—</div>
+          <div class="cal-stat-desc">In Progress</div>
+        </div>
+      </div>
+      <div class="cal-stat-box">
+        <div class="cal-stat-icon-wrap" style="background:rgba(139,92,246,0.12);color:var(--purple)"><i class="ph ph-lightbulb"></i></div>
+        <div class="cal-stat-text">
+          <div class="cal-stat-num" id="calStatIdeas" style="color:var(--purple)">—</div>
+          <div class="cal-stat-desc">Ideas</div>
+        </div>
+      </div>
     </div>
 
     <!-- Add / edit form (hidden by default) -->
@@ -1826,6 +2092,14 @@ let lastInsights = null;
 let lastInsightsMonth = '';
 let viewsChart = null, pillarChart = null;
 
+// Register the datalabels plugin globally but keep it OFF by default —
+// only viewsChart explicitly turns it on (see its config below), so
+// other charts (pillarChart, hookRateChart, etc.) are unaffected.
+if (typeof ChartDataLabels !== 'undefined') {
+  Chart.register(ChartDataLabels);
+  Chart.defaults.set('plugins.datalabels', { display: false });
+}
+
 function showLoader(msg) {
   document.getElementById('loadingOverlay').style.display = 'flex';
   document.getElementById('loadingMsg').textContent = msg || 'Loading live data...';
@@ -2137,14 +2411,14 @@ function updateDashboard() {
       <div class="kpi-sub">Authentic: ${d.authentic} videos</div>
       ${delta(d.avg_rate, prev?.avg_rate)}
     </div>
-    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;">
+    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#22c55e,#00d4ff)"></div>
       <div class="kpi-label">Avg Hook Rate</div>
       <div class="kpi-value" style="color:${d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444'}">${d.avg_hook_rate}%</div>
       <div class="kpi-sub">${d.avg_hook_rate>=60?'<i class="ph ph-fire"></i> Excellent':d.avg_hook_rate>=50?'<i class="ph ph-lightning"></i> Very Strong':d.avg_hook_rate>=40?'✓ Good':d.avg_hook_rate>=30?'~ Average':'✗ Needs Work'}</div>
       ${delta(d.avg_hook_rate, prev?.avg_hook_rate)}
     </div>
-    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;">
+    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#a855f7,#ec4899)"></div>
       <div class="kpi-label">Avg Hold Rate</div>
       <div class="kpi-value" style="color:${d.avg_hold_rate>=60?'#22c55e':d.avg_hold_rate>=50?'#00d4ff':d.avg_hold_rate>=40?'#a855f7':d.avg_hold_rate>=30?'#eab308':'#ef4444'}">${d.avg_hold_rate}%</div>
@@ -2158,12 +2432,27 @@ function updateDashboard() {
     </div>
   `;
 
-  const vPct = Math.min(100, viewsPct), wPct = Math.min(100, winPct), tPct = Math.min(100, thruPct);
-  document.getElementById('progressBars').innerHTML = `
-    <div class="progress-item"><div class="progress-label"><span>Views</span><span>${fmt(d.views)} / ${fmt(KPI_TARGETS.views)} (${viewsPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-cyan" style="width:${vPct}%"></div></div></div>
-    <div class="progress-item"><div class="progress-label"><span>Winning Videos</span><span>${d.winning} / ${KPI_TARGETS.winning} (${winPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-green" style="width:${wPct}%"></div></div></div>
-    <div class="progress-item"><div class="progress-label"><span>Thruplays</span><span>${fmt(d.thruplays)} / ${fmt(KPI_TARGETS.thruplays)} (${thruPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-purple" style="width:${tPct}%"></div></div></div>
-  `;
+  function buildProgressItem(label, current, target, actualPct, fillClass) {
+    // If actual exceeds target, scale the bar to actualPct so the fill goes full
+    // width and the target marker shifts left to show exactly where 100% sits.
+    const displayMax   = Math.max(100, actualPct);
+    const fillWidth    = (actualPct / displayMax) * 100;
+    const markerPos    = (100 / displayMax) * 100;
+    const showMarker   = actualPct > 100; // only needed when there's overflow beyond the bar's own 100% edge
+    return `
+      <div class="progress-item">
+        <div class="progress-label"><span>${label}</span><span>${current} / ${target} (${actualPct}%)</span></div>
+        <div class="progress-bar">
+          <div class="progress-fill ${fillClass}" style="width:${fillWidth}%"></div>
+          ${showMarker ? `<div class="progress-target-marker" style="left:${markerPos}%"><span class="progress-target-label">Target</span></div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('progressBars').innerHTML =
+    buildProgressItem('Views', fmt(d.views), fmt(KPI_TARGETS.views), viewsPct, 'fill-cyan') +
+    buildProgressItem('Winning Videos', d.winning, KPI_TARGETS.winning, winPct, 'fill-green') +
+    buildProgressItem('Thruplays', fmt(d.thruplays), fmt(KPI_TARGETS.thruplays), thruPct, 'fill-purple');
 
   const monthLabels = sortedMonths.map(m => m.charAt(0) + m.slice(1,3).toLowerCase());
   const viewsData = sortedMonths.map(m => DATA[m] ? DATA[m].views : 0);
@@ -2182,7 +2471,19 @@ function updateDashboard() {
           borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
           titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false,
           callbacks: { label: ctx => fmt(ctx.parsed.y) + ' views' }
+        },
+        datalabels: {
+          display: true,
+          anchor: 'end',
+          align: 'top',
+          offset: 4,
+          color: (ctx) => sortedMonths[ctx.dataIndex] === month ? '#FFFFFF' : '#71717A',
+          font: { size: 11, weight: '700' },
+          formatter: (value) => value > 0 ? fmt(value) : ''
         }
+      },
+      layout: {
+        padding: { top: 24 }
       },
       scales: {
         x: { grid: { display: false }, border: { display: false }, ticks: { color: '#71717A', font: { size: 11 } } },
@@ -2199,20 +2500,42 @@ function updateDashboard() {
 
   if (pillarChart) pillarChart.destroy();
   pillarChart = new Chart(document.getElementById('pillarChart'), {
-    type: 'doughnut',
-    data: { labels: ['Know', 'Like', 'Trust'], datasets: [{ data: [d.know, d.like, d.trust], backgroundColor: ['#3B82F6', '#8B5CF6', '#22C55E'], borderWidth: 0, hoverOffset: 4 }] },
+    type: 'radar',
+    data: {
+      labels: ['Know', 'Like', 'Trust'],
+      datasets: [{
+        label: 'Pillar Distribution',
+        data: [d.know, d.like, d.trust],
+        backgroundColor: 'rgba(59,130,246,0.25)',
+        borderColor: '#3B82F6',
+        borderWidth: 2,
+        pointBackgroundColor: ['#3B82F6', '#8B5CF6', '#22C55E'],
+        pointBorderColor: '#0B0B0D',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600, easing: 'easeOutQuart' },
       plugins: {
-        legend: { position: 'bottom', labels: { color: '#A1A1AA', padding: 18, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } },
+        legend: { display: false },
         tooltip: {
           backgroundColor: 'rgba(18,19,22,0.95)', titleColor: '#FFFFFF', bodyColor: '#A1A1AA',
           borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
-          titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false
+          titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false,
+          callbacks: { label: ctx => ctx.label + ': ' + fmt(ctx.parsed.r) }
         }
       },
-      cutout: '70%'
+      scales: {
+        r: {
+          angleLines: { color: 'rgba(255,255,255,0.08)' },
+          grid: { color: 'rgba(255,255,255,0.08)' },
+          pointLabels: { color: '#A1A1AA', font: { size: 12, weight: '600' } },
+          ticks: { display: false, backdropColor: 'transparent' }
+        }
+      }
     }
   });
 
@@ -2276,10 +2599,30 @@ function renderAI(month) {
   const aiWinRate = aiVids.length > 0 ? Math.round(aiWins / aiVids.length * 100) : 0;
 
   document.getElementById('aiSummary').innerHTML = `
-    <div class="ai-stat"><div class="ai-stat-val">${aiVids.length}</div><div class="ai-stat-label">AI Videos</div></div>
-    <div class="ai-stat"><div class="ai-stat-val">${aiWins}</div><div class="ai-stat-label">AI Wins</div></div>
-    <div class="ai-stat"><div class="ai-stat-val">${fmt(aiViews)}</div><div class="ai-stat-label">AI Total Views</div></div>
-    <div class="ai-stat"><div class="ai-stat-val">${aiWinRate}%</div><div class="ai-stat-label">AI Win Rate</div></div>
+    <div class="ai-stat">
+      <div class="ai-stat-icon"><i class="ph ph-sparkle"></i></div>
+      <div class="ai-stat-val">${aiVids.length}</div>
+      <div class="ai-stat-label">AI Videos</div>
+      <div class="ai-stat-sub">tagged this period</div>
+    </div>
+    <div class="ai-stat">
+      <div class="ai-stat-icon"><i class="ph ph-trophy"></i></div>
+      <div class="ai-stat-val" style="color:var(--green)">${aiWins}</div>
+      <div class="ai-stat-label">AI Wins</div>
+      <div class="ai-stat-sub">50K+ view threshold</div>
+    </div>
+    <div class="ai-stat">
+      <div class="ai-stat-icon"><i class="ph ph-eye"></i></div>
+      <div class="ai-stat-val" style="color:var(--cyan)">${fmt(aiViews)}</div>
+      <div class="ai-stat-label">AI Total Views</div>
+      <div class="ai-stat-sub">combined reach</div>
+    </div>
+    <div class="ai-stat">
+      <div class="ai-stat-icon"><i class="ph ph-percent"></i></div>
+      <div class="ai-stat-val" style="color:${aiWinRate >= 50 ? 'var(--green)' : aiWinRate >= 30 ? 'var(--yellow)' : 'var(--red)'}">${aiWinRate}%</div>
+      <div class="ai-stat-label">AI Win Rate</div>
+      <div class="ai-stat-sub">${aiWins} of ${aiVids.length} videos</div>
+    </div>
   `;
 
   const sorted = [...aiVids].sort((a, b) => b.views - a.views);
@@ -2466,11 +2809,36 @@ function renderHook(month) {
   const avgHook    = sorted.length > 0 ? Math.round(sorted.reduce((s,v) => s+v.hook_rate, 0) / sorted.length * 10) / 10 : 0;
 
   document.getElementById('hookSummary').innerHTML = `
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#22c55e">${excellent}</div><div class="hook-stat-label"><i class="ph ph-fire"></i> Excellent (60%+)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hook-stat-label"><i class="ph ph-lightning"></i> Very Strong (50–59%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#a855f7">${good}</div><div class="hook-stat-label"><i class="ph ph-check"></i> Good (40–49%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#eab308">${average}</div><div class="hook-stat-label">~ Average (30–39%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#f97316">${avgHook}%</div><div class="hook-stat-label">Avg Hook Rate</div></div>
+    <div class="hook-stat" style="--hook-stat-accent: linear-gradient(90deg, #22c55e, transparent);">
+      <div class="hook-stat-icon" style="color:#22c55e"><i class="ph ph-fire"></i></div>
+      <div class="hook-stat-val" style="color:#22c55e">${excellent}</div>
+      <div class="hook-stat-label">Excellent</div>
+      <div class="hook-stat-sub">60%+ hook rate</div>
+    </div>
+    <div class="hook-stat" style="--hook-stat-accent: linear-gradient(90deg, #06B6D4, transparent);">
+      <div class="hook-stat-icon" style="color:#06B6D4"><i class="ph ph-lightning"></i></div>
+      <div class="hook-stat-val" style="color:#06B6D4">${veryStrong}</div>
+      <div class="hook-stat-label">Very Strong</div>
+      <div class="hook-stat-sub">50–59% hook rate</div>
+    </div>
+    <div class="hook-stat" style="--hook-stat-accent: linear-gradient(90deg, #a855f7, transparent);">
+      <div class="hook-stat-icon" style="color:#a855f7"><i class="ph ph-check-circle"></i></div>
+      <div class="hook-stat-val" style="color:#a855f7">${good}</div>
+      <div class="hook-stat-label">Good</div>
+      <div class="hook-stat-sub">40–49% hook rate</div>
+    </div>
+    <div class="hook-stat" style="--hook-stat-accent: linear-gradient(90deg, #eab308, transparent);">
+      <div class="hook-stat-icon" style="color:#eab308"><i class="ph ph-minus-circle"></i></div>
+      <div class="hook-stat-val" style="color:#eab308">${average}</div>
+      <div class="hook-stat-label">Average</div>
+      <div class="hook-stat-sub">30–39% hook rate</div>
+    </div>
+    <div class="hook-stat" style="--hook-stat-accent: linear-gradient(90deg, #F97316, transparent);">
+      <div class="hook-stat-icon" style="color:#F97316"><i class="ph ph-fish-simple"></i></div>
+      <div class="hook-stat-val" style="color:#F97316">${avgHook}%</div>
+      <div class="hook-stat-label">Avg Hook Rate</div>
+      <div class="hook-stat-sub">across Top 20</div>
+    </div>
   `;
 
   const TARGET_VIEWS = 50000;
@@ -2531,11 +2899,36 @@ function renderHold(month) {
   const avgHold    = sorted.length > 0 ? Math.round(sorted.reduce((s,v) => s+v.hold_rate, 0) / sorted.length * 10) / 10 : 0;
 
   document.getElementById('holdSummary').innerHTML = `
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#22c55e">${excellent}</div><div class="hold-stat-label"><i class="ph ph-fire"></i> Excellent (60%+)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#00d4ff">${veryStrong}</div><div class="hold-stat-label"><i class="ph ph-lightning"></i> Very Strong (50–59%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#a855f7">${good}</div><div class="hold-stat-label"><i class="ph ph-check"></i> Good (40–49%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#eab308">${average}</div><div class="hold-stat-label">~ Average (30–39%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#f97316">${avgHold}%</div><div class="hold-stat-label">Avg Hold Rate</div></div>
+    <div class="hold-stat" style="--hold-stat-accent: linear-gradient(90deg, #22c55e, transparent);">
+      <div class="hold-stat-icon" style="color:#22c55e"><i class="ph ph-fire"></i></div>
+      <div class="hold-stat-val" style="color:#22c55e">${excellent}</div>
+      <div class="hold-stat-label">Excellent</div>
+      <div class="hold-stat-sub">60%+ hold rate</div>
+    </div>
+    <div class="hold-stat" style="--hold-stat-accent: linear-gradient(90deg, #06B6D4, transparent);">
+      <div class="hold-stat-icon" style="color:#06B6D4"><i class="ph ph-lightning"></i></div>
+      <div class="hold-stat-val" style="color:#06B6D4">${veryStrong}</div>
+      <div class="hold-stat-label">Very Strong</div>
+      <div class="hold-stat-sub">50–59% hold rate</div>
+    </div>
+    <div class="hold-stat" style="--hold-stat-accent: linear-gradient(90deg, #a855f7, transparent);">
+      <div class="hold-stat-icon" style="color:#a855f7"><i class="ph ph-check-circle"></i></div>
+      <div class="hold-stat-val" style="color:#a855f7">${good}</div>
+      <div class="hold-stat-label">Good</div>
+      <div class="hold-stat-sub">40–49% hold rate</div>
+    </div>
+    <div class="hold-stat" style="--hold-stat-accent: linear-gradient(90deg, #eab308, transparent);">
+      <div class="hold-stat-icon" style="color:#eab308"><i class="ph ph-minus-circle"></i></div>
+      <div class="hold-stat-val" style="color:#eab308">${average}</div>
+      <div class="hold-stat-label">Average</div>
+      <div class="hold-stat-sub">30–39% hold rate</div>
+    </div>
+    <div class="hold-stat" style="--hold-stat-accent: linear-gradient(90deg, #F97316, transparent);">
+      <div class="hold-stat-icon" style="color:#F97316"><i class="ph ph-timer"></i></div>
+      <div class="hold-stat-val" style="color:#F97316">${avgHold}%</div>
+      <div class="hold-stat-label">Avg Hold Rate</div>
+      <div class="hold-stat-sub">across Top 20</div>
+    </div>
   `;
 
   const TARGET_VIEWS = 50000;
@@ -4790,6 +5183,18 @@ function renderContentCalendar() {
     if (!byDate[e.date]) byDate[e.date] = [];
     byDate[e.date].push(e);
   });
+
+  // ── Update premium stat strip ──
+  const doneStatuses = ['Posted', 'Done'];
+  const inProgStatuses = ['Scripting', 'Filming', 'Ready'];
+  const totalEl = document.getElementById('calStatTotal');
+  const doneEl  = document.getElementById('calStatDone');
+  const inProgEl = document.getElementById('calStatInProg');
+  const ideasEl = document.getElementById('calStatIdeas');
+  if (totalEl) totalEl.textContent = contentCalendar.length;
+  if (doneEl)  doneEl.textContent  = contentCalendar.filter(e => doneStatuses.includes(e.status)).length;
+  if (inProgEl) inProgEl.textContent = contentCalendar.filter(e => inProgStatuses.includes(e.status)).length;
+  if (ideasEl) ideasEl.textContent  = contentCalendar.filter(e => e.status === 'Idea').length;
 
   const year = calendarViewDate.getFullYear();
   const month = calendarViewDate.getMonth();
