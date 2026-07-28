@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EasyPC Content Dashboard 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -498,8 +497,7 @@ html { overflow-x: hidden; }
   margin-bottom: 28px;
   letter-spacing: 0.1px;
 }
-.progress-item { margin-bottom: 26px; margin-top: 12px; }
-.progress-item:first-child { margin-top: 0; }
+.progress-item { margin-bottom: 26px; }
 .progress-item:last-child { margin-bottom: 0; }
 .progress-label {
   display: flex;
@@ -510,65 +508,19 @@ html { overflow-x: hidden; }
   font-weight: 500;
 }
 .progress-bar {
-  position: relative;
-  height: 8px;
+  height: 5px;
   background: rgba(255,255,255,0.06);
   border-radius: 99px;
-  overflow: visible;
+  overflow: hidden;
 }
 .progress-fill {
   height: 100%;
   border-radius: 99px;
   transition: width 1s cubic-bezier(0.4,0,0.2,1);
-  position: relative;
-  overflow: hidden;
 }
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2.5s ease-in-out infinite;
-}
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-.fill-cyan   { background: linear-gradient(90deg, #06b6d4, #3b82f6); box-shadow: 0 0 10px rgba(6,182,212,0.45); }
-.fill-purple { background: linear-gradient(90deg, #8b5cf6, #d946ef); box-shadow: 0 0 10px rgba(139,92,246,0.45); }
-.fill-green  { background: linear-gradient(90deg, #22c55e, #10b981); box-shadow: 0 0 10px rgba(34,197,94,0.45); }
-.progress-target-marker {
-  position: absolute;
-  top: -5px;
-  bottom: -5px;
-  width: 2px;
-  background: rgba(255,255,255,0.85);
-  z-index: 3;
-  border-radius: 2px;
-}
-.progress-target-marker::before {
-  content: '';
-  position: absolute;
-  top: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0; height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 5px solid rgba(255,255,255,0.85);
-}
-.progress-target-label {
-  position: absolute;
-  top: -22px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--text3);
-  white-space: nowrap;
-  letter-spacing: 0.3px;
-}
+.fill-cyan   { background: linear-gradient(90deg, var(--cyan), #0891b2); }
+.fill-purple { background: linear-gradient(90deg, var(--purple), #7c3aed); }
+.fill-green  { background: linear-gradient(90deg, var(--green), #16a34a); }
 
 /* ── CHARTS ── */
 .charts-grid {
@@ -1613,17 +1565,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       </button>
     </div>
 
-    <!-- ── LEGEND ── -->
-    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:20px;">
-      <span style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">STATUS</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-lightbulb"></i> Idea</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(245,158,11,0.08);color:#F59E0B;border:1px solid rgba(245,158,11,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-pencil-simple"></i> Scripting</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(139,92,246,0.08);color:#8B5CF6;border:1px solid rgba(139,92,246,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-video-camera"></i> Filming</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(6,182,212,0.08);color:#06B6D4;border:1px solid rgba(6,182,212,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-rocket-launch"></i> Ready</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-circle"></i> Posted</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.05);color:#4ade80;border:1px solid rgba(34,197,94,0.12);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-fat"></i> Done</span>
-    </div>
-
     <!-- ── CALENDAR STAT STRIP ── -->
     <div class="cal-stat-strip" id="calStatStrip">
       <div class="cal-stat-box">
@@ -1753,6 +1694,17 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <option value="all">Everyone</option>
         </select>
       </div>
+    </div>
+
+    <!-- ── LEGEND (moved below Today/nav row) ── -->
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:20px;">
+      <span style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">STATUS</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-lightbulb"></i> Idea</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(245,158,11,0.08);color:#F59E0B;border:1px solid rgba(245,158,11,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-pencil-simple"></i> Scripting</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(139,92,246,0.08);color:#8B5CF6;border:1px solid rgba(139,92,246,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-video-camera"></i> Filming</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(6,182,212,0.08);color:#06B6D4;border:1px solid rgba(6,182,212,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-rocket-launch"></i> Ready</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.18);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-circle"></i> Posted</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.05);color:#4ade80;border:1px solid rgba(34,197,94,0.12);display:inline-flex;align-items:center;gap:5px;"><i class="ph ph-check-fat"></i> Done</span>
     </div>
 
     <div id="calendarStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:14px;"></div>
@@ -2092,14 +2044,6 @@ let lastInsights = null;
 let lastInsightsMonth = '';
 let viewsChart = null, pillarChart = null;
 
-// Register the datalabels plugin globally but keep it OFF by default —
-// only viewsChart explicitly turns it on (see its config below), so
-// other charts (pillarChart, hookRateChart, etc.) are unaffected.
-if (typeof ChartDataLabels !== 'undefined') {
-  Chart.register(ChartDataLabels);
-  Chart.defaults.set('plugins.datalabels', { display: false });
-}
-
 function showLoader(msg) {
   document.getElementById('loadingOverlay').style.display = 'flex';
   document.getElementById('loadingMsg').textContent = msg || 'Loading live data...';
@@ -2432,27 +2376,12 @@ function updateDashboard() {
     </div>
   `;
 
-  function buildProgressItem(label, current, target, actualPct, fillClass) {
-    // If actual exceeds target, scale the bar to actualPct so the fill goes full
-    // width and the target marker shifts left to show exactly where 100% sits.
-    const displayMax   = Math.max(100, actualPct);
-    const fillWidth    = (actualPct / displayMax) * 100;
-    const markerPos    = (100 / displayMax) * 100;
-    const showMarker   = actualPct > 100; // only needed when there's overflow beyond the bar's own 100% edge
-    return `
-      <div class="progress-item">
-        <div class="progress-label"><span>${label}</span><span>${current} / ${target} (${actualPct}%)</span></div>
-        <div class="progress-bar">
-          <div class="progress-fill ${fillClass}" style="width:${fillWidth}%"></div>
-          ${showMarker ? `<div class="progress-target-marker" style="left:${markerPos}%"><span class="progress-target-label">Target</span></div>` : ''}
-        </div>
-      </div>`;
-  }
-
-  document.getElementById('progressBars').innerHTML =
-    buildProgressItem('Views', fmt(d.views), fmt(KPI_TARGETS.views), viewsPct, 'fill-cyan') +
-    buildProgressItem('Winning Videos', d.winning, KPI_TARGETS.winning, winPct, 'fill-green') +
-    buildProgressItem('Thruplays', fmt(d.thruplays), fmt(KPI_TARGETS.thruplays), thruPct, 'fill-purple');
+  const vPct = Math.min(100, viewsPct), wPct = Math.min(100, winPct), tPct = Math.min(100, thruPct);
+  document.getElementById('progressBars').innerHTML = `
+    <div class="progress-item"><div class="progress-label"><span>Views</span><span>${fmt(d.views)} / ${fmt(KPI_TARGETS.views)} (${viewsPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-cyan" style="width:${vPct}%"></div></div></div>
+    <div class="progress-item"><div class="progress-label"><span>Winning Videos</span><span>${d.winning} / ${KPI_TARGETS.winning} (${winPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-green" style="width:${wPct}%"></div></div></div>
+    <div class="progress-item"><div class="progress-label"><span>Thruplays</span><span>${fmt(d.thruplays)} / ${fmt(KPI_TARGETS.thruplays)} (${thruPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-purple" style="width:${tPct}%"></div></div></div>
+  `;
 
   const monthLabels = sortedMonths.map(m => m.charAt(0) + m.slice(1,3).toLowerCase());
   const viewsData = sortedMonths.map(m => DATA[m] ? DATA[m].views : 0);
@@ -2471,19 +2400,7 @@ function updateDashboard() {
           borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
           titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false,
           callbacks: { label: ctx => fmt(ctx.parsed.y) + ' views' }
-        },
-        datalabels: {
-          display: true,
-          anchor: 'end',
-          align: 'top',
-          offset: 4,
-          color: (ctx) => sortedMonths[ctx.dataIndex] === month ? '#FFFFFF' : '#71717A',
-          font: { size: 11, weight: '700' },
-          formatter: (value) => value > 0 ? fmt(value) : ''
         }
-      },
-      layout: {
-        padding: { top: 24 }
       },
       scales: {
         x: { grid: { display: false }, border: { display: false }, ticks: { color: '#71717A', font: { size: 11 } } },
@@ -2500,42 +2417,20 @@ function updateDashboard() {
 
   if (pillarChart) pillarChart.destroy();
   pillarChart = new Chart(document.getElementById('pillarChart'), {
-    type: 'radar',
-    data: {
-      labels: ['Know', 'Like', 'Trust'],
-      datasets: [{
-        label: 'Pillar Distribution',
-        data: [d.know, d.like, d.trust],
-        backgroundColor: 'rgba(59,130,246,0.25)',
-        borderColor: '#3B82F6',
-        borderWidth: 2,
-        pointBackgroundColor: ['#3B82F6', '#8B5CF6', '#22C55E'],
-        pointBorderColor: '#0B0B0D',
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 7
-      }]
-    },
+    type: 'doughnut',
+    data: { labels: ['Know', 'Like', 'Trust'], datasets: [{ data: [d.know, d.like, d.trust], backgroundColor: ['#3B82F6', '#8B5CF6', '#22C55E'], borderWidth: 0, hoverOffset: 4 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600, easing: 'easeOutQuart' },
       plugins: {
-        legend: { display: false },
+        legend: { position: 'bottom', labels: { color: '#A1A1AA', padding: 18, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } },
         tooltip: {
           backgroundColor: 'rgba(18,19,22,0.95)', titleColor: '#FFFFFF', bodyColor: '#A1A1AA',
           borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
-          titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false,
-          callbacks: { label: ctx => ctx.label + ': ' + fmt(ctx.parsed.r) }
+          titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false
         }
       },
-      scales: {
-        r: {
-          angleLines: { color: 'rgba(255,255,255,0.08)' },
-          grid: { color: 'rgba(255,255,255,0.08)' },
-          pointLabels: { color: '#A1A1AA', font: { size: 12, weight: '600' } },
-          ticks: { display: false, backdropColor: 'transparent' }
-        }
-      }
+      cutout: '70%'
     }
   });
 
