@@ -1043,7 +1043,17 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 @media (max-width: 600px) {
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  /* Month filter — hide pills, show compact dropdown */
+  #monthPillGroup { display: none !important; }
+  .mobile-month-select { display: block !important; width: 100%; }
+
+  /* KPI grid — 2 per row, compact */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .kpi-card { padding: 14px 12px; }
+  .kpi-label { font-size: 10px !important; margin-bottom: 6px; letter-spacing: 0; }
+  .kpi-value { font-size: 26px !important; letter-spacing: -0.5px; }
+  .kpi-sub { font-size: 10px; margin-top: 6px; }
+
   .ai-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .hook-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .hold-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -1058,54 +1068,15 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   .charts-grid { grid-template-columns: 1fr !important; gap: 14px; }
   .chart-card { padding: 14px 12px; }
   .chart-container { height: 160px !important; }
-
-  /* Month pills → horizontally scrollable strip on mobile */
-  #monthPillGroup {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    flex-wrap: nowrap !important;
-    border-radius: 12px !important;
-    padding: 4px 6px !important;
-    gap: 4px !important;
-    max-width: 100%;
-    scrollbar-width: none;
-  }
-  #monthPillGroup::-webkit-scrollbar { display: none; }
-  #monthPillGroup button {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    font-size: 11px !important;
-    padding: 5px 11px !important;
-    border-radius: 8px !important;
-  }
-
-  /* Header row — stack month pills below title */
-  .header > div:last-child {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .header > div:last-child > div:last-child { /* refresh row */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-  }
-  #lastRefreshed { font-size: 9.5px; }
-
-  /* KPI cards compact */
-  .kpi-card { padding: 14px 12px; }
-  .kpi-value { font-size: 28px !important; }
-  .kpi-label { font-size: 10px !important; }
-
-  /* Charts full width */
   .chart-card[style*="grid-column"] { grid-column: 1 / -1 !important; }
+  .header > div:last-child { width: 100%; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .header > div:last-child > div { width: 100%; }
+  #lastRefreshed { font-size: 9.5px; }
+  .progress-section { padding: 16px 14px; margin-bottom: 20px; }
+  .progress-item { margin-bottom: 16px; }
 }
 @media (max-width: 420px) {
-  .kpi-grid { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .ai-summary { grid-template-columns: 1fr; }
   .hook-summary { grid-template-columns: 1fr; }
   .hold-summary { grid-template-columns: 1fr; }
@@ -1186,9 +1157,11 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   </div>
 
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-    <!-- Fix #1: pill-group month filter — keeps monthSelect hidden for JS compat -->
+    <!-- Desktop: pill group | Mobile: dropdown select -->
     <select id="monthSelect" onchange="updateDashboard();syncMonthPills()" style="display:none;"></select>
     <div id="monthPillGroup" style="display:flex;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:99px;padding:3px;gap:2px;"></div>
+    <!-- Mobile month dropdown — shown only on small screens -->
+    <select id="monthSelectMobile" onchange="document.getElementById('monthSelect').value=this.value;updateDashboard();syncMonthPills();syncMobileMonthSelect()" class="mobile-month-select" style="display:none;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;"></select>
 
     <div style="display:flex;align-items:center;gap:8px;">
       <label class="toggle-switch">
@@ -1322,7 +1295,12 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
 
     <!-- Add / edit form (hidden by default) -->
-    <div id="calendarFormCard" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:26px;box-shadow:var(--shadow-sm);">
+    <div id="calendarFormModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCalendarForm()">
+    <div id="calendarFormCard" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:15px;font-weight:700;color:var(--text);" id="calendarFormTitle">📅 Add Entry</div>
+        <button onclick="closeCalendarForm()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px;">
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Date</label>
@@ -1382,6 +1360,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <button onclick="submitCalendarEntry()" id="calendarSaveBtn" style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
         <button onclick="closeCalendarForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
       </div>
+    </div>
     </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
@@ -1457,8 +1436,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       </button>
     </div>
 
-    <!-- Add / edit form -->
-    <div id="creativeFormCard" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:26px;box-shadow:var(--shadow-sm);">
+    <!-- Add / edit form modal -->
+    <div id="creativeFormModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCreativeForm()">
+    <div id="creativeFormCard" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:15px;font-weight:700;color:var(--text);" id="creativeFormTitle">🎨 Add Job Order</div>
+        <button onclick="closeCreativeForm()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px;">
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Deadline Date</label>
@@ -1528,6 +1512,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <button onclick="deleteCreativeEntry(editingCreativeId)" id="creativeDeleteBtn" style="display:none;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🗑 Delete</button>
         <button onclick="closeCreativeForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
       </div>
+    </div>
     </div>
 
     <!-- Nav + filters -->
@@ -2143,9 +2128,21 @@ function buildMonthPills(available) {
   }).join('');
   group.innerHTML = allYearBtn + monthBtns;
 
-  // On mobile, scroll the active pill into view
-  const activeBtn = group.querySelector('button[style*="background:var(--text)"], button[style*="background:linear-gradient"]');
-  if (activeBtn) setTimeout(() => activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 100);
+  // Also populate mobile dropdown
+  const mob = document.getElementById('monthSelectMobile');
+  if (mob) {
+    mob.innerHTML = `<option value="ALL_YEAR">📊 All Year</option>` +
+      available.filter(m => m !== 'ALL_YEAR').map(m =>
+        `<option value="${m}" ${m === cur ? 'selected' : ''}>${m.charAt(0) + m.slice(1).toLowerCase()}</option>`
+      ).join('');
+    mob.value = cur;
+  }
+}
+
+function syncMobileMonthSelect() {
+  const cur = document.getElementById('monthSelect').value;
+  const mob = document.getElementById('monthSelectMobile');
+  if (mob) mob.value = cur;
 }
 
 function selectMonthPill(month, btn) {
@@ -4725,8 +4722,10 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldNotes').value = entry ? entry.notes : '';
   document.getElementById('calendarSaveBtn').textContent = entry ? 'Update Entry' : 'Save to Sheet';
   renderCalendarHistory(entry);
-  document.getElementById('calendarFormCard').style.display = 'block';
-  document.getElementById('calendarFormCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('calendarFormTitle').textContent = entry ? '📅 Edit Entry' : '📅 Add Entry';
+  const modal = document.getElementById('calendarFormModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function renderCalendarHistory(entry) {
@@ -4751,7 +4750,8 @@ function renderCalendarHistory(entry) {
 
 function closeCalendarForm() {
   editingCalendarId = null;
-  document.getElementById('calendarFormCard').style.display = 'none';
+  document.getElementById('calendarFormModal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 async function submitCalendarEntry() {
@@ -4963,36 +4963,40 @@ function renderContentCalendar() {
     const MAX_VISIBLE = 3;
     dayEntries.slice(0, MAX_VISIBLE).forEach(entry => {
       const color = calendarStatusColor(entry.status);
-      const pill = document.createElement('div');
-      pill.className = 'cal-entry-pill';
-      pill.style.background = color + '26';
-      pill.style.color = color;
-      pill.title = `${entry.title} · ${entry.platform} · ${entry.status} · ${entry.savedBy || ''}`;
-      pill.textContent = entry.title || '(no title)';
-      pill.onclick = (ev) => { ev.stopPropagation(); openCalendarForm(entry); };
-      entriesWrap.appendChild(pill);
+      const card = document.createElement('div');
+      card.className = 'cal-entry-pill';
+      card.style.cssText = `background:${color}18;border-left:3px solid ${color};border-radius:6px;padding:5px 8px;margin-bottom:3px;cursor:pointer;`;
+      card.title = `${entry.title} · ${entry.platform} · ${entry.status} · ${entry.savedBy || ''}`;
+      card.innerHTML = `
+        <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.title || '(no title)'}</div>
+        <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+          ${entry.savedBy ? `<span>${entry.savedBy}</span>` : ''}
+          ${entry.platform ? `<span style="color:var(--text3);">· ${entry.platform}</span>` : ''}
+          <span style="color:${color};font-weight:600;">· ${entry.status}</span>
+        </div>`;
+      card.onclick = (ev) => { ev.stopPropagation(); openCalendarForm(entry); };
+      entriesWrap.appendChild(card);
     });
     if (dayEntries.length > MAX_VISIBLE) {
       const morePill = document.createElement('div');
-      morePill.className = 'cal-entry-pill';
-      morePill.style.background = 'rgba(255,255,255,0.06)';
-      morePill.style.color = 'var(--text3)';
-      morePill.style.fontStyle = 'italic';
-      morePill.style.cursor = 'pointer';
+      morePill.style.cssText = `font-size:10.5px;color:var(--text3);font-style:italic;padding:3px 6px;cursor:pointer;text-align:center;`;
       morePill.textContent = `+${dayEntries.length - MAX_VISIBLE} more`;
       morePill.onclick = (ev) => {
         ev.stopPropagation();
-        // Show all remaining entries on click
         dayEntries.slice(MAX_VISIBLE).forEach(entry => {
           const color = calendarStatusColor(entry.status);
-          const pill = document.createElement('div');
-          pill.className = 'cal-entry-pill';
-          pill.style.background = color + '26';
-          pill.style.color = color;
-          pill.title = `${entry.title} · ${entry.platform} · ${entry.status} · ${entry.savedBy || ''}`;
-          pill.textContent = entry.title || '(no title)';
-          pill.onclick = (ev2) => { ev2.stopPropagation(); openCalendarForm(entry); };
-          entriesWrap.insertBefore(pill, morePill);
+          const card = document.createElement('div');
+          card.className = 'cal-entry-pill';
+          card.style.cssText = `background:${color}18;border-left:3px solid ${color};border-radius:6px;padding:5px 8px;margin-bottom:3px;cursor:pointer;`;
+          card.innerHTML = `
+            <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.title || '(no title)'}</div>
+            <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+              ${entry.savedBy ? `<span>${entry.savedBy}</span>` : ''}
+              ${entry.platform ? `<span>· ${entry.platform}</span>` : ''}
+              <span style="color:${color};font-weight:600;">· ${entry.status}</span>
+            </div>`;
+          card.onclick = (ev2) => { ev2.stopPropagation(); openCalendarForm(entry); };
+          entriesWrap.insertBefore(card, morePill);
         });
         morePill.remove();
       };
@@ -5089,13 +5093,16 @@ function openCreativeForm(entry, presetDate) {
     list.innerHTML = '';
   }
 
-  document.getElementById('creativeFormCard').style.display = 'block';
-  document.getElementById('creativeFormCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('creativeFormTitle').textContent = entry ? '🎨 Edit Job Order' : '🎨 Add Job Order';
+  const modal = document.getElementById('creativeFormModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeCreativeForm() {
   editingCreativeId = null;
-  document.getElementById('creativeFormCard').style.display = 'none';
+  document.getElementById('creativeFormModal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 async function submitCreativeEntry() {
@@ -5264,15 +5271,19 @@ function renderCreativeCalendar() {
     (byDate[dateStr] || []).forEach(entry => {
       const color    = creativeStatusColor(entry.status);
       const priority = creativePriorityBadge(entry.priority);
-      const pill = document.createElement('div');
-      pill.className = 'cal-entry-pill';
-      pill.style.background = color + '26';
-      pill.style.color = color;
-      pill.style.borderLeft = '3px solid ' + priority.color;
-      pill.title = `${entry.title} · ${entry.client || 'No client'} · ${entry.designer || 'Unassigned'} · ${entry.status} · ${entry.priority}`;
-      pill.innerHTML = `${priority.icon} ${entry.title}`;
-      pill.onclick = (ev) => { ev.stopPropagation(); openCreativeForm(entry); };
-      entriesWrap.appendChild(pill);
+      const card = document.createElement('div');
+      card.className = 'cal-entry-pill';
+      card.style.cssText = `background:${color}18;border-left:3px solid ${priority.color};border-radius:6px;padding:5px 8px;margin-bottom:3px;cursor:pointer;`;
+      card.title = `${entry.title} · ${entry.client || 'No client'} · ${entry.designer || 'Unassigned'} · ${entry.status} · ${entry.priority}`;
+      card.innerHTML = `
+        <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${priority.icon} ${entry.title}</div>
+        <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+          ${entry.designer ? `<span>${entry.designer}</span>` : ''}
+          ${entry.client ? `<span>· ${entry.client}</span>` : ''}
+          <span style="color:${color};font-weight:600;">· ${entry.status}</span>
+        </div>`;
+      card.onclick = (ev) => { ev.stopPropagation(); openCreativeForm(entry); };
+      entriesWrap.appendChild(card);
     });
     cell.appendChild(entriesWrap);
     grid.appendChild(cell);
