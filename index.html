@@ -1189,6 +1189,30 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         </div>
         <div class="chart-container"><canvas id="pillarChart"></canvas></div>
       </div>
+      <!-- NEW: Monthly Trend Line -->
+      <div class="chart-card" style="grid-column:1/-1;">
+        <div class="chart-card-header">
+          <div><div class="chart-title">📈 Views Trend</div><div class="chart-subtitle">Monthly views over time — all months</div></div>
+          <span class="chart-status-badge info" id="trendChartBadge">All Year</span>
+        </div>
+        <div class="chart-container" style="height:180px;"><canvas id="trendChart"></canvas></div>
+      </div>
+      <!-- NEW: Creator Comparison -->
+      <div class="chart-card" style="grid-column:1/-1;">
+        <div class="chart-card-header">
+          <div><div class="chart-title">👤 Creator Comparison</div><div class="chart-subtitle">Hook Rate vs Hold Rate — avg per creator</div></div>
+          <span class="chart-status-badge info" id="creatorChartBadge">This month</span>
+        </div>
+        <div class="chart-container" style="height:200px;"><canvas id="creatorCompareChart"></canvas></div>
+      </div>
+      <!-- NEW: Hold Rate Leaderboard -->
+      <div class="chart-card" style="grid-column:1/-1;">
+        <div class="chart-card-header">
+          <div><div class="chart-title">⏱️ Hold Rate Leaderboard</div><div class="chart-subtitle">Top 10 videos by Hold Rate % — this month</div></div>
+          <span class="chart-status-badge info" id="holdLeaderBadge">Top 10</span>
+        </div>
+        <div class="chart-container" style="height:260px;"><canvas id="holdLeaderChart"></canvas></div>
+      </div>
     </div>
     <div class="section-title">Creator Breakdown</div>
     <div class="creator-grid" id="creatorGrid"></div>
@@ -1844,7 +1868,7 @@ const KPI_TARGETS = { views: 3000000, winning: 20, thruplays: 1800000 };
 let DATA = {};
 let lastInsights = null;
 let lastInsightsMonth = '';
-let viewsChart = null, pillarChart = null;
+let viewsChart = null, pillarChart = null, trendChart = null, creatorCompareChart = null, holdLeaderChart = null;
 
 function showLoader(msg) {
   document.getElementById('loadingOverlay').style.display = 'flex';
@@ -2247,7 +2271,231 @@ function updateDashboard() {
   renderAI(month);
   renderHook(month);
   renderHold(month);
+  renderTrendChart();
+  renderCreatorCompareChart(month);
+  renderHoldLeaderChart(month);
   renderMonthlyResults();
+}
+
+// ─────────────────────────────────────────────────────────────
+// UPGRADE 1 — Monthly Trend Line (views over all months)
+// ─────────────────────────────────────────────────────────────
+function renderTrendChart() {
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const sortedMonths = Object.keys(DATA)
+    .filter(m => m !== 'ALL_YEAR')
+    .sort((a, b) => MONTHS_ORDER.indexOf(a) - MONTHS_ORDER.indexOf(b));
+
+  if (sortedMonths.length < 2) return;
+
+  const labels   = sortedMonths.map(m => m.charAt(0) + m.slice(1).toLowerCase().slice(0,2));
+  const views    = sortedMonths.map(m => DATA[m].views || 0);
+  const thruplays = sortedMonths.map(m => DATA[m].thruplays || 0);
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Views',
+          data: views,
+          borderColor: '#3B82F6',
+          backgroundColor: 'rgba(59,130,246,0.08)',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: '#3B82F6',
+          tension: 0.4,
+          fill: true,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Thruplays',
+          data: thruplays,
+          borderColor: '#22C55E',
+          backgroundColor: 'rgba(34,197,94,0.06)',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#22C55E',
+          tension: 0.4,
+          fill: true,
+          yAxisID: 'y'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 700, easing: 'easeOutQuart' },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { color: '#A1A1AA', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 7, boxHeight: 7, padding: 16 } },
+        tooltip: {
+          backgroundColor: 'rgba(18,19,22,0.95)', titleColor: '#fff', bodyColor: '#A1A1AA',
+          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
+          callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y) }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#71717A', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false }, ticks: { color: '#71717A', font: { size: 11 }, callback: v => fmt(v) } }
+      }
+    }
+  });
+
+  // Badge: best month
+  const maxIdx = views.indexOf(Math.max(...views));
+  const badge = document.getElementById('trendChartBadge');
+  if (badge && maxIdx >= 0) {
+    badge.textContent = '📈 Best: ' + labels[maxIdx];
+    badge.className = 'chart-status-badge good';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// UPGRADE 2 — Creator Comparison: Hook Rate vs Hold Rate
+// ─────────────────────────────────────────────────────────────
+function renderCreatorCompareChart(month) {
+  const videos = getVideos(month);
+  if (!videos.length) return;
+
+  // Group by creator — avg hook + hold rate
+  const byCreator = {};
+  videos.forEach(v => {
+    if (!v.creator) return;
+    if (!byCreator[v.creator]) byCreator[v.creator] = { hookTotal: 0, holdTotal: 0, hookCount: 0, holdCount: 0 };
+    if (v.hook_rate > 0) { byCreator[v.creator].hookTotal += v.hook_rate; byCreator[v.creator].hookCount++; }
+    if (v.hold_rate > 0) { byCreator[v.creator].holdTotal += v.hold_rate; byCreator[v.creator].holdCount++; }
+  });
+
+  const creators = Object.keys(byCreator).filter(c => byCreator[c].hookCount > 0 || byCreator[c].holdCount > 0);
+  if (!creators.length) return;
+
+  const hookData = creators.map(c => byCreator[c].hookCount > 0 ? Math.round(byCreator[c].hookTotal / byCreator[c].hookCount * 10) / 10 : 0);
+  const holdData = creators.map(c => byCreator[c].holdCount > 0 ? Math.round(byCreator[c].holdTotal / byCreator[c].holdCount * 10) / 10 : 0);
+
+  if (creatorCompareChart) creatorCompareChart.destroy();
+  creatorCompareChart = new Chart(document.getElementById('creatorCompareChart'), {
+    type: 'bar',
+    data: {
+      labels: creators,
+      datasets: [
+        {
+          label: '🪝 Avg Hook Rate %',
+          data: hookData,
+          backgroundColor: 'rgba(34,197,94,0.75)',
+          borderRadius: 6,
+          borderSkipped: false,
+          maxBarThickness: 28
+        },
+        {
+          label: '⏱️ Avg Hold Rate %',
+          data: holdData,
+          backgroundColor: 'rgba(6,182,212,0.75)',
+          borderRadius: 6,
+          borderSkipped: false,
+          maxBarThickness: 28
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { color: '#A1A1AA', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 7, boxHeight: 7, padding: 16 } },
+        tooltip: {
+          backgroundColor: 'rgba(18,19,22,0.95)', titleColor: '#fff', bodyColor: '#A1A1AA',
+          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
+          callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%' }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#A1A1AA', font: { size: 11 } } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false },
+          ticks: { color: '#71717A', font: { size: 11 }, callback: v => v + '%' },
+          suggestedMax: Math.max(...hookData, ...holdData) * 1.2 || 100
+        }
+      }
+    }
+  });
+
+  // Badge: highest hook creator
+  const topHookIdx = hookData.indexOf(Math.max(...hookData));
+  const badge = document.getElementById('creatorChartBadge');
+  if (badge && topHookIdx >= 0 && hookData[topHookIdx] > 0) {
+    badge.textContent = '🪝 Best Hook: ' + creators[topHookIdx] + ' (' + hookData[topHookIdx] + '%)';
+    badge.className = 'chart-status-badge good';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// UPGRADE 3 — Hold Rate Leaderboard (horizontal bar, Top 10)
+// ─────────────────────────────────────────────────────────────
+function renderHoldLeaderChart(month) {
+  const videos = getVideos(month);
+  if (!videos.length) return;
+
+  const withRate = videos.filter(v => v.hold_rate > 0);
+  if (!withRate.length) return;
+
+  const top10 = [...withRate].sort((a, b) => b.hold_rate - a.hold_rate).slice(0, 10);
+  const labels = top10.map(v => v.title.length > 30 ? v.title.slice(0, 30) + '…' : v.title);
+  const data   = top10.map(v => v.hold_rate);
+  const colors = data.map(r =>
+    r >= 100 ? '#F59E0B' :
+    r >= 60  ? '#22C55E' :
+    r >= 50  ? '#06B6D4' :
+    r >= 40  ? '#8B5CF6' :
+    r >= 30  ? '#eab308' : '#71717A'
+  );
+
+  if (holdLeaderChart) holdLeaderChart.destroy();
+  holdLeaderChart = new Chart(document.getElementById('holdLeaderChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Hold Rate %',
+        data,
+        backgroundColor: colors,
+        borderRadius: 6,
+        borderSkipped: false,
+        maxBarThickness: 22
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(18,19,22,0.95)', titleColor: '#fff', bodyColor: '#A1A1AA',
+          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
+          callbacks: {
+            title: ctx => top10[ctx[0].dataIndex].title,
+            label: ctx => '⏱️ ' + ctx.parsed.x + '% Hold Rate · ' + fmt(top10[ctx.dataIndex].views) + ' views'
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false },
+          ticks: { color: '#71717A', font: { size: 11 }, callback: v => v + '%' },
+          suggestedMax: Math.max(...data) * 1.15 || 100
+        },
+        y: { grid: { display: false }, border: { display: false }, ticks: { color: '#A1A1AA', font: { size: 10.5 } } }
+      }
+    }
+  });
+
+  const badge = document.getElementById('holdLeaderBadge');
+  if (badge && top10.length > 0) {
+    badge.textContent = '🏆 Best: ' + top10[0].hold_rate + '%';
+    badge.className = top10[0].hold_rate >= 60 ? 'chart-status-badge good' : 'chart-status-badge info';
+  }
 }
 
 function renderTop10(month) {
