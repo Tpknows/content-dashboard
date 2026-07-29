@@ -4759,8 +4759,8 @@ async function submitCreativeEntry() {
     title:      title,
     client:     document.getElementById('crFieldClient').value.trim(),
     designer:   designer,
-    notes:      document.getElementById('crFieldNotes').value.trim(),
-    calendarType: 'creative'  // tells Apps Script which sheet tab to write to
+    notes:      document.getElementById('crFieldNotes').value.trim()
+    // calendarType is sent at the top level of the POST body, not inside entry
   };
 
   // Build status history
@@ -4782,7 +4782,7 @@ async function submitCreativeEntry() {
     const response = await fetch(CREATIVE_CALENDAR_APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: editingCreativeId ? 'update' : 'add', entry: payload })
+      body: JSON.stringify({ action: editingCreativeId ? 'update' : 'add', calendarType: 'creative', entry: payload })
     });
     const result = await response.json();
     if (result.status === 'error') {
