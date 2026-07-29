@@ -572,7 +572,9 @@ html { overflow-x: hidden; }
   padding: 14px;
   min-width: 240px;
   max-width: 300px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -4603,13 +4605,28 @@ function showDayPopover(ev, entries, dateStr) {
 
   document.body.appendChild(popover);
 
-  const rect = ev.target.getBoundingClientRect();
-  let top = rect.bottom + 6;
-  let left = rect.left;
-  if (left + 300 > window.innerWidth) left = window.innerWidth - 310;
-  if (top + 300 > window.innerHeight) top = rect.top - 6;
-  popover.style.top = top + 'px';
-  popover.style.left = left + 'px';
+  // Wait for popover to render so we know its actual size
+  requestAnimationFrame(() => {
+    const pw = popover.offsetWidth || 280;
+    const ph = popover.offsetHeight || 200;
+    const rect = ev.target.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Horizontal: prefer right of click, shift left if it overflows
+    let left = rect.left;
+    if (left + pw > vw - 10) left = Math.max(10, vw - pw - 10);
+
+    // Vertical: prefer below, but if not enough room go above
+    let top = rect.bottom + 6;
+    if (top + ph > vh - 10) {
+      top = rect.top - ph - 6;
+      if (top < 10) top = Math.max(10, vh / 2 - ph / 2); // center fallback
+    }
+
+    popover.style.top = top + 'px';
+    popover.style.left = left + 'px';
+  });
 
   setTimeout(() => {
     document.addEventListener('click', function handler(e) {
