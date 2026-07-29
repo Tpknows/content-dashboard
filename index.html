@@ -1043,17 +1043,66 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 @media (max-width: 600px) {
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .ai-summary { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .hook-summary { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .hold-summary { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .ai-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .hook-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .hold-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .creator-grid { grid-template-columns: 1fr; }
-  .top10-list { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .monthly-summary-bar { gap: 10px; }
-  .msb-item { min-width: 100px; padding: 14px 16px; }
-  .header { height: auto; padding: 16px 16px 18px; row-gap: 12px; flex-wrap: wrap; }
-  .content { padding: 20px 16px; }
-  #monthPillGroup { margin-bottom: 2px; }
+  .top10-list { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .monthly-summary-bar { gap: 8px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 6px; }
+  .msb-item { min-width: 90px; padding: 12px 14px; flex-shrink: 0; }
+  .header { height: auto; padding: 12px 14px 14px; row-gap: 10px; flex-wrap: wrap; }
+  .header > div:first-child .logo { font-size: 16px; }
+  .header > div:first-child .subtitle { font-size: 10px; }
+  .content { padding: 14px 12px; }
+  .charts-grid { grid-template-columns: 1fr !important; gap: 14px; }
+  .chart-card { padding: 14px 12px; }
+  .chart-container { height: 160px !important; }
+
+  /* Month pills → horizontally scrollable strip on mobile */
+  #monthPillGroup {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    flex-wrap: nowrap !important;
+    border-radius: 12px !important;
+    padding: 4px 6px !important;
+    gap: 4px !important;
+    max-width: 100%;
+    scrollbar-width: none;
+  }
+  #monthPillGroup::-webkit-scrollbar { display: none; }
+  #monthPillGroup button {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    font-size: 11px !important;
+    padding: 5px 11px !important;
+    border-radius: 8px !important;
+  }
+
+  /* Header row — stack month pills below title */
+  .header > div:last-child {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .header > div:last-child > div:last-child { /* refresh row */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  #lastRefreshed { font-size: 9.5px; }
+
+  /* KPI cards compact */
+  .kpi-card { padding: 14px 12px; }
+  .kpi-value { font-size: 28px !important; }
+  .kpi-label { font-size: 10px !important; }
+
+  /* Charts full width */
+  .chart-card[style*="grid-column"] { grid-column: 1 / -1 !important; }
 }
 @media (max-width: 420px) {
   .kpi-grid { grid-template-columns: 1fr; }
@@ -1161,6 +1210,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon">🪝</span>Hook Rate</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon">⏱️</span>Hold Rate</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon">🗓️</span>Calendar</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('creative-calendar', this)"><span class="sidebar-item-icon">🎨</span>Creative</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon">🔥</span>Viral Topics</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon">📅</span>Monthly</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('insights', this)"><span class="sidebar-item-icon">✦</span>AI Insights</div>
@@ -2063,6 +2113,10 @@ function buildMonthPills(available) {
     return `<button style="${isActive ? activeStyle : pillStyle}" onclick="selectMonthPill('${m}',this)">${label}</button>`;
   }).join('');
   group.innerHTML = allYearBtn + monthBtns;
+
+  // On mobile, scroll the active pill into view
+  const activeBtn = group.querySelector('button[style*="background:var(--text)"], button[style*="background:linear-gradient"]');
+  if (activeBtn) setTimeout(() => activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 100);
 }
 
 function selectMonthPill(month, btn) {
