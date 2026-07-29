@@ -1392,7 +1392,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <button onclick="calendarChangeMonth(1)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius:10px;font-size:14px;cursor:pointer;">›</button>
         <div id="calendarMonthLabel" style="font-size:16px;font-weight:700;color:var(--text);margin-left:6px;"></div>
       </div>
-      <div class="filter-row" style="margin-bottom:0;">
+      <div class="filter-row" style="margin-bottom:0;flex-wrap:wrap;">
         <select id="calendarFilterPlatform" onchange="renderContentCalendar()" class="filter-select">
           <option value="all">All platforms</option>
           <option>Facebook</option>
@@ -1415,6 +1415,17 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <option value="all">Everyone</option>
         </select>
       </div>
+    </div>
+
+    <!-- Status legend -->
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:16px;">
+      <span style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">STATUS</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);">💡 Idea</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(245,158,11,0.08);color:#F59E0B;border:1px solid rgba(245,158,11,0.18);">✏️ Scripting</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(139,92,246,0.08);color:#8B5CF6;border:1px solid rgba(139,92,246,0.18);">🎬 Filming/Design</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(6,182,212,0.08);color:#06B6D4;border:1px solid rgba(6,182,212,0.18);">🚀 Ready to post</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.18);">✅ Posted</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(59,130,246,0.08);color:#3B82F6;border:1px solid rgba(59,130,246,0.18);">✔️ Done</span>
     </div>
 
     <div id="calendarStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:14px;"></div>
@@ -4948,17 +4959,45 @@ function renderContentCalendar() {
 
     const entriesWrap = document.createElement('div');
     entriesWrap.className = 'cal-entries';
-    (byDate[dateStr] || []).forEach(entry => {
+    const dayEntries = byDate[dateStr] || [];
+    const MAX_VISIBLE = 3;
+    dayEntries.slice(0, MAX_VISIBLE).forEach(entry => {
       const color = calendarStatusColor(entry.status);
       const pill = document.createElement('div');
       pill.className = 'cal-entry-pill';
       pill.style.background = color + '26';
       pill.style.color = color;
-      pill.title = `${entry.title} \u00b7 ${entry.platform} \u00b7 ${entry.status}`;
-      pill.textContent = entry.title;
+      pill.title = `${entry.title} · ${entry.platform} · ${entry.status} · ${entry.savedBy || ''}`;
+      pill.textContent = entry.title || '(no title)';
       pill.onclick = (ev) => { ev.stopPropagation(); openCalendarForm(entry); };
       entriesWrap.appendChild(pill);
     });
+    if (dayEntries.length > MAX_VISIBLE) {
+      const morePill = document.createElement('div');
+      morePill.className = 'cal-entry-pill';
+      morePill.style.background = 'rgba(255,255,255,0.06)';
+      morePill.style.color = 'var(--text3)';
+      morePill.style.fontStyle = 'italic';
+      morePill.style.cursor = 'pointer';
+      morePill.textContent = `+${dayEntries.length - MAX_VISIBLE} more`;
+      morePill.onclick = (ev) => {
+        ev.stopPropagation();
+        // Show all remaining entries on click
+        dayEntries.slice(MAX_VISIBLE).forEach(entry => {
+          const color = calendarStatusColor(entry.status);
+          const pill = document.createElement('div');
+          pill.className = 'cal-entry-pill';
+          pill.style.background = color + '26';
+          pill.style.color = color;
+          pill.title = `${entry.title} · ${entry.platform} · ${entry.status} · ${entry.savedBy || ''}`;
+          pill.textContent = entry.title || '(no title)';
+          pill.onclick = (ev2) => { ev2.stopPropagation(); openCalendarForm(entry); };
+          entriesWrap.insertBefore(pill, morePill);
+        });
+        morePill.remove();
+      };
+      entriesWrap.appendChild(morePill);
+    }
     cell.appendChild(entriesWrap);
 
     grid.appendChild(cell);
