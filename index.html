@@ -5570,7 +5570,7 @@ async function confirmReassign() {
   }
 }
 
-function deleteCreativeEntry(id) {
+async function deleteCreativeEntry(id) {
   if (!id) return;
   if (!confirm('Sigurado ka bang gusto mong tanggalin ang job order na ito?')) return;
   try {
