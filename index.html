@@ -1367,73 +1367,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
 
     <!-- Add / edit form (hidden by default) -->
-    <div id="calendarFormModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCalendarForm()">
-    <div id="calendarFormCard" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-size:15px;font-weight:700;color:var(--text);" id="calendarFormTitle">📅 Add Entry</div>
-        <button onclick="closeCalendarForm()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px;">
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Date</label>
-          <input type="date" id="calFieldDate" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Platform</label>
-          <select id="calFieldPlatform" class="filter-select" style="width:100%;">
-            <option>Facebook</option>
-            <option>Instagram</option>
-            <option>TikTok</option>
-            <option>YouTube</option>
-            <option>X (Twitter)</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Content Type</label>
-          <select id="calFieldType" class="filter-select" style="width:100%;">
-            <option>Reel/Short Video</option>
-            <option>Static Post</option>
-            <option>Carousel</option>
-            <option>Livestream</option>
-            <option>Story</option>
-            <option>Blog/Article</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Status</label>
-          <select id="calFieldStatus" class="filter-select" style="width:100%;">
-            <option>Idea</option>
-            <option>Scripting</option>
-            <option>Filming/Design</option>
-            <option>Ready to post</option>
-            <option>Posted</option>
-            <option>Done</option>
-          </select>
-        </div>
-      </div>
-      <div style="margin-bottom:14px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Topic / Title</label>
-        <input type="text" id="calFieldTitle" placeholder="e.g. RTX 5060 unboxing" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-      </div>
-      <div style="margin-bottom:14px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Saved by</label>
-        <input type="text" id="calFieldSavedBy" placeholder="Your name" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-      </div>
-      <div style="margin-bottom:18px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Notes / Caption draft</label>
-        <textarea id="calFieldNotes" rows="3" placeholder="Optional notes, hooks, or caption draft..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
-      </div>
-      <div id="calFieldHistoryWrap" style="display:none;margin-bottom:18px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
-        <div id="calFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="submitCalendarEntry()" id="calendarSaveBtn" style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
-        <button onclick="closeCalendarForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
-      </div>
-    </div>
-    </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
       <div style="display:flex;align-items:center;gap:8px;">
@@ -1509,89 +1442,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
 
     <!-- Add / edit form modal -->
-    <div id="creativeFormModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCreativeForm()">
-    <div id="creativeFormCard" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-size:15px;font-weight:700;color:var(--text);" id="creativeFormTitle">🎨 Add Job Order</div>
-        <button onclick="closeCreativeForm()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px;">
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Deadline Date</label>
-          <input type="date" id="crFieldDate" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Output Type</label>
-          <select id="crFieldType" class="filter-select" style="width:100%;">
-            <option>Social Media Poster</option>
-            <option>Print Ad</option>
-            <option>Banner / Tarpaulin</option>
-            <option>Product Graphic</option>
-            <option>Video Thumbnail</option>
-            <option>Story / Reel Cover</option>
-            <option>Email Graphic</option>
-            <option>Presentation Deck</option>
-            <option>Logo / Branding</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Priority</label>
-          <select id="crFieldPriority" class="filter-select" style="width:100%;">
-            <option>Normal</option>
-            <option>Urgent</option>
-            <option>Rush</option>
-            <option>Low</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Status</label>
-          <select id="crFieldStatus" class="filter-select" style="width:100%;">
-            <option>Received</option>
-            <option>In Progress</option>
-            <option>For Review</option>
-            <option>Revision</option>
-            <option>Approved</option>
-            <option>Done</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px;">
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Job Order Title</label>
-          <input type="text" id="crFieldTitle" placeholder="e.g. RTX 5060 Launch Poster" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Client / Requester</label>
-          <input type="text" id="crFieldClient" placeholder="e.g. Marketing Team / Store" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Assigned Designer</label>
-          <select id="crFieldDesigner" class="filter-select" style="width:100%;">
-            <option value="">— Unassigned —</option>
-            <option>JP</option>
-            <option>Amy</option>
-            <option>Yana</option>
-            <option>Khen</option>
-          </select>
-        </div>
-      </div>
-      <div style="margin-bottom:18px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Brief / Notes</label>
-        <textarea id="crFieldNotes" rows="3" placeholder="Design brief, specs, references, or any important details..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
-      </div>
-      <!-- Status history -->
-      <div id="crFieldHistoryWrap" style="display:none;margin-bottom:18px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
-        <div id="crFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button onclick="submitCreativeEntry()" id="creativeSaveBtn" style="background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
-        <button onclick="deleteCreativeEntry(editingCreativeId)" id="creativeDeleteBtn" style="display:none;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🗑 Delete</button>
-        <button onclick="closeCreativeForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
-      </div>
-    </div>
-    </div>
 
     <!-- Nav + filters -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
@@ -1653,139 +1503,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);">⚪ Normal</span>
     </div>
 
-    <!-- ── VIEW DETAILS MODAL (Content Calendar) ── -->
-    <div id="calViewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCalViewModal()">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;">
-          <div>
-            <div id="calViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
-            <div id="calViewBadges" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-          </div>
-          <button onclick="closeCalViewModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;flex-shrink:0;">✕</button>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">DATE</div>
-            <div id="calViewDate" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">PLATFORM</div>
-            <div id="calViewPlatform" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">CONTENT TYPE</div>
-            <div id="calViewContentType" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">SAVED BY</div>
-            <div id="calViewSavedBy" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-        </div>
-        <div id="calViewNotesWrap" style="background:var(--surface);border-radius:10px;padding:14px;margin-bottom:18px;display:none;">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:6px;">NOTES</div>
-          <div id="calViewNotes" style="font-size:13px;color:var(--text2);line-height:1.6;"></div>
-        </div>
-        <div id="calViewHistoryWrap" style="margin-bottom:20px;display:none;">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:8px;">📜 STATUS HISTORY</div>
-          <div id="calViewHistoryList" style="max-height:150px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button id="calViewEditBtn" onclick="calViewToEdit()" style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">✏️ Edit</button>
-          <button onclick="closeCalViewModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── VIEW DETAILS MODAL (Creative Calendar) ── -->
-    <div id="crViewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCrViewModal()">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;">
-          <div>
-            <div id="crViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
-            <div id="crViewBadges" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-          </div>
-          <button onclick="closeCrViewModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;flex-shrink:0;">✕</button>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">DEADLINE</div>
-            <div id="crViewDate" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">OUTPUT TYPE</div>
-            <div id="crViewOutputType" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">CLIENT</div>
-            <div id="crViewClient" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-          <div style="background:var(--surface);border-radius:10px;padding:12px;">
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">DESIGNER</div>
-            <div id="crViewDesigner" style="font-size:13px;font-weight:600;color:var(--text);"></div>
-          </div>
-        </div>
-        <div id="crViewNotesWrap" style="background:var(--surface);border-radius:10px;padding:14px;margin-bottom:18px;display:none;">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:6px;">BRIEF / NOTES</div>
-          <div id="crViewNotes" style="font-size:13px;color:var(--text2);line-height:1.6;"></div>
-        </div>
-        <div id="crViewHistoryWrap" style="margin-bottom:20px;display:none;">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:8px;">📜 STATUS / PASS HISTORY</div>
-          <div id="crViewHistoryList" style="max-height:150px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button id="crViewEditBtn" onclick="crViewToEdit()" style="background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">✏️ Edit</button>
-          <button onclick="openReassignModal(crViewCurrentId)" style="background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🔁 Reassign</button>
-          <button onclick="closeCrViewModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>
-        </div>
-      </div>
-    </div>
-    <div id="reassignModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9100;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.88);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeReassignModal()">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-          <div style="font-size:15px;font-weight:700;color:var(--text);">🔁 Reassign Job Order</div>
-          <button onclick="closeReassignModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
-        </div>
-        <div id="reassignJobTitle" style="font-size:12px;color:var(--text2);background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:18px;font-weight:600;"></div>
-        <div style="margin-bottom:14px;">
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Currently Assigned</label>
-          <div id="reassignFromName" style="font-size:13px;color:var(--text);font-weight:600;padding:6px 0;"></div>
-        </div>
-        <div style="margin-bottom:14px;">
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Pass To</label>
-          <select id="reassignToSelect" class="filter-select" style="width:100%;">
-            <option value="">— Select Designer —</option>
-            <option>JP</option>
-            <option>Amy</option>
-            <option>Yana</option>
-            <option>Khen</option>
-          </select>
-        </div>
-        <div style="margin-bottom:14px;">
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Passed By</label>
-          <select id="reassignBySelect" class="filter-select" style="width:100%;">
-            <option value="">— Select Your Name —</option>
-            <option>JP</option>
-            <option>Amy</option>
-            <option>Yana</option>
-            <option>Khen</option>
-            <option>TP</option>
-          </select>
-        </div>
-        <div style="margin-bottom:20px;">
-          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Note (optional)</label>
-          <textarea id="reassignNote" rows="2" placeholder="e.g. Amy is on leave, please continue the poster..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
-        </div>
-        <!-- Reassign history -->
-        <div id="reassignHistoryWrap" style="margin-bottom:20px;display:none;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px;">📜 Pass history</div>
-          <div id="reassignHistoryList" style="max-height:120px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button onclick="confirmReassign()" style="background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;flex:1;">🔁 Reassign</button>
-          <button onclick="closeReassignModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
-        </div>
-      </div>
-    </div>
 
     <div id="creativeStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:14px;"></div>
 
@@ -5976,5 +5693,290 @@ function addViralTopicToCalendar(title) {
 }
 
 </script>
+
+    <div id="calendarFormModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCalendarForm()">
+    <div id="calendarFormCard" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:15px;font-weight:700;color:var(--text);" id="calendarFormTitle">📅 Add Entry</div>
+        <button onclick="closeCalendarForm()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px;">
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Date</label>
+          <input type="date" id="calFieldDate" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Platform</label>
+          <select id="calFieldPlatform" class="filter-select" style="width:100%;">
+            <option>Facebook</option>
+            <option>Instagram</option>
+            <option>TikTok</option>
+            <option>YouTube</option>
+            <option>X (Twitter)</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Content Type</label>
+          <select id="calFieldType" class="filter-select" style="width:100%;">
+            <option>Reel/Short Video</option>
+            <option>Static Post</option>
+            <option>Carousel</option>
+            <option>Livestream</option>
+            <option>Story</option>
+            <option>Blog/Article</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Status</label>
+          <select id="calFieldStatus" class="filter-select" style="width:100%;">
+            <option>Idea</option>
+            <option>Scripting</option>
+            <option>Filming/Design</option>
+            <option>Ready to post</option>
+            <option>Posted</option>
+            <option>Done</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Topic / Title</label>
+        <input type="text" id="calFieldTitle" placeholder="e.g. RTX 5060 unboxing" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Saved by</label>
+        <input type="text" id="calFieldSavedBy" placeholder="Your name" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Notes / Caption draft</label>
+        <textarea id="calFieldNotes" rows="3" placeholder="Optional notes, hooks, or caption draft..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+      <div id="calFieldHistoryWrap" style="display:none;margin-bottom:18px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
+        <div id="calFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="submitCalendarEntry()" id="calendarSaveBtn" style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
+        <button onclick="closeCalendarForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+      </div>
+    </div>
+    </div>
+    <div id="creativeFormModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCreativeForm()">
+    <div id="creativeFormCard" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:15px;font-weight:700;color:var(--text);" id="creativeFormTitle">🎨 Add Job Order</div>
+        <button onclick="closeCreativeForm()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px;">
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Deadline Date</label>
+          <input type="date" id="crFieldDate" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Output Type</label>
+          <select id="crFieldType" class="filter-select" style="width:100%;">
+            <option>Social Media Poster</option>
+            <option>Print Ad</option>
+            <option>Banner / Tarpaulin</option>
+            <option>Product Graphic</option>
+            <option>Video Thumbnail</option>
+            <option>Story / Reel Cover</option>
+            <option>Email Graphic</option>
+            <option>Presentation Deck</option>
+            <option>Logo / Branding</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Priority</label>
+          <select id="crFieldPriority" class="filter-select" style="width:100%;">
+            <option>Normal</option>
+            <option>Urgent</option>
+            <option>Rush</option>
+            <option>Low</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Status</label>
+          <select id="crFieldStatus" class="filter-select" style="width:100%;">
+            <option>Received</option>
+            <option>In Progress</option>
+            <option>For Review</option>
+            <option>Revision</option>
+            <option>Approved</option>
+            <option>Done</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px;">
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Job Order Title</label>
+          <input type="text" id="crFieldTitle" placeholder="e.g. RTX 5060 Launch Poster" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Client / Requester</label>
+          <input type="text" id="crFieldClient" placeholder="e.g. Marketing Team / Store" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Assigned Designer</label>
+          <select id="crFieldDesigner" class="filter-select" style="width:100%;">
+            <option value="">— Unassigned —</option>
+            <option>JP</option>
+            <option>Amy</option>
+            <option>Yana</option>
+            <option>Khen</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Brief / Notes</label>
+        <textarea id="crFieldNotes" rows="3" placeholder="Design brief, specs, references, or any important details..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+      <!-- Status history -->
+      <div id="crFieldHistoryWrap" style="display:none;margin-bottom:18px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
+        <div id="crFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button onclick="submitCreativeEntry()" id="creativeSaveBtn" style="background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
+        <button onclick="deleteCreativeEntry(editingCreativeId)" id="creativeDeleteBtn" style="display:none;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🗑 Delete</button>
+        <button onclick="closeCreativeForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+      </div>
+    </div>
+    </div>
+<!-- ═══ GLOBAL MODALS (outside tab panels so display:flex works) ═══ -->
+    <!-- ── VIEW DETAILS MODAL (Content Calendar) ── -->
+    <div id="calViewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCalViewModal()">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;">
+          <div>
+            <div id="calViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
+            <div id="calViewBadges" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+          </div>
+          <button onclick="closeCalViewModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;flex-shrink:0;">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">DATE</div>
+            <div id="calViewDate" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">PLATFORM</div>
+            <div id="calViewPlatform" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">CONTENT TYPE</div>
+            <div id="calViewContentType" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">SAVED BY</div>
+            <div id="calViewSavedBy" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+        </div>
+        <div id="calViewNotesWrap" style="background:var(--surface);border-radius:10px;padding:14px;margin-bottom:18px;display:none;">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:6px;">NOTES</div>
+          <div id="calViewNotes" style="font-size:13px;color:var(--text2);line-height:1.6;"></div>
+        </div>
+        <div id="calViewHistoryWrap" style="margin-bottom:20px;display:none;">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:8px;">📜 STATUS HISTORY</div>
+          <div id="calViewHistoryList" style="max-height:150px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="calViewEditBtn" onclick="calViewToEdit()" style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">✏️ Edit</button>
+          <button onclick="closeCalViewModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW DETAILS MODAL (Creative Calendar) ── -->
+    <div id="crViewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCrViewModal()">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;">
+          <div>
+            <div id="crViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
+            <div id="crViewBadges" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+          </div>
+          <button onclick="closeCrViewModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;flex-shrink:0;">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">DEADLINE</div>
+            <div id="crViewDate" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">OUTPUT TYPE</div>
+            <div id="crViewOutputType" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">CLIENT</div>
+            <div id="crViewClient" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">DESIGNER</div>
+            <div id="crViewDesigner" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+        </div>
+        <div id="crViewNotesWrap" style="background:var(--surface);border-radius:10px;padding:14px;margin-bottom:18px;display:none;">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:6px;">BRIEF / NOTES</div>
+          <div id="crViewNotes" style="font-size:13px;color:var(--text2);line-height:1.6;"></div>
+        </div>
+        <div id="crViewHistoryWrap" style="margin-bottom:20px;display:none;">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:8px;">📜 STATUS / PASS HISTORY</div>
+          <div id="crViewHistoryList" style="max-height:150px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="crViewEditBtn" onclick="crViewToEdit()" style="background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">✏️ Edit</button>
+          <button onclick="openReassignModal(crViewCurrentId)" style="background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🔁 Reassign</button>
+          <button onclick="closeCrViewModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>
+        </div>
+      </div>
+    </div>
+    <div id="reassignModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9100;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.88);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeReassignModal()">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div style="font-size:15px;font-weight:700;color:var(--text);">🔁 Reassign Job Order</div>
+          <button onclick="closeReassignModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
+        </div>
+        <div id="reassignJobTitle" style="font-size:12px;color:var(--text2);background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:18px;font-weight:600;"></div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Currently Assigned</label>
+          <div id="reassignFromName" style="font-size:13px;color:var(--text);font-weight:600;padding:6px 0;"></div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Pass To</label>
+          <select id="reassignToSelect" class="filter-select" style="width:100%;">
+            <option value="">— Select Designer —</option>
+            <option>JP</option>
+            <option>Amy</option>
+            <option>Yana</option>
+            <option>Khen</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Passed By</label>
+          <select id="reassignBySelect" class="filter-select" style="width:100%;">
+            <option value="">— Select Your Name —</option>
+            <option>JP</option>
+            <option>Amy</option>
+            <option>Yana</option>
+            <option>Khen</option>
+            <option>TP</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Note (optional)</label>
+          <textarea id="reassignNote" rows="2" placeholder="e.g. Amy is on leave, please continue the poster..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
+        </div>
+        <!-- Reassign history -->
+        <div id="reassignHistoryWrap" style="margin-bottom:20px;display:none;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px;">📜 Pass history</div>
+          <div id="reassignHistoryList" style="max-height:120px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="confirmReassign()" style="background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;flex:1;">🔁 Reassign</button>
+          <button onclick="closeReassignModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
