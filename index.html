@@ -1567,7 +1567,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         </div>
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Assigned Designer</label>
-          <input type="text" id="crFieldDesigner" placeholder="Designer name" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
+          <select id="crFieldDesigner" class="filter-select" style="width:100%;">
+            <option value="">— Unassigned —</option>
+            <option>JP</option>
+            <option>Amy</option>
+            <option>Yana</option>
+            <option>Khen</option>
+          </select>
         </div>
       </div>
       <div style="margin-bottom:18px;">
@@ -1645,6 +1651,55 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">🔴 Rush</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(249,115,22,0.1);color:#fb923c;border:1px solid rgba(249,115,22,0.2);">🟠 Urgent</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);">⚪ Normal</span>
+    </div>
+
+    <!-- ── REASSIGN MODAL ── -->
+    <div id="reassignModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9100;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.88);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeReassignModal()">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div style="font-size:15px;font-weight:700;color:var(--text);">🔁 Reassign Job Order</div>
+          <button onclick="closeReassignModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
+        </div>
+        <div id="reassignJobTitle" style="font-size:12px;color:var(--text2);background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:18px;font-weight:600;"></div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Currently Assigned</label>
+          <div id="reassignFromName" style="font-size:13px;color:var(--text);font-weight:600;padding:6px 0;"></div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Pass To</label>
+          <select id="reassignToSelect" class="filter-select" style="width:100%;">
+            <option value="">— Select Designer —</option>
+            <option>JP</option>
+            <option>Amy</option>
+            <option>Yana</option>
+            <option>Khen</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Passed By</label>
+          <select id="reassignBySelect" class="filter-select" style="width:100%;">
+            <option value="">— Select Your Name —</option>
+            <option>JP</option>
+            <option>Amy</option>
+            <option>Yana</option>
+            <option>Khen</option>
+            <option>TP</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Note (optional)</label>
+          <textarea id="reassignNote" rows="2" placeholder="e.g. Amy is on leave, please continue the poster..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
+        </div>
+        <!-- Reassign history -->
+        <div id="reassignHistoryWrap" style="margin-bottom:20px;display:none;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px;">📜 Pass history</div>
+          <div id="reassignHistoryList" style="max-height:120px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="confirmReassign()" style="background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;flex:1;">🔁 Reassign</button>
+          <button onclick="closeReassignModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+        </div>
+      </div>
     </div>
 
     <div id="creativeStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:14px;"></div>
@@ -5396,10 +5451,13 @@ function renderCreativeCalendar() {
       card.title = `${entry.title} · ${entry.client || 'No client'} · ${entry.designer || 'Unassigned'} · ${entry.status} · ${entry.priority}${isOverdue ? ' · OVERDUE' : ''}`;
       card.innerHTML = `
         <div style="font-size:11px;font-weight:700;color:${isOverdue ? '#f87171' : 'var(--text)'};line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${priority.icon} ${entry.title}</div>
-        <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
-          ${entry.designer ? `<span>${entry.designer}</span>` : ''}
-          ${entry.client ? `<span>· ${entry.client}</span>` : ''}
-          <span style="color:${isOverdue ? '#ef4444' : color};font-weight:600;">· ${isOverdue ? '⚠ OVERDUE' : entry.status}</span>
+        <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:space-between;">
+          <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+            ${entry.designer ? `<span>${entry.designer}</span>` : '<span style="color:var(--text3);font-style:italic;">Unassigned</span>'}
+            ${entry.client ? `<span>· ${entry.client}</span>` : ''}
+            <span style="color:${isOverdue ? '#ef4444' : color};font-weight:600;">· ${isOverdue ? '⚠ OVERDUE' : entry.status}</span>
+          </div>
+          <span onclick="(function(e){e.stopPropagation();openReassignModal('${entry.id}')})(event)" style="color:#a855f7;font-weight:700;cursor:pointer;font-size:9.5px;background:rgba(168,85,247,0.1);padding:2px 6px;border-radius:6px;border:1px solid rgba(168,85,247,0.2);white-space:nowrap;">🔁 Pass</span>
         </div>`;
       card.onclick = (ev) => { ev.stopPropagation(); openCreativeForm(entry); };
       entriesWrap.appendChild(card);
@@ -5409,7 +5467,110 @@ function renderCreativeCalendar() {
   }
 }
 
-async function deleteCreativeEntry(id) {
+async // ─────────────────────────────────────────────────────────────
+// CREATIVE CALENDAR — REASSIGN SYSTEM
+// ─────────────────────────────────────────────────────────────
+
+let reassigningEntryId = null;
+
+function openReassignModal(entryId) {
+  const entry = creativeCalendar.find(e => e.id === entryId);
+  if (!entry) return;
+  reassigningEntryId = entryId;
+
+  document.getElementById('reassignJobTitle').textContent = `📋 ${entry.title}${entry.client ? ' · ' + entry.client : ''}`;
+  document.getElementById('reassignFromName').textContent = entry.designer || 'Unassigned';
+  document.getElementById('reassignToSelect').value = '';
+  document.getElementById('reassignBySelect').value = '';
+  document.getElementById('reassignNote').value = '';
+
+  // Show pass history
+  const passHistory = (entry.statusHistory || []).filter(h => h.type === 'reassign');
+  const histWrap = document.getElementById('reassignHistoryWrap');
+  const histList = document.getElementById('reassignHistoryList');
+  if (passHistory.length > 0) {
+    histWrap.style.display = 'block';
+    histList.innerHTML = [...passHistory].reverse().map(h => {
+      const dt = new Date(h.at);
+      const dateLabel = isNaN(dt.getTime()) ? h.at : dt.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      return `<div style="font-size:11.5px;color:var(--text2);padding:8px 0;border-bottom:1px solid var(--border);">
+        <div><span style="color:#a855f7;font-weight:700;">${h.from || 'Unassigned'}</span> → <span style="color:#ec4899;font-weight:700;">${h.to}</span>${h.note ? ` <span style="color:var(--text3);">· "${h.note}"</span>` : ''}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;">${h.by ? 'by ' + h.by + ' · ' : ''}${dateLabel}</div>
+      </div>`;
+    }).join('');
+  } else {
+    histWrap.style.display = 'none';
+  }
+
+  const modal = document.getElementById('reassignModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeReassignModal() {
+  reassigningEntryId = null;
+  document.getElementById('reassignModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function confirmReassign() {
+  const toDesigner = document.getElementById('reassignToSelect').value;
+  const byPerson   = document.getElementById('reassignBySelect').value;
+  const note       = document.getElementById('reassignNote').value.trim();
+
+  if (!toDesigner) { alert('Piliin ang designer na ipapasa ang job order.'); return; }
+  if (!byPerson)   { alert('Piliin kung sino ang nagpa-pass.'); return; }
+
+  const entry = creativeCalendar.find(e => e.id === reassigningEntryId);
+  if (!entry) return;
+
+  const passRecord = {
+    type:  'reassign',
+    from:  entry.designer || 'Unassigned',
+    to:    toDesigner,
+    by:    byPerson,
+    note:  note,
+    at:    new Date().toISOString()
+  };
+
+  const updatedEntry = {
+    ...entry,
+    designer:      toDesigner,
+    statusHistory: [...(entry.statusHistory || []), passRecord],
+    updatedAt:     new Date().toISOString()
+  };
+
+  const btn = document.querySelector('#reassignModal button[onclick="confirmReassign()"]');
+  btn.disabled = true;
+  btn.textContent = '⏳ Saving...';
+
+  try {
+    const response = await fetch(CREATIVE_CALENDAR_APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'update', calendarType: 'creative', entry: updatedEntry })
+    });
+    const result = await response.json();
+    if (result.status === 'error') {
+      alert('May error sa pag-save: ' + result.message);
+      return;
+    }
+    // Update local data
+    const idx = creativeCalendar.findIndex(e => e.id === reassigningEntryId);
+    if (idx !== -1) creativeCalendar[idx] = updatedEntry;
+
+    closeReassignModal();
+    updateCreativeBadge();
+    renderCreativeCalendar();
+  } catch (err) {
+    alert('May error. Subukan ulit. (' + err.message + ')');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔁 Reassign';
+  }
+}
+
+function deleteCreativeEntry(id) {
   if (!id) return;
   if (!confirm('Sigurado ka bang gusto mong tanggalin ang job order na ito?')) return;
   try {
