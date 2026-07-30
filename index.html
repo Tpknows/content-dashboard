@@ -1043,44 +1043,97 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 @media (max-width: 600px) {
-  /* Month filter — hide pills, show compact dropdown */
+  /* ── MONTH FILTER ── */
   #monthPillGroup { display: none !important; }
-  .mobile-month-select { display: block !important; width: 100%; }
+  .mobile-month-select { display: block !important; width: 100%; font-size: 13px; font-weight: 600; padding: 9px 14px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text); font-family: inherit; cursor: pointer; }
 
-  /* KPI grid — 2 per row, compact */
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-  .kpi-card { padding: 14px 12px; }
-  .kpi-label { font-size: 10px !important; margin-bottom: 6px; letter-spacing: 0; }
-  .kpi-value { font-size: 26px !important; letter-spacing: -0.5px; }
-  .kpi-sub { font-size: 10px; margin-top: 6px; }
-
-  .ai-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .hook-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .hold-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .creator-grid { grid-template-columns: 1fr; }
-  .top10-list { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .monthly-summary-bar { gap: 8px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 6px; }
-  .msb-item { min-width: 90px; padding: 12px 14px; flex-shrink: 0; }
+  /* ── HEADER ── */
   .header { height: auto; padding: 12px 14px 14px; row-gap: 10px; flex-wrap: wrap; }
   .header > div:first-child .logo { font-size: 16px; }
   .header > div:first-child .subtitle { font-size: 10px; }
+  .header > div:last-child { width: 100%; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .header > div:last-child > div { width: 100%; }
+  #lastRefreshed { font-size: 9.5px; }
   .content { padding: 14px 12px; }
+
+  /* ── OVERVIEW KPI ── */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .kpi-card { padding: 14px 12px; }
+  .kpi-label { font-size: 10px !important; margin-bottom: 6px; letter-spacing: 0; }
+  .kpi-value { font-size: 24px !important; letter-spacing: -0.5px; }
+  .kpi-sub { font-size: 10px; margin-top: 6px; }
+  .progress-section { padding: 16px 14px; margin-bottom: 20px; }
+  .progress-item { margin-bottom: 16px; }
+
+  /* ── CHARTS ── */
   .charts-grid { grid-template-columns: 1fr !important; gap: 14px; }
   .chart-card { padding: 14px 12px; }
   .chart-container { height: 160px !important; }
   .chart-card[style*="grid-column"] { grid-column: 1 / -1 !important; }
-  .header > div:last-child { width: 100%; flex-direction: column; align-items: flex-start; gap: 8px; }
-  .header > div:last-child > div { width: 100%; }
-  #lastRefreshed { font-size: 9.5px; }
-  .progress-section { padding: 16px 14px; margin-bottom: 20px; }
-  .progress-item { margin-bottom: 16px; }
+  .chart-title { font-size: 13px; }
+  .chart-subtitle { font-size: 10px; }
+
+  /* ── TOP 20 ── */
+  .top10-list { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .results-table-wrap { border-radius: 10px; }
+  .results-table { min-width: 680px; font-size: 11px; }
+  .results-table th, .results-table td { padding: 9px 7px; }
+
+  /* ── AI CONTENT ── */
+  .ai-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .ai-stat { padding: 16px 12px; }
+  .ai-stat-val { font-size: 22px; }
+  .ai-stat-label { font-size: 10px; margin-top: 6px; }
+  .ai-table th, .ai-table td { padding: 9px 7px; font-size: 11px; }
+
+  /* ── HOOK RATE ── */
+  .hook-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .hook-stat { padding: 14px 10px; }
+  .hook-stat-val { font-size: 22px; }
+  .hook-stat-label { font-size: 10px; margin-top: 6px; }
+
+  /* ── HOLD RATE ── */
+  .hold-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .hold-stat { padding: 14px 10px; }
+  .hold-stat-val { font-size: 22px; }
+  .hold-stat-label { font-size: 10px; margin-top: 6px; }
+
+  /* ── CREATOR GRID ── */
+  .creator-grid { grid-template-columns: 1fr; }
+
+  /* ── MONTHLY RESULTS ── */
+  .monthly-results-title { font-size: 16px !important; }
+  .monthly-results-header { flex-direction: column !important; gap: 10px; align-items: flex-start !important; }
+  .monthly-summary-bar { gap: 8px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+  .msb-item { min-width: 90px; padding: 12px 14px; flex-shrink: 0; }
+
+  /* ── AI INSIGHTS ── */
+  #tab-insights .msb-item { min-width: 110px; }
+  #tab-insights .monthly-summary-bar { flex-wrap: nowrap; overflow-x: auto; }
+
+  /* ── FILTER ROWS — wrap on all tabs ── */
+  .filter-row { flex-wrap: wrap; gap: 8px; }
+  .filter-select { font-size: 12px; padding: 7px 10px; min-width: 0; flex: 1 1 calc(50% - 8px); }
+
+  /* ── VIRAL TOPICS ── */
+  #tab-viral .filter-row { flex-wrap: wrap; }
+
+  /* ── TECH NEWS ── */
+  #tab-news .filter-row { flex-wrap: wrap; }
+  .news-subtab { font-size: 11px; padding: 8px 12px; }
+
+  /* ── GENERAL ── */
+  table { font-size: 11px; }
+  th, td { padding: 8px 6px; }
 }
+
 @media (max-width: 420px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .ai-summary { grid-template-columns: 1fr; }
   .hook-summary { grid-template-columns: 1fr; }
   .hold-summary { grid-template-columns: 1fr; }
   .top10-list { grid-template-columns: 1fr; }
+  .filter-select { flex: 1 1 100%; }
 }
 
 </style>
