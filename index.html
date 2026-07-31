@@ -2879,8 +2879,8 @@ function switchTab(tab, el) {
       markNewsAsVisited();
     }
   }
-  if (tab === 'calendar' && !calendarLoaded) loadContentCalendar();
-  if (tab === 'creative-calendar' && !creativeCalendarLoaded) loadCreativeCalendar();
+  if (tab === 'calendar') loadContentCalendar();
+  if (tab === 'creative-calendar') loadCreativeCalendar();
 }
 
 function toggleSidebarGroup(groupName) {
@@ -4754,23 +4754,23 @@ async function submitCalendarEntry() {
 async function loadContentCalendar() {
   calendarLoaded = true;
   const statusEl = document.getElementById('calendarStatus');
-  statusEl.textContent = "Loading content calendar...";
+  const isFirstLoad = contentCalendar.length === 0;
+  if (isFirstLoad) statusEl.textContent = "Loading content calendar...";
+  else statusEl.textContent = "Refreshing...";
 
   try {
     const response = await fetch(CALENDAR_APPS_SCRIPT_URL + "?action=list&calendarType=content&t=" + Date.now(), { cache: "no-store" });
     const result = await response.json();
-
     if (result.status === "error") {
       statusEl.textContent = "Error: " + result.message;
       return;
     }
-
     contentCalendar = result.entries || [];
     statusEl.textContent = `${contentCalendar.length} scheduled entries.`;
     renderContentCalendar();
   } catch (err) {
     console.error(err);
-    statusEl.textContent = "May error sa pag-load ng calendar. Siguraduhing naka-set na ang CALENDAR_APPS_SCRIPT_URL. (" + err.message + ")";
+    statusEl.textContent = "May error sa pag-load. (" + err.message + ")";
   }
 }
 
@@ -5104,7 +5104,8 @@ async function submitCreativeEntry() {
 async function loadCreativeCalendar() {
   creativeCalendarLoaded = true;
   const statusEl = document.getElementById('creativeStatus');
-  statusEl.textContent = 'Loading creative calendar...';
+  const isFirstLoad = creativeCalendar.length === 0;
+  statusEl.textContent = isFirstLoad ? 'Loading creative calendar...' : 'Refreshing...';
   try {
     const response = await fetch(CREATIVE_CALENDAR_APPS_SCRIPT_URL + '?action=list&calendarType=creative&t=' + Date.now(), { cache: 'no-store' });
     const result = await response.json();
@@ -5117,7 +5118,7 @@ async function loadCreativeCalendar() {
     updateCreativeBadge();
     renderCreativeCalendar();
   } catch (err) {
-    statusEl.textContent = 'May error sa pag-load. Siguraduhing naka-deploy ang Apps Script. (' + err.message + ')';
+    statusEl.textContent = 'May error sa pag-load. (' + err.message + ')';
   }
 }
 
