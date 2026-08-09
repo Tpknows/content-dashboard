@@ -4041,13 +4041,21 @@ async function msalSignIn() {
     const response = await msalInstance.loginPopup({ scopes: msalScopes });
     msalOnAuthenticated(response.account);
   } catch (err) {
-    if (err.errorCode === 'popup_window_error' || err.errorCode === 'empty_window_error') {
+    if (
+      err.errorCode === 'popup_window_error' ||
+      err.errorCode === 'empty_window_error' ||
+      err.errorCode === 'block_nested_popups'
+    ) {
+      // Popup blocked or nested popup — fall back to redirect flow
       msalInstance.loginRedirect({ scopes: msalScopes });
     } else if (err.errorCode !== 'user_cancelled') {
       showMsalError('Login error: ' + (err.message || err));
+      btn.textContent = 'Sign in with Microsoft';
+      btn.disabled = false;
+    } else {
+      btn.textContent = 'Sign in with Microsoft';
+      btn.disabled = false;
     }
-    btn.textContent = 'Sign in with Microsoft';
-    btn.disabled = false;
   }
 }
 
