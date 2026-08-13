@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EasyPC Content Dashboard 2026</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://alcdn.msauth.net/browser/2.35.0/js/msal-browser.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -1238,7 +1238,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div class="sidebar-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon">📅</span>Monthly Results</div>
       <div class="sidebar-item" onclick="switchTab('insights', this)" id="insightsTab"><span class="sidebar-item-icon">✦</span>AI Insights</div>
       <div class="sidebar-item" onclick="switchTab('news', this)" id="newsTab"><span class="sidebar-item-icon">📰</span>Tech News<span id="newsBadgeDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#EF4444;margin-left:auto;"></span></div>
-      <div class="sidebar-item" id="adminTabBtn" onclick="openAdminTab()" style="display:none;"><span class="sidebar-item-icon">🔒</span>Access Log</div>
     </div>
   </div>
 </div>
@@ -1273,7 +1272,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
 <div class="header">
   <div>
-    <div class="logo" onclick="handleLogoClick()" style="cursor:default;user-select:none;">EASY<span>PC</span> Content Dashboard</div>
+    <div class="logo">EASY<span>PC</span> Content Dashboard</div>
     <div class="subtitle">2026 Performance Tracker — EasyPC Main Page · <span style="color:var(--accent);font-weight:600;">Last updated: July 6, 2026</span></div>
   </div>
 
@@ -1809,9 +1808,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div><!-- /insightsView-records -->
 
   </div>
-
-  <!-- ═══ SECRET ADMIN TAB ═══ -->
-  <div id="tab-admin" class="tab-panel"></div>
 
   <div id="tab-news" class="tab-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
@@ -3057,7 +3053,7 @@ async function saveCurrentInsights() {
     const response = await fetch(INSIGHTS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'saveInsight', ...record })
+      body: JSON.stringify({ action: 'save', ...record })
     });
     const result = await response.json();
     if (result.status === 'error') {
@@ -3231,7 +3227,7 @@ async function loadInsightsFromSheet() {
   statusEl.style.color = 'var(--text3)';
 
   try {
-    const response = await fetch(INSIGHTS_SCRIPT_URL + '?action=listInsights&t=' + Date.now(), { cache: 'no-store' });
+    const response = await fetch(INSIGHTS_SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
     const result = await response.json();
 
     if (result.status === 'error') {
@@ -3798,6 +3794,23 @@ function generateManusPrompt() {
     return c.length ? c.map(x => '- ' + x).join('\n') : '- No data available.';
   };
 
+  // Build winning videos list from current month's data
+  const monthData = DATA[month] || {};
+  const winVids = (monthData.all_videos || [])
+    .filter(v => v.winning)
+    .sort((a, b) => b.views - a.views);
+
+  const winningSlideContent = winVids.length === 0
+    ? '- No winning videos recorded for this month yet.'
+    : winVids.map((v, i) => {
+        const hookStr  = v.hook_rate  > 0 ? ` · Hook Rate: ${v.hook_rate}%`  : '';
+        const holdStr  = v.hold_rate  > 0 ? ` · Hold Rate: ${v.hold_rate}%`  : '';
+        const linkStr  = v.link       ? ` · Link: ${v.link}` : '';
+        const aiStr    = v.ai         ? ' · ✦ AI' : '';
+        return `${i+1}. "${v.title}"
+   Creator: ${v.creator || '—'} · Views: ${fmt(v.views)} · Thruplay: ${v.thruplay_rate || 0}%${hookStr}${holdStr} · Pillar: ${v.pillar || '—'}${aiStr}${linkStr}`;
+      }).join('\n\n');
+
   const prompt =
 `Create a professional, minimalist business presentation titled "EasyPC Content Performance Report — ${monthLabel} 2026".
 
@@ -3872,7 +3885,31 @@ ${listOrNone(ins.opportunities)}
 Right column "CREATOR NOTES":
 ${listOrNone(ins.creator_notes)}
 
-SLIDE 9 — CLOSING (dark background)
+SLIDE 9 — WINNING CONTENT THIS MONTH (light background)
+──────────────────────────────────────────────────────
+Section label: "🏆 WINNING CONTENT — ${monthLabel} 2026"
+Slide subtitle: "${winVids.length} winning video${winVids.length !== 1 ? 's' : ''} that exceeded performance benchmarks this month"
+
+Layout: Each winning video gets its own card row — ranked by views (highest first).
+Card design: Green left border (#10B981), white card background, rounded corners.
+
+For each card, display:
+  - Rank number (bold, large, emerald green)
+  - Video title (bold, dark, 14–15px)
+  - Creator name · Pillar badge · AI tag (if applicable)
+  - Metric pills in a row: Views | Thruplay Rate | Hook Rate | Hold Rate
+  - If a link is provided → add a prominent "▶ Watch Video" button (emerald green, rounded pill) that links directly to the post
+
+WINNING VIDEOS DATA — use exactly as written below:
+${winningSlideContent}
+
+Design notes for this slide:
+  - The "▶ Watch Video" hyperlink must be CLICKABLE in the final presentation (use hyperlink feature in the slide tool)
+  - Metric pills: small rounded badges, colored per value (green if high, amber if average, red if low)
+  - If more than 5 winning videos, split into two columns
+  - This slide should feel like a "hall of fame" — celebratory but professional
+
+SLIDE 10 — CLOSING (dark background)
 - Headline: "Thank You"
 - Subtitle: "${monthLabel} 2026 Content Performance Report"
 - Footer: "EasyPC Content Dashboard · Confidential"
@@ -3954,195 +3991,6 @@ function toggleAutoRefresh() {
   }
 }
 
-
-/* ============================================================
-   SECRET ADMIN TAB — Access Log
-   Unlock: click the logo 5 times within 3 seconds.
-   Logs every page load to localStorage + APPS_SCRIPT_URL.
-   ============================================================ */
-const ADMIN_LOG_KEY   = 'easypc_access_log';
-const ADMIN_PIN       = '2026epc';   // change this to your preferred PIN
-let   adminUnlocked   = false;
-let   logoClickCount  = 0;
-let   logoClickTimer  = null;
-
-// ── Log this page load ──────────────────────────────────────
-(function logAccess() {
-  const entry = {
-    ts:        new Date().toISOString(),
-    ua:        navigator.userAgent,
-    screen:    screen.width + 'x' + screen.height,
-    lang:      navigator.language,
-    tz:        Intl.DateTimeFormat().resolvedOptions().timeZone,
-    referrer:  document.referrer || '(direct)',
-    url:       location.href
-  };
-  try {
-    const log = JSON.parse(localStorage.getItem(ADMIN_LOG_KEY) || '[]');
-    log.unshift(entry);
-    if (log.length > 200) log.length = 200; // keep last 200
-    localStorage.setItem(ADMIN_LOG_KEY, JSON.stringify(log));
-  } catch(e) {}
-  // Also ping the Apps Script silently (fire-and-forget)
-  try {
-    navigator.sendBeacon(APPS_SCRIPT_URL + '?action=logAccess', JSON.stringify(entry));
-  } catch(e) {}
-})();
-
-// ── Logo click unlock sequence ───────────────────────────────
-function handleLogoClick() {
-  logoClickCount++;
-  clearTimeout(logoClickTimer);
-  if (logoClickCount >= 5) {
-    logoClickCount = 0;
-    promptAdminPin();
-    return;
-  }
-  logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 3000);
-}
-
-function promptAdminPin() {
-  const pin = prompt('🔒 Enter admin PIN:');
-  if (pin === ADMIN_PIN) {
-    adminUnlocked = true;
-    document.getElementById('adminTabBtn').style.display = 'flex';
-    openAdminTab();
-  } else if (pin !== null) {
-    alert('Incorrect PIN.');
-  }
-}
-
-function openAdminTab() {
-  if (!adminUnlocked) { promptAdminPin(); return; }
-  // Switch to admin tab
-  document.querySelectorAll('.sidebar-item').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('adminTabBtn').classList.add('active');
-  const panel = document.getElementById('tab-admin');
-  panel.classList.add('active');
-  renderAdminLog();
-}
-
-function renderAdminLog() {
-  const panel = document.getElementById('tab-admin');
-  let log = [];
-  try { log = JSON.parse(localStorage.getItem(ADMIN_LOG_KEY) || '[]'); } catch(e) {}
-
-  const fmt = iso => {
-    const d = new Date(iso);
-    return d.toLocaleString('en-PH', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
-  };
-
-  const deviceIcon = ua => {
-    if (/mobile|android|iphone|ipad/i.test(ua)) return '📱';
-    if (/tablet/i.test(ua)) return '📟';
-    return '🖥️';
-  };
-
-  const browserName = ua => {
-    if (/Edg\//i.test(ua))    return 'Edge';
-    if (/OPR\//i.test(ua))    return 'Opera';
-    if (/Chrome\//i.test(ua)) return 'Chrome';
-    if (/Firefox\//i.test(ua))return 'Firefox';
-    if (/Safari\//i.test(ua)) return 'Safari';
-    return 'Unknown';
-  };
-
-  panel.innerHTML = `
-    <div style="padding:32px 0 0;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px;">
-        <div>
-          <div style="font-size:20px;font-weight:800;color:#fff;">🔒 Access Log</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:4px;">Recorded locally — last 200 visits on this device/browser</div>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button onclick="exportAccessLog()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:9px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">⬇ Export CSV</button>
-          <button onclick="if(confirm('Clear all access log entries?')){localStorage.removeItem('${ADMIN_LOG_KEY}');renderAdminLog();}" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:9px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🗑 Clear Log</button>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-bottom:32px;">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;">
-          <div style="font-size:28px;font-weight:700;color:#06B6D4;">${log.length}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px;">Total Visits</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;">
-          <div style="font-size:28px;font-weight:700;color:#22C55E;">${log.filter(e => new Date(e.ts) > new Date(Date.now()-86400000)).length}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px;">Last 24 Hours</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;">
-          <div style="font-size:28px;font-weight:700;color:#8B5CF6;">${log.filter(e => new Date(e.ts) > new Date(Date.now()-7*86400000)).length}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px;">Last 7 Days</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;">
-          <div style="font-size:28px;font-weight:700;color:#F59E0B;">${new Set(log.map(e=>e.tz)).size}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px;">Unique Timezones</div>
-        </div>
-      </div>
-
-      ${log.length === 0 ? `<div style="text-align:center;padding:60px;color:var(--text3);">No access records yet.</div>` : `
-      <div style="overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);">
-        <table style="width:100%;border-collapse:collapse;min-width:700px;">
-          <thead>
-            <tr>
-              <th style="background:var(--surface);color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:13px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">#</th>
-              <th style="background:var(--surface);color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:13px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Time</th>
-              <th style="background:var(--surface);color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:13px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Device</th>
-              <th style="background:var(--surface);color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:13px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Browser</th>
-              <th style="background:var(--surface);color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:13px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Screen</th>
-              <th style="background:var(--surface);color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:13px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Timezone</th>
-              <th style="background:var(--surface);color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:13px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Lang</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${log.map((e, i) => `
-            <tr style="transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.025)'" onmouseout="this.style.background='transparent'">
-              <td style="padding:12px 16px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border);">${i+1}</td>
-              <td style="padding:12px 16px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;">${fmt(e.ts)}</td>
-              <td style="padding:12px 16px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);">${deviceIcon(e.ua)} ${/mobile|android|iphone/i.test(e.ua)?'Mobile':/ipad|tablet/i.test(e.ua)?'Tablet':'Desktop'}</td>
-              <td style="padding:12px 16px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);">${browserName(e.ua)}</td>
-              <td style="padding:12px 16px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);">${e.screen||'—'}</td>
-              <td style="padding:12px 16px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);">${e.tz||'—'}</td>
-              <td style="padding:12px 16px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);">${e.lang||'—'}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`}
-    </div>
-  `;
-}
-
-function exportAccessLog() {
-  let log = [];
-  try { log = JSON.parse(localStorage.getItem(ADMIN_LOG_KEY) || '[]'); } catch(e) {}
-  if (!log.length) { alert('No log entries to export.'); return; }
-  const headers = ['#','Timestamp','Device','Browser','Screen','Timezone','Language','Referrer'];
-  const browserName = ua => {
-    if (/Edg\//i.test(ua)) return 'Edge';
-    if (/OPR\//i.test(ua)) return 'Opera';
-    if (/Chrome\//i.test(ua)) return 'Chrome';
-    if (/Firefox\//i.test(ua)) return 'Firefox';
-    if (/Safari\//i.test(ua)) return 'Safari';
-    return 'Unknown';
-  };
-  const rows = log.map((e, i) => [
-    i+1,
-    e.ts,
-    /mobile|android|iphone/i.test(e.ua)?'Mobile':/ipad|tablet/i.test(e.ua)?'Tablet':'Desktop',
-    browserName(e.ua),
-    e.screen||'',
-    e.tz||'',
-    e.lang||'',
-    e.referrer||''
-  ].map(v => '"'+String(v).replace(/"/g,'""')+'"').join(','));
-  const csv = [headers.join(','), ...rows].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'easypc_access_log_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-}
-
 // On load, fetch live data
 fetchLiveData();
 
@@ -4169,20 +4017,28 @@ const msalInstance = new msal.PublicClientApplication(msalConfig);
 const msalScopes = ['User.Read'];
 
 async function msalInit() {
+  // Fast path — check existing session first, no delay
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    msalOnAuthenticated(accounts[0]);
+    return;
+  }
+
+  // Slow path — only needed right after a redirect login
   try {
     const response = await msalInstance.handleRedirectPromise();
-    if (response) { msalOnAuthenticated(response.account); return; }
+    if (response && response.account) {
+      msalOnAuthenticated(response.account);
+      return;
+    }
   } catch (err) {
     console.error('MSAL redirect error:', err);
     showMsalError('Login failed: ' + (err.message || err));
     return;
   }
-  const accounts = msalInstance.getAllAccounts();
-  if (accounts.length > 0) {
-    msalOnAuthenticated(accounts[0]);
-  } else {
-    document.getElementById('msalLoginWall').style.display = 'flex';
-  }
+
+  // No session found — show login wall
+  document.getElementById('msalLoginWall').style.display = 'flex';
 }
 
 async function msalSignIn() {
@@ -4987,7 +4843,6 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldTitle').value = entry ? entry.title : '';
   document.getElementById('calFieldSavedBy').value = entry ? (entry.savedBy || '') : lastSavedByName;
   document.getElementById('calFieldNotes').value = entry ? entry.notes : '';
-  document.getElementById('calFieldLink').value = entry ? (entry.link || '') : '';
   document.getElementById('calendarSaveBtn').textContent = entry ? 'Update Entry' : 'Save to Sheet';
   renderCalendarHistory(entry);
   document.getElementById('calendarFormTitle').textContent = entry ? '📅 Edit Entry' : '📅 Add Entry';
@@ -5039,8 +4894,7 @@ async function submitCalendarEntry() {
     status: document.getElementById('calFieldStatus').value,
     title: title,
     savedBy: document.getElementById('calFieldSavedBy').value.trim(),
-    notes: document.getElementById('calFieldNotes').value.trim(),
-    link: document.getElementById('calFieldLink').value.trim()
+    notes: document.getElementById('calFieldNotes').value.trim()
   };
 
   if (payload.savedBy) lastSavedByName = payload.savedBy;
@@ -5248,26 +5102,13 @@ function renderContentCalendar() {
     });
     if (dayEntries.length > MAX_VISIBLE) {
       const morePill = document.createElement('div');
-      morePill.style.cssText = `font-size:10.5px;color:var(--text3);font-style:italic;padding:3px 6px;cursor:pointer;text-align:center;`;
+      morePill.style.cssText = `font-size:10.5px;color:var(--accent);font-weight:600;padding:3px 6px;cursor:pointer;text-align:center;border-radius:6px;transition:background 0.15s;`;
       morePill.textContent = `+${dayEntries.length - MAX_VISIBLE} more`;
+      morePill.onmouseenter = () => morePill.style.background = 'rgba(59,130,246,0.1)';
+      morePill.onmouseleave = () => morePill.style.background = 'transparent';
       morePill.onclick = (ev) => {
         ev.stopPropagation();
-        dayEntries.slice(MAX_VISIBLE).forEach(entry => {
-          const color = calendarStatusColor(entry.status);
-          const card = document.createElement('div');
-          card.className = 'cal-entry-pill';
-          card.style.cssText = `background:${color}18;border-left:3px solid ${color};border-radius:6px;padding:5px 8px;margin-bottom:3px;cursor:pointer;`;
-          card.innerHTML = `
-            <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.title || '(no title)'}</div>
-            <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
-              ${entry.savedBy ? `<span>${entry.savedBy}</span>` : ''}
-              ${entry.platform ? `<span>· ${entry.platform}</span>` : ''}
-              <span style="color:${color};font-weight:600;">· ${entry.status}</span>
-            </div>`;
-          card.onclick = (ev2) => { ev2.stopPropagation(); openCalViewModal(entry); };
-          entriesWrap.insertBefore(card, morePill);
-        });
-        morePill.remove();
+        openCalDayPopup(dateStr, dayEntries);
       };
       entriesWrap.appendChild(morePill);
     }
@@ -5617,6 +5458,62 @@ function renderCreativeCalendar() {
 let calViewCurrentEntry = null;
 let crViewCurrentId = null;
 
+function openCalDayPopup(dateStr, entries) {
+  const popup = document.getElementById('calDayPopup');
+  const title = document.getElementById('calDayPopupTitle');
+  const list  = document.getElementById('calDayPopupList');
+  if (!popup || !title || !list) return;
+
+  // Format date nicely: "Tuesday, July 15"
+  const d = new Date(dateStr + 'T12:00:00');
+  const dayLabel = d.toLocaleDateString('en-PH', { weekday:'long', month:'long', day:'numeric' });
+  title.textContent = `📅 ${dayLabel} — ${entries.length} event${entries.length > 1 ? 's' : ''}`;
+
+  list.innerHTML = '';
+  entries.forEach(entry => {
+    const color = calendarStatusColor(entry.status);
+    const isDone = entry.status === 'Posted' || entry.status === 'Done';
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background:${isDone ? '#22C55E18' : color + '18'};
+      border-left:3px solid ${isDone ? '#22C55E' : color};
+      border-radius:8px;padding:10px 12px;cursor:pointer;
+      transition:background 0.15s;
+    `;
+    card.onmouseenter = () => card.style.background = isDone ? '#22C55E28' : color + '28';
+    card.onmouseleave = () => card.style.background = isDone ? '#22C55E18' : color + '18';
+
+    const hasLink = entry.link && entry.link.trim();
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px;">${entry.title || '(no title)'}</div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            ${entry.savedBy ? `<span style="font-size:11px;color:var(--text3);">${entry.savedBy}</span>` : ''}
+            ${entry.platform ? `<span style="font-size:11px;color:var(--text3);">· ${entry.platform}</span>` : ''}
+            <span style="font-size:11px;color:${isDone ? '#22C55E' : color};font-weight:600;">· ${entry.status}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+          ${hasLink ? `<a href="${entry.link}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="font-size:11px;color:var(--accent);text-decoration:none;background:rgba(59,130,246,0.1);padding:3px 8px;border-radius:6px;">↗ Link</a>` : ''}
+        </div>
+      </div>`;
+
+    card.onclick = () => {
+      closeCalDayPopup();
+      openCalViewModal(entry);
+    };
+    list.appendChild(card);
+  });
+
+  popup.style.display = 'flex';
+}
+
+function closeCalDayPopup() {
+  const popup = document.getElementById('calDayPopup');
+  if (popup) popup.style.display = 'none';
+}
+
 function openCalViewModal(entry) {
   calViewCurrentEntry = entry;
   const color = calendarStatusColor(entry.status);
@@ -5636,14 +5533,6 @@ function openCalViewModal(entry) {
     notesWrap.style.display = 'block';
     document.getElementById('calViewNotes').textContent = entry.notes;
   } else { notesWrap.style.display = 'none'; }
-
-  const calLinkWrap = document.getElementById('calViewLinkWrap');
-  const calLinkEl = document.getElementById('calViewLinkAnchor');
-  if (entry.link) {
-    calLinkWrap.style.display = 'block';
-    calLinkEl.href = entry.link;
-    calLinkEl.textContent = '\u{1F517} ' + entry.link.replace(/^https?:\/\//, '').substring(0, 55) + (entry.link.length > 58 ? '\u2026' : '');
-  } else if (calLinkWrap) { calLinkWrap.style.display = 'none'; }
 
   const histWrap = document.getElementById('calViewHistoryWrap');
   const hist = Array.isArray(entry.statusHistory) ? entry.statusHistory : [];
@@ -6100,10 +5989,6 @@ function addViralTopicToCalendar(title) {
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Notes / Caption draft</label>
         <textarea id="calFieldNotes" rows="3" placeholder="Optional notes, hooks, or caption draft..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
       </div>
-      <div style="margin-bottom:14px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Post Link (optional)</label>
-        <input type="url" id="calFieldLink" placeholder="https://facebook.com/watch/?v=..." style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-      </div>
       <div id="calFieldHistoryWrap" style="display:none;margin-bottom:18px;">
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:8px;">📜 Status history</label>
         <div id="calFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
@@ -6199,6 +6084,17 @@ function addViralTopicToCalendar(title) {
     </div>
 <!-- ═══ GLOBAL MODALS (outside tab panels so display:flex works) ═══ -->
     <!-- ── VIEW DETAILS MODAL (Content Calendar) ── -->
+    <!-- Day Events Popup — shows all events for a day when "+N more" is clicked -->
+    <div id="calDayPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9100;align-items:flex-start;justify-content:center;padding:20px 16px;background:rgba(11,11,13,0.75);backdrop-filter:blur(6px);" onclick="if(event.target===this)closeCalDayPopup()">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;margin-top:40px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div id="calDayPopupTitle" style="font-size:16px;font-weight:700;color:var(--text);"></div>
+          <button onclick="closeCalDayPopup()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">✕</button>
+        </div>
+        <div id="calDayPopupList" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </div>
+
     <div id="calViewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCalViewModal()">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;">
@@ -6233,9 +6129,6 @@ function addViralTopicToCalendar(title) {
         <div id="calViewHistoryWrap" style="margin-bottom:20px;display:none;">
           <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:8px;">📜 STATUS HISTORY</div>
           <div id="calViewHistoryList" style="max-height:150px;overflow-y:auto;background:var(--surface);border-radius:10px;padding:2px 12px;"></div>
-        </div>
-        <div id="calViewLinkWrap" style="margin-bottom:14px;display:none;">
-          <a id="calViewLinkAnchor" href="#" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,0.1);color:#93C5FD;border:1px solid rgba(59,130,246,0.25);padding:9px 16px;border-radius:10px;font-size:12px;font-weight:600;text-decoration:none;">🔗 View Post / Link</a>
         </div>
         <div style="display:flex;gap:10px;">
           <button id="calViewEditBtn" onclick="calViewToEdit()" style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">✏️ Edit</button>
