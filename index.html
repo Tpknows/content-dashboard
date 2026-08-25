@@ -1270,13 +1270,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);">
       <div>
         <div style="font-size:16px;font-weight:800;color:#fff;">🔐 Admin — Login Activity</div>
-        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;" id="adminActivitySub">Recent sign-ins on this device</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;" id="adminActivitySub">Recent sign-ins across all staff/devices</div>
       </div>
       <button onclick="closeAdminActivity()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
     </div>
     <div id="adminActivityList" style="flex:1;overflow-y:auto;padding:12px 24px;min-height:200px;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
-      <span style="font-size:11px;color:var(--text3);">Tracked locally in this browser only — not shared across devices.</span>
+      <span style="font-size:11px;color:var(--text3);">Synced to the "Login Log" tab on the Content Calendar Google Sheet.</span>
       <div style="display:flex;gap:10px;">
         <button onclick="clearAdminActivity()" style="background:transparent;border:1px solid rgba(239,68,68,0.35);color:#F87171;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Clear Log</button>
         <button onclick="closeAdminActivity()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
@@ -4087,15 +4087,10 @@ function msalOnAuthenticated(account) {
 
 // ─────────────────────────────────────────────────────────────
 // HIDDEN ADMIN PANEL — tap the header logo 6x to reveal a log of
-// sign-ins. Stored in localStorage only (this browser/device), since
-// there's no backend endpoint set up yet to collect this across
-// devices/staff. To make this visible to all staff regardless of
-// device, add a "logLogin" (POST) and "listLogins" (GET) action to
-// whichever Apps Script backend you want to own this, then swap the
-// localStorage calls below for fetch() calls to that endpoint.
+// sign-ins. Synced to the "Login Log" tab on the Content Calendar
+// Google Sheet via CALENDAR_APPS_SCRIPT_URL, so it's shared across
+// all staff/devices instead of being local to one browser.
 // ─────────────────────────────────────────────────────────────
-const ADMIN_LOGIN_LOG_KEY = 'easypc_admin_login_log';
-const ADMIN_LOG_MAX_ENTRIES = 200;
 const ADMIN_TAP_TARGET = 6;
 const ADMIN_TAP_WINDOW_MS = 2500;
 // Only this account can open the hidden admin panel via the 6-tap trigger.
@@ -4125,23 +4120,26 @@ function handleLogoTap() {
 }
 
 function logLoginActivity(account) {
-  try {
-    const log = JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]');
-    log.push({
-      name: account.name || '',
-      username: account.username || '',
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent
-    });
-    // Cap the log so localStorage doesn't grow unbounded
-    while (log.length > ADMIN_LOG_MAX_ENTRIES) log.shift();
-    localStorage.setItem(ADMIN_LOGIN_LOG_KEY, JSON.stringify(log));
-  } catch (e) { /* storage unavailable — skip logging silently */ }
+  const entry = {
+    name: account.name || '',
+    username: account.username || '',
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent
+  };
+  fetch(CALENDAR_APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action: "logLogin", entry: entry })
+  }).catch(e => { /* offline or endpoint unreachable — skip logging silently */ });
 }
 
-function loadAdminLoginLog() {
-  try { return JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]'); }
-  catch (e) { return []; }
+async function loadAdminLoginLog() {
+  try {
+    const response = await fetch(CALENDAR_APPS_SCRIPT_URL + "?action=listLogins&t=" + Date.now(), { cache: "no-store" });
+    const result = await response.json();
+    if (result.status === "error") return [];
+    return result.logins || [];
+  } catch (e) { return []; }
 }
 
 function openAdminActivity() {
@@ -4154,19 +4152,18 @@ function closeAdminActivity() {
 }
 
 function clearAdminActivity() {
-  if (!confirm('Clear the local login activity log? This cannot be undone.')) return;
-  localStorage.removeItem(ADMIN_LOGIN_LOG_KEY);
-  renderAdminActivity();
+  alert('Ang login log ay nasa "Login Log" tab ng Google Sheet — i-delete ang mga rows diyan direkta kung kailangan i-clear.');
 }
 
-function renderAdminActivity() {
-  const log = loadAdminLoginLog().slice().reverse(); // most recent first
+async function renderAdminActivity() {
   const listEl = document.getElementById('adminActivityList');
+  listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">Loading...</div>`;
+  const log = (await loadAdminLoginLog()).slice().reverse(); // most recent first
   const subEl  = document.getElementById('adminActivitySub');
-  if (subEl) subEl.textContent = `${log.length} sign-in${log.length === 1 ? '' : 's'} recorded on this device`;
+  if (subEl) subEl.textContent = `${log.length} sign-in${log.length === 1 ? '' : 's'} recorded (all staff/devices)`;
 
   if (log.length === 0) {
-    listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">No login activity recorded yet on this device.</div>`;
+    listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">No login activity recorded yet.</div>`;
     return;
   }
 
