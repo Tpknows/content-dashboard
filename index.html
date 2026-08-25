@@ -4036,17 +4036,16 @@ async function msalInit() {
 
 async function msalSignIn() {
   const btn = document.getElementById('msalSignInBtn');
-  btn.textContent = 'Signing in...';
+  btn.textContent = 'Redirecting to Microsoft...';
   btn.disabled = true;
+  // Redirect-only flow. Popups are unreliable across browsers, embeds, and
+  // "opened via a link from another tab" contexts (MSAL blocks any popup
+  // once it thinks it's already inside one) — redirect has none of that
+  // failure mode, since it's a full-page navigation, not a new window.
   try {
-    const response = await msalInstance.loginPopup({ scopes: msalScopes });
-    msalOnAuthenticated(response.account);
+    await msalInstance.loginRedirect({ scopes: msalScopes });
   } catch (err) {
-    if (err.errorCode === 'popup_window_error' || err.errorCode === 'empty_window_error') {
-      msalInstance.loginRedirect({ scopes: msalScopes });
-    } else if (err.errorCode !== 'user_cancelled') {
-      showMsalError('Login error: ' + (err.message || err));
-    }
+    showMsalError('Login error: ' + (err.message || err));
     btn.textContent = 'Sign in with Microsoft';
     btn.disabled = false;
   }
@@ -4067,15 +4066,7 @@ function msalOnAuthenticated(account) {
 function msalSignOut() {
   const accounts = msalInstance.getAllAccounts();
   if (!accounts.length) return;
-  msalInstance.logoutPopup({ account: accounts[0] })
-    .then(() => {
-      document.getElementById('msalLoginWall').style.display = 'flex';
-      document.getElementById('msalUserInfo').style.display  = 'none';
-      document.getElementById('msalSignOutBtn').style.display = 'none';
-      document.getElementById('msalSignInBtn').textContent = 'Sign in with Microsoft';
-      document.getElementById('msalSignInBtn').disabled = false;
-    })
-    .catch(() => msalInstance.logoutRedirect({ account: accounts[0] }));
+  msalInstance.logoutRedirect({ account: accounts[0] });
 }
 
 function showMsalError(msg) {
