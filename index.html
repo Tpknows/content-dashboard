@@ -1925,8 +1925,10 @@ function hideLoader() {
 function normalizeRatePct(raw) {
   let v = parseFloat(String(raw ?? 0).replace(/%/g, '').replace(/,/g, '').trim()) || 0;
   if (v <= 0) return 0;
-  // Fractions (and slightly-broken fractions up to 1.5) get converted to %
-  if (v <= 1.5) v = v * 100;
+  // Fractions (and slightly-broken fractions up to 1.0) get converted to %.
+  // Capped at 1.0 rather than 1.5 so a genuinely low but valid rate like
+  // 1.2% isn't mistaken for a fraction and inflated to 120% (clamped to 100).
+  if (v < 1) v = v * 100;
   v = Math.round(v * 10) / 10;
   if (v > 100) v = 100; // hard safety cap — never display an impossible rate
   return v;
@@ -2058,12 +2060,6 @@ async function fetchLiveData() {
   try {
     const res = await fetch(APPS_SCRIPT_URL);
     const raw = await res.json();
-    // DEBUG: log raw keys and sample data
-    console.log('RAW KEYS:', Object.keys(raw));
-    console.log('videos count:', raw.videos ? raw.videos.length : 'MISSING');
-    console.log('campaignAds rows:', raw.campaignAds ? raw.campaignAds.length : 'MISSING');
-    if (raw.videos && raw.videos.length > 0) console.log('Sample video:', JSON.stringify(raw.videos[0]));
-    if (raw.campaignAds && raw.campaignAds.length > 0) console.log('Campaign Ads sample:', JSON.stringify(raw.campaignAds.slice(0,4)));
     DATA = parseSheetData(raw);
     // Show server-side lastUpdated from Apps Script if available
     if (raw.lastUpdated) {
@@ -2071,9 +2067,6 @@ async function fetchLiveData() {
       const stampVal = document.getElementById('lastUpdatedValue');
       if (stampEl && stampVal) { stampEl.style.display = 'inline'; stampVal.textContent = raw.lastUpdated; }
     }
-    console.log('DATA months:', Object.keys(DATA));
-    if (DATA['MAY']) console.log('MAY kpi_submitted:', DATA['MAY'].kpi_submitted, '| videos:', DATA['MAY'].videos, '| winning:', DATA['MAY'].winning);
-
     const monthSelect = document.getElementById('monthSelect');
     const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
     const available = MONTHS_ORDER.filter(m => DATA[m] && DATA[m].videos > 0);
@@ -4977,7 +4970,7 @@ function calendarStatusColor(status) {
     'Filming/Design': '#8B5CF6',
     'Ready to post': '#06B6D4',
     'Posted': '#22C55E',
-    'Done': '#3B82F6'
+    'Done': '#22C55E'
   };
   return map[status] || '#71717A';
 }
