@@ -1264,6 +1264,27 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   </div>
 </div>
 
+<!-- Hidden Admin Activity Log — revealed by tapping the header logo 6x -->
+<div id="adminActivityModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,11,13,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeAdminActivity()">
+  <div style="background:#141416;border:1px solid var(--border);border-radius:16px;max-width:640px;width:100%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#fff;">🔐 Admin — Login Activity</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;" id="adminActivitySub">Recent sign-ins on this device</div>
+      </div>
+      <button onclick="closeAdminActivity()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+    </div>
+    <div id="adminActivityList" style="flex:1;overflow-y:auto;padding:12px 24px;min-height:200px;"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
+      <span style="font-size:11px;color:var(--text3);">Tracked locally in this browser only — not shared across devices.</span>
+      <div style="display:flex;gap:10px;">
+        <button onclick="clearAdminActivity()" style="background:transparent;border:1px solid rgba(239,68,68,0.35);color:#F87171;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Clear Log</button>
+        <button onclick="closeAdminActivity()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,11,13,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
   <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.08);border-top:4px solid #3B82F6;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
   <div id="loadingMsg" style="color:#A1A1AA;font-size:13px;font-weight:500;letter-spacing:0.5px;">Loading live data...</div>
@@ -1272,7 +1293,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
 <div class="header">
   <div>
-    <div class="logo">EASY<span>PC</span> Content Dashboard</div>
+    <div class="logo" id="dashLogoTitle" onclick="handleLogoTap()" style="cursor:default;user-select:none;">EASY<span>PC</span> Content Dashboard</div>
     <div class="subtitle">2026 Performance Tracker — EasyPC Main Page · <span style="color:var(--accent);font-weight:600;">Last updated: July 6, 2026</span></div>
   </div>
 
@@ -4061,6 +4082,108 @@ function msalOnAuthenticated(account) {
   if (avatarEl) avatarEl.textContent = (account.name || account.username || '?')[0].toUpperCase();
   if (infoEl)   infoEl.style.display  = 'flex';
   if (outBtn)   outBtn.style.display  = 'flex';
+  logLoginActivity(account);
+}
+
+// ─────────────────────────────────────────────────────────────
+// HIDDEN ADMIN PANEL — tap the header logo 6x to reveal a log of
+// sign-ins. Stored in localStorage only (this browser/device), since
+// there's no backend endpoint set up yet to collect this across
+// devices/staff. To make this visible to all staff regardless of
+// device, add a "logLogin" (POST) and "listLogins" (GET) action to
+// whichever Apps Script backend you want to own this, then swap the
+// localStorage calls below for fetch() calls to that endpoint.
+// ─────────────────────────────────────────────────────────────
+const ADMIN_LOGIN_LOG_KEY = 'easypc_admin_login_log';
+const ADMIN_LOG_MAX_ENTRIES = 200;
+const ADMIN_TAP_TARGET = 6;
+const ADMIN_TAP_WINDOW_MS = 2500;
+// Only this account can open the hidden admin panel via the 6-tap trigger.
+// Match is case-insensitive against the signed-in MSAL account's username.
+const ADMIN_EMAIL = 'thamie.padal@easypc.com.ph';
+let _adminTapCount = 0;
+let _adminTapTimer = null;
+
+function isCurrentUserAdmin() {
+  const accounts = msalInstance.getAllAccounts();
+  if (!accounts.length) return false;
+  const username = (accounts[0].username || '').trim().toLowerCase();
+  return username === ADMIN_EMAIL.toLowerCase();
+}
+
+function handleLogoTap() {
+  _adminTapCount++;
+  clearTimeout(_adminTapTimer);
+  _adminTapTimer = setTimeout(() => { _adminTapCount = 0; }, ADMIN_TAP_WINDOW_MS);
+  if (_adminTapCount >= ADMIN_TAP_TARGET) {
+    _adminTapCount = 0;
+    clearTimeout(_adminTapTimer);
+    // Silently do nothing for non-admins — no error, no hint that anything
+    // was supposed to happen, so the trigger stays effectively invisible.
+    if (isCurrentUserAdmin()) openAdminActivity();
+  }
+}
+
+function logLoginActivity(account) {
+  try {
+    const log = JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]');
+    log.push({
+      name: account.name || '',
+      username: account.username || '',
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    });
+    // Cap the log so localStorage doesn't grow unbounded
+    while (log.length > ADMIN_LOG_MAX_ENTRIES) log.shift();
+    localStorage.setItem(ADMIN_LOGIN_LOG_KEY, JSON.stringify(log));
+  } catch (e) { /* storage unavailable — skip logging silently */ }
+}
+
+function loadAdminLoginLog() {
+  try { return JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+
+function openAdminActivity() {
+  renderAdminActivity();
+  document.getElementById('adminActivityModal').style.display = 'flex';
+}
+
+function closeAdminActivity() {
+  document.getElementById('adminActivityModal').style.display = 'none';
+}
+
+function clearAdminActivity() {
+  if (!confirm('Clear the local login activity log? This cannot be undone.')) return;
+  localStorage.removeItem(ADMIN_LOGIN_LOG_KEY);
+  renderAdminActivity();
+}
+
+function renderAdminActivity() {
+  const log = loadAdminLoginLog().slice().reverse(); // most recent first
+  const listEl = document.getElementById('adminActivityList');
+  const subEl  = document.getElementById('adminActivitySub');
+  if (subEl) subEl.textContent = `${log.length} sign-in${log.length === 1 ? '' : 's'} recorded on this device`;
+
+  if (log.length === 0) {
+    listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">No login activity recorded yet on this device.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = log.map(entry => {
+    const d = new Date(entry.timestamp);
+    const dateStr = isNaN(d.getTime()) ? entry.timestamp : d.toLocaleString('en-PH', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+    const initial = (entry.name || entry.username || '?')[0].toUpperCase();
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="width:32px;height:32px;flex-shrink:0;border-radius:50%;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#93C5FD;">${initial}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.name || entry.username || 'Unknown'}</div>
+          <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.username || ''}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;">${dateStr}</div>
+      </div>`;
+  }).join('');
 }
 
 function msalSignOut() {
