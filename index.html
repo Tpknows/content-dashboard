@@ -3474,7 +3474,7 @@ function analyzeData(month, d) {
     ? `${month} is ON TRACK — all KPI targets are being met. Keep the momentum going!`
     : overallPct >= 60
     ? `${month} is AT RISK — you're making progress but need to push harder to hit all targets.`
-    : `${month} is BEHIND — significant effort needed to close the gap before month end.`;
+    : `${month} is BEHIND — significant effort needed next month to close the gap.`;
 
   // WHAT'S WORKING
   const working = [];
@@ -3489,30 +3489,30 @@ function analyzeData(month, d) {
   // WHAT'S NOT WORKING
   const notWorking = [];
   if (viewsPct < 70) notWorking.push(`Views at only ${viewsPct}% of the ${fmt(KPI_TARGETS.views)} target — still need ${fmt(viewsGap)} more views.`);
-  if (winPct < 70) notWorking.push(`Only ${d.winning} winning videos vs target of ${KPI_TARGETS.winning} — need ${winGap} more wins this month.`);
+  if (winPct < 70) notWorking.push(`Only ${d.winning} winning videos vs target of ${KPI_TARGETS.winning} — ${winGap} more wins needed to hit target pace.`);
   if (thruPct < 70) notWorking.push(`Thruplays at ${thruPct}% of target — ${fmt(thruGap)} more needed. Average watch time needs improvement.`);
   if (d.avg_rate < 10) notWorking.push(`Avg thruplay rate is ${d.avg_rate}% — below the ideal 10%+ threshold. Hooks and retention need work.`);
   if (lowRate.length > d.videos * 0.4) notWorking.push(`${lowRate.length} videos have under 5% thruplay rate — too many videos are losing viewers in the first 3 seconds.`);
   if (worstPillar.count > 0 && worstPillar.avg < 30000) notWorking.push(`<strong>${worstPillar.name}</strong> pillar is underperforming with avg ${fmt(worstPillar.avg)} views — needs better content strategy.`);
   if (notWorking.length === 0) notWorking.push('No major red flags — focus on consistency to maintain performance.');
 
-  // ACTION PLAN
+  // ACTION PLAN (for next month — the reporting month is already closed)
   const actions = [];
-  if (winGap > 0) actions.push(`🎯 Need ${winGap} more winning videos — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
-  if (viewsGap > 0) actions.push(`📈 To close the ${fmt(viewsGap)} views gap, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
-  if (d.avg_rate < 10) actions.push(`⚡ Improve hooks in the first 3 seconds — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
-  if (aiVids.length < d.videos * 0.3) actions.push(`🤖 Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration, it correlates with better performance.`);
-  actions.push(`🔁 Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output this month.`);
-  if (winVids.length > 0) actions.push(`📋 Study the winning videos' hook types and pillar — replicate those exact formats with new topics.`);
-  actions.push(`📅 Submit content earlier in the month to allow more time for views to accumulate before month-end reporting.`);
+  if (winGap > 0) actions.push(`🎯 Aim for ${winGap} more winning videos next month — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
+  if (viewsGap > 0) actions.push(`📈 To close the ${fmt(viewsGap)} views gap next month, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
+  if (d.avg_rate < 10) actions.push(`⚡ Improve hooks in the first 3 seconds next month — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
+  if (aiVids.length < d.videos * 0.3) actions.push(`🤖 Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration next month, it correlates with better performance.`);
+  actions.push(`🔁 Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output next month.`);
+  if (winVids.length > 0) actions.push(`📋 Study the winning videos' hook types and pillar — replicate those exact formats with new topics next month.`);
+  actions.push(`📅 Submit content earlier next month to allow more time for views to accumulate before reporting.`);
 
-  // DON'T DO
+  // DON'T DO (going into next month)
   const dont = [];
   if (lowRate.length > 0) dont.push(`Don't keep publishing content with the same hook style as your ${lowRate.length} low-retention videos (under 5% thruplay rate) — it's not working.`);
-  if (worstPillar.count > 2) dont.push(`Don't over-invest in <strong>${worstPillar.name}</strong> content right now — it's averaging only ${fmt(worstPillar.avg)} views. Shift budget to ${bestPillar.name}.`);
+  if (worstPillar.count > 2) dont.push(`Don't over-invest in <strong>${worstPillar.name}</strong> content next month — it's averaging only ${fmt(worstPillar.avg)} views. Shift budget to ${bestPillar.name}.`);
   dont.push(`Don't spread creators thin across too many pillars — focus each creator on their strongest content type.`);
   dont.push(`Don't ignore thruplay rate — views without retention don't help hit the ${fmt(KPI_TARGETS.thruplays)} thruplay target.`);
-  if (d.videos > 0 && winRate < 10) dont.push(`Don't keep repeating content formats with a sub-10% win rate — experiment with new approaches.`);
+  if (d.videos > 0 && winRate < 10) dont.push(`Don't keep repeating content formats with a sub-10% win rate — experiment with new approaches next month.`);
 
   // TOP VIDEO INSIGHT
   let top_videos_insight = '';
@@ -3527,11 +3527,10 @@ function analyzeData(month, d) {
 
   // OPPORTUNITIES
   const opportunities = [];
-  if (bestPillar.count < 10) opportunities.push(`Scale up <strong>${bestPillar.name}</strong> content — only ${bestPillar.count} videos this month but highest avg views at ${fmt(bestPillar.avg)}.`);
+  if (bestPillar.count < 10) opportunities.push(`Scale up <strong>${bestPillar.name}</strong> content next month — it only had ${bestPillar.count} videos this reporting month but the highest avg views at ${fmt(bestPillar.avg)}.`);
   if (aiVids.length > 0 && aiWinRate > 0) opportunities.push(`AI content shows ${aiWinRate}% win rate — there's room to produce more AI-integrated videos.`);
   if (highRate.length > 0) opportunities.push(`${highRate.length} videos with 15%+ thruplay rate — analyze their hooks and replicate for more submissions.`);
   opportunities.push(`Repurpose winning content into different formats (shorter cuts, different hooks) to multiply output without extra production effort.`);
-  if (winVids.length > 0) opportunities.push(`Boost winning videos with paid promotion to maximize their reach before month end.`);
 
   // CREATOR NOTES
   const creator_notes = [];
@@ -3909,7 +3908,7 @@ SLIDE 6 — HOLD RATE ANALYSIS
 ${listOrNone(ins.hold_recs)}
 
 SLIDE 7 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
-Left column "DO THIS MONTH":
+Left column "DO NEXT MONTH":
 ${listOrNone(ins.actions)}
 
 Right column "STOP DOING":
