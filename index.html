@@ -1270,13 +1270,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);">
       <div>
         <div style="font-size:16px;font-weight:800;color:#fff;">🔐 Admin — Login Activity</div>
-        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;" id="adminActivitySub">Recent sign-ins across all staff/devices</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;" id="adminActivitySub">Recent sign-ins on this device</div>
       </div>
       <button onclick="closeAdminActivity()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
     </div>
     <div id="adminActivityList" style="flex:1;overflow-y:auto;padding:12px 24px;min-height:200px;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
-      <span style="font-size:11px;color:var(--text3);">Synced to the "Login Log" tab on the Content Calendar Google Sheet.</span>
+      <span style="font-size:11px;color:var(--text3);">Tracked locally in this browser only — not shared across devices.</span>
       <div style="display:flex;gap:10px;">
         <button onclick="clearAdminActivity()" style="background:transparent;border:1px solid rgba(239,68,68,0.35);color:#F87171;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Clear Log</button>
         <button onclick="closeAdminActivity()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
@@ -1955,6 +1955,16 @@ function normalizeRatePct(raw) {
   return v;
 }
 
+// Only these creators' content counts toward the dashboard. Any row tagged
+// to someone outside this list is excluded entirely — not counted in views,
+// thruplays, winning count, videos, charts, or any KPI anywhere.
+const APPROVED_CREATORS = ['Tammy Padal', 'Tammy', 'Bianca Elisha Sanchez'];
+function isApprovedCreator(name) {
+  const n = String(name || '').trim().toLowerCase();
+  if (!n) return false;
+  return APPROVED_CREATORS.some(c => c.toLowerCase() === n);
+}
+
 function parseSheetData(raw) {
   const MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   const result = {};
@@ -1978,6 +1988,7 @@ function parseSheetData(raw) {
       const authentic = authRaw==='YES'||authRaw==='TRUE';
       const pillar = String(v.pillar||'').trim().toUpperCase();
       const creator = String(v.creator||'').trim();
+      if (!isApprovedCreator(creator)) continue;
       const title = String(v.title||'').trim();
       const link = String(v.link||'').trim();
       const hookType = String(v.hookType||'').trim();
@@ -2019,6 +2030,7 @@ function parseSheetData(raw) {
       const authentic=(row[AUTH_COL]||'').toString().trim().toUpperCase()==='YES';
       const pillar=(row[PILLAR_COL]||'').toString().trim().toUpperCase();
       const creator=(row[CREATOR_COL]||'').toString().trim();
+      if (!isApprovedCreator(creator)) continue;
       const title=(row[TITLE_COL]||'').toString().trim();
       const link=(row[LINK_COL]||'').toString().trim();
       const hookType=(row[HOOK_COL]||'').toString().trim();
@@ -3808,6 +3820,17 @@ function generateManusPrompt() {
     return c.length ? c.map(x => '- ' + x).join('\n') : '- No data available.';
   };
 
+  // Highlights should never look sparse next to Lowlights. If MoM comparisons
+  // are thin (e.g. only 1 win, or none — common in the first tracked month,
+  // or a month with mostly MoM declines), pad the Highlights column with
+  // standout "what's working" stats this month (win rate, top pillar, top
+  // creator, retention wins) so it stays a full, useful column either way.
+  const momHighlightsClean = clean(ins.mom_highlights);
+  const workingClean = clean(ins.working);
+  const blendedHighlights = momHighlightsClean.length >= 3
+    ? momHighlightsClean
+    : momHighlightsClean.concat(workingClean.filter(w => !momHighlightsClean.includes(w))).slice(0, 5);
+
   // Build winning videos list from current month's data
   const monthData = DATA[month] || {};
   const winVids = (monthData.all_videos || [])
@@ -3860,8 +3883,8 @@ Below the cards, show 3 progress bars against targets:
 - Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
 
 SLIDE 3 — MONTH-OVER-MONTH PERFORMANCE (two-column layout)
-Left column "HIGHLIGHTS" (vs previous month):
-${listOrNone(ins.mom_highlights)}
+Left column "HIGHLIGHTS" — a mix of vs. previous-month comparisons AND standout stats from this month (not limited to MoM comparisons only):
+${listOrNone(blendedHighlights)}
 
 Right column "LOWLIGHTS" (vs previous month):
 ${listOrNone(ins.mom_lowlights)}
@@ -4087,10 +4110,15 @@ function msalOnAuthenticated(account) {
 
 // ─────────────────────────────────────────────────────────────
 // HIDDEN ADMIN PANEL — tap the header logo 6x to reveal a log of
-// sign-ins. Synced to the "Login Log" tab on the Content Calendar
-// Google Sheet via CALENDAR_APPS_SCRIPT_URL, so it's shared across
-// all staff/devices instead of being local to one browser.
+// sign-ins. Stored in localStorage only (this browser/device), since
+// there's no backend endpoint set up yet to collect this across
+// devices/staff. To make this visible to all staff regardless of
+// device, add a "logLogin" (POST) and "listLogins" (GET) action to
+// whichever Apps Script backend you want to own this, then swap the
+// localStorage calls below for fetch() calls to that endpoint.
 // ─────────────────────────────────────────────────────────────
+const ADMIN_LOGIN_LOG_KEY = 'easypc_admin_login_log';
+const ADMIN_LOG_MAX_ENTRIES = 200;
 const ADMIN_TAP_TARGET = 6;
 const ADMIN_TAP_WINDOW_MS = 2500;
 // Only this account can open the hidden admin panel via the 6-tap trigger.
@@ -4120,26 +4148,23 @@ function handleLogoTap() {
 }
 
 function logLoginActivity(account) {
-  const entry = {
-    name: account.name || '',
-    username: account.username || '',
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent
-  };
-  fetch(CALENDAR_APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ action: "logLogin", entry: entry })
-  }).catch(e => { /* offline or endpoint unreachable — skip logging silently */ });
+  try {
+    const log = JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]');
+    log.push({
+      name: account.name || '',
+      username: account.username || '',
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    });
+    // Cap the log so localStorage doesn't grow unbounded
+    while (log.length > ADMIN_LOG_MAX_ENTRIES) log.shift();
+    localStorage.setItem(ADMIN_LOGIN_LOG_KEY, JSON.stringify(log));
+  } catch (e) { /* storage unavailable — skip logging silently */ }
 }
 
-async function loadAdminLoginLog() {
-  try {
-    const response = await fetch(CALENDAR_APPS_SCRIPT_URL + "?action=listLogins&t=" + Date.now(), { cache: "no-store" });
-    const result = await response.json();
-    if (result.status === "error") return [];
-    return result.logins || [];
-  } catch (e) { return []; }
+function loadAdminLoginLog() {
+  try { return JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]'); }
+  catch (e) { return []; }
 }
 
 function openAdminActivity() {
@@ -4152,18 +4177,19 @@ function closeAdminActivity() {
 }
 
 function clearAdminActivity() {
-  alert('Ang login log ay nasa "Login Log" tab ng Google Sheet — i-delete ang mga rows diyan direkta kung kailangan i-clear.');
+  if (!confirm('Clear the local login activity log? This cannot be undone.')) return;
+  localStorage.removeItem(ADMIN_LOGIN_LOG_KEY);
+  renderAdminActivity();
 }
 
-async function renderAdminActivity() {
+function renderAdminActivity() {
+  const log = loadAdminLoginLog().slice().reverse(); // most recent first
   const listEl = document.getElementById('adminActivityList');
-  listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">Loading...</div>`;
-  const log = (await loadAdminLoginLog()).slice().reverse(); // most recent first
   const subEl  = document.getElementById('adminActivitySub');
-  if (subEl) subEl.textContent = `${log.length} sign-in${log.length === 1 ? '' : 's'} recorded (all staff/devices)`;
+  if (subEl) subEl.textContent = `${log.length} sign-in${log.length === 1 ? '' : 's'} recorded on this device`;
 
   if (log.length === 0) {
-    listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">No login activity recorded yet.</div>`;
+    listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">No login activity recorded yet on this device.</div>`;
     return;
   }
 
