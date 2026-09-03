@@ -590,6 +590,14 @@ html { overflow-x: hidden; }
   .cal-weekday { font-size: 9px; padding: 4px 0; }
   .cal-entry-pill { font-size: 9px; padding: 2px 4px; }
 }
+/* ── Compact calendar view — title stays readable, subtitle (creator/
+   platform/status text) is hidden and replaced by the pill's existing
+   left color bar, so each entry takes far less vertical space. ── */
+.cal-compact .cal-entries { max-height: 132px; }
+.cal-compact .cal-entry-pill { padding: 3px 7px !important; margin-bottom: 2px !important; }
+.cal-compact .cal-entry-sub { display: none !important; }
+.cal-compact .cal-entry-title { margin-bottom: 0 !important; }
+#calCompactToggleBtn.active { background: rgba(59,130,246,0.15) !important; border-color: rgba(59,130,246,0.4) !important; color: #93C5FD !important; }
 .top10-item {
   background: var(--card);
   border: 1px solid var(--border);
@@ -1270,13 +1278,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);">
       <div>
         <div style="font-size:16px;font-weight:800;color:#fff;">🔐 Admin — Login Activity</div>
-        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;" id="adminActivitySub">Recent sign-ins across all staff/devices</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;" id="adminActivitySub">Recent sign-ins on this device</div>
       </div>
       <button onclick="closeAdminActivity()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
     </div>
     <div id="adminActivityList" style="flex:1;overflow-y:auto;padding:12px 24px;min-height:200px;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
-      <span style="font-size:11px;color:var(--text3);">Synced to the "Login Log" tab on the Content Calendar Google Sheet.</span>
+      <span style="font-size:11px;color:var(--text3);">Tracked locally in this browser only — not shared across devices.</span>
       <div style="display:flex;gap:10px;">
         <button onclick="clearAdminActivity()" style="background:transparent;border:1px solid rgba(239,68,68,0.35);color:#F87171;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Clear Log</button>
         <button onclick="closeAdminActivity()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
@@ -1448,6 +1456,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div style="display:flex;align-items:center;gap:8px;">
         <button onclick="calendarGoToday()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Today</button>
         <button onclick="loadContentCalendar()" title="Refresh from Sheet" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄</button>
+        <button id="calCompactToggleBtn" onclick="toggleCalendarCompact()" title="Toggle compact view" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">▦ Compact</button>
         <button onclick="calendarChangeMonth(-1)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius:10px;font-size:14px;cursor:pointer;">‹</button>
         <button onclick="calendarChangeMonth(1)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius:10px;font-size:14px;cursor:pointer;">›</button>
         <div id="calendarMonthLabel" style="font-size:16px;font-weight:700;color:var(--text);margin-left:6px;"></div>
@@ -1955,6 +1964,16 @@ function normalizeRatePct(raw) {
   return v;
 }
 
+// Only these creators' content counts toward the dashboard. Any row tagged
+// to someone outside this list is excluded entirely — not counted in views,
+// thruplays, winning count, videos, charts, or any KPI anywhere.
+const APPROVED_CREATORS = ['Tammy Padal', 'Tammy', 'Bianca Elisha Sanchez'];
+function isApprovedCreator(name) {
+  const n = String(name || '').trim().toLowerCase();
+  if (!n) return false;
+  return APPROVED_CREATORS.some(c => c.toLowerCase() === n);
+}
+
 function parseSheetData(raw) {
   const MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   const result = {};
@@ -1978,6 +1997,7 @@ function parseSheetData(raw) {
       const authentic = authRaw==='YES'||authRaw==='TRUE';
       const pillar = String(v.pillar||'').trim().toUpperCase();
       const creator = String(v.creator||'').trim();
+      if (!isApprovedCreator(creator)) continue;
       const title = String(v.title||'').trim();
       const link = String(v.link||'').trim();
       const hookType = String(v.hookType||'').trim();
@@ -2019,6 +2039,7 @@ function parseSheetData(raw) {
       const authentic=(row[AUTH_COL]||'').toString().trim().toUpperCase()==='YES';
       const pillar=(row[PILLAR_COL]||'').toString().trim().toUpperCase();
       const creator=(row[CREATOR_COL]||'').toString().trim();
+      if (!isApprovedCreator(creator)) continue;
       const title=(row[TITLE_COL]||'').toString().trim();
       const link=(row[LINK_COL]||'').toString().trim();
       const hookType=(row[HOOK_COL]||'').toString().trim();
@@ -3462,7 +3483,7 @@ function analyzeData(month, d) {
     ? `${month} is ON TRACK — all KPI targets are being met. Keep the momentum going!`
     : overallPct >= 60
     ? `${month} is AT RISK — you're making progress but need to push harder to hit all targets.`
-    : `${month} is BEHIND — significant effort needed to close the gap before month end.`;
+    : `${month} is BEHIND — significant effort needed next month to close the gap.`;
 
   // WHAT'S WORKING
   const working = [];
@@ -3477,30 +3498,30 @@ function analyzeData(month, d) {
   // WHAT'S NOT WORKING
   const notWorking = [];
   if (viewsPct < 70) notWorking.push(`Views at only ${viewsPct}% of the ${fmt(KPI_TARGETS.views)} target — still need ${fmt(viewsGap)} more views.`);
-  if (winPct < 70) notWorking.push(`Only ${d.winning} winning videos vs target of ${KPI_TARGETS.winning} — need ${winGap} more wins this month.`);
+  if (winPct < 70) notWorking.push(`Only ${d.winning} winning videos vs target of ${KPI_TARGETS.winning} — ${winGap} more wins needed to hit target pace.`);
   if (thruPct < 70) notWorking.push(`Thruplays at ${thruPct}% of target — ${fmt(thruGap)} more needed. Average watch time needs improvement.`);
   if (d.avg_rate < 10) notWorking.push(`Avg thruplay rate is ${d.avg_rate}% — below the ideal 10%+ threshold. Hooks and retention need work.`);
   if (lowRate.length > d.videos * 0.4) notWorking.push(`${lowRate.length} videos have under 5% thruplay rate — too many videos are losing viewers in the first 3 seconds.`);
   if (worstPillar.count > 0 && worstPillar.avg < 30000) notWorking.push(`<strong>${worstPillar.name}</strong> pillar is underperforming with avg ${fmt(worstPillar.avg)} views — needs better content strategy.`);
   if (notWorking.length === 0) notWorking.push('No major red flags — focus on consistency to maintain performance.');
 
-  // ACTION PLAN
+  // ACTION PLAN (for next month — the reporting month is already closed)
   const actions = [];
-  if (winGap > 0) actions.push(`🎯 Need ${winGap} more winning videos — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
-  if (viewsGap > 0) actions.push(`📈 To close the ${fmt(viewsGap)} views gap, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
-  if (d.avg_rate < 10) actions.push(`⚡ Improve hooks in the first 3 seconds — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
-  if (aiVids.length < d.videos * 0.3) actions.push(`🤖 Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration, it correlates with better performance.`);
-  actions.push(`🔁 Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output this month.`);
-  if (winVids.length > 0) actions.push(`📋 Study the winning videos' hook types and pillar — replicate those exact formats with new topics.`);
-  actions.push(`📅 Submit content earlier in the month to allow more time for views to accumulate before month-end reporting.`);
+  if (winGap > 0) actions.push(`🎯 Aim for ${winGap} more winning videos next month — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
+  if (viewsGap > 0) actions.push(`📈 To close the ${fmt(viewsGap)} views gap next month, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
+  if (d.avg_rate < 10) actions.push(`⚡ Improve hooks in the first 3 seconds next month — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
+  if (aiVids.length < d.videos * 0.3) actions.push(`🤖 Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration next month, it correlates with better performance.`);
+  actions.push(`🔁 Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output next month.`);
+  if (winVids.length > 0) actions.push(`📋 Study the winning videos' hook types and pillar — replicate those exact formats with new topics next month.`);
+  actions.push(`📅 Submit content earlier next month to allow more time for views to accumulate before reporting.`);
 
-  // DON'T DO
+  // DON'T DO (going into next month)
   const dont = [];
   if (lowRate.length > 0) dont.push(`Don't keep publishing content with the same hook style as your ${lowRate.length} low-retention videos (under 5% thruplay rate) — it's not working.`);
-  if (worstPillar.count > 2) dont.push(`Don't over-invest in <strong>${worstPillar.name}</strong> content right now — it's averaging only ${fmt(worstPillar.avg)} views. Shift budget to ${bestPillar.name}.`);
+  if (worstPillar.count > 2) dont.push(`Don't over-invest in <strong>${worstPillar.name}</strong> content next month — it's averaging only ${fmt(worstPillar.avg)} views. Shift budget to ${bestPillar.name}.`);
   dont.push(`Don't spread creators thin across too many pillars — focus each creator on their strongest content type.`);
   dont.push(`Don't ignore thruplay rate — views without retention don't help hit the ${fmt(KPI_TARGETS.thruplays)} thruplay target.`);
-  if (d.videos > 0 && winRate < 10) dont.push(`Don't keep repeating content formats with a sub-10% win rate — experiment with new approaches.`);
+  if (d.videos > 0 && winRate < 10) dont.push(`Don't keep repeating content formats with a sub-10% win rate — experiment with new approaches next month.`);
 
   // TOP VIDEO INSIGHT
   let top_videos_insight = '';
@@ -3515,11 +3536,10 @@ function analyzeData(month, d) {
 
   // OPPORTUNITIES
   const opportunities = [];
-  if (bestPillar.count < 10) opportunities.push(`Scale up <strong>${bestPillar.name}</strong> content — only ${bestPillar.count} videos this month but highest avg views at ${fmt(bestPillar.avg)}.`);
+  if (bestPillar.count < 10) opportunities.push(`Scale up <strong>${bestPillar.name}</strong> content next month — it only had ${bestPillar.count} videos this reporting month but the highest avg views at ${fmt(bestPillar.avg)}.`);
   if (aiVids.length > 0 && aiWinRate > 0) opportunities.push(`AI content shows ${aiWinRate}% win rate — there's room to produce more AI-integrated videos.`);
   if (highRate.length > 0) opportunities.push(`${highRate.length} videos with 15%+ thruplay rate — analyze their hooks and replicate for more submissions.`);
   opportunities.push(`Repurpose winning content into different formats (shorter cuts, different hooks) to multiply output without extra production effort.`);
-  if (winVids.length > 0) opportunities.push(`Boost winning videos with paid promotion to maximize their reach before month end.`);
 
   // CREATOR NOTES
   const creator_notes = [];
@@ -3808,6 +3828,17 @@ function generateManusPrompt() {
     return c.length ? c.map(x => '- ' + x).join('\n') : '- No data available.';
   };
 
+  // Highlights should never look sparse next to Lowlights. If MoM comparisons
+  // are thin (e.g. only 1 win, or none — common in the first tracked month,
+  // or a month with mostly MoM declines), pad the Highlights column with
+  // standout "what's working" stats this month (win rate, top pillar, top
+  // creator, retention wins) so it stays a full, useful column either way.
+  const momHighlightsClean = clean(ins.mom_highlights);
+  const workingClean = clean(ins.working);
+  const blendedHighlights = momHighlightsClean.length >= 3
+    ? momHighlightsClean
+    : momHighlightsClean.concat(workingClean.filter(w => !momHighlightsClean.includes(w))).slice(0, 5);
+
   // Build winning videos list from current month's data
   const monthData = DATA[month] || {};
   const winVids = (monthData.all_videos || [])
@@ -3860,8 +3891,8 @@ Below the cards, show 3 progress bars against targets:
 - Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
 
 SLIDE 3 — MONTH-OVER-MONTH PERFORMANCE (two-column layout)
-Left column "HIGHLIGHTS" (vs previous month):
-${listOrNone(ins.mom_highlights)}
+Left column "HIGHLIGHTS" — a mix of vs. previous-month comparisons AND standout stats from this month (not limited to MoM comparisons only):
+${listOrNone(blendedHighlights)}
 
 Right column "LOWLIGHTS" (vs previous month):
 ${listOrNone(ins.mom_lowlights)}
@@ -3886,7 +3917,7 @@ SLIDE 6 — HOLD RATE ANALYSIS
 ${listOrNone(ins.hold_recs)}
 
 SLIDE 7 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
-Left column "DO THIS MONTH":
+Left column "DO NEXT MONTH":
 ${listOrNone(ins.actions)}
 
 Right column "STOP DOING":
@@ -4087,10 +4118,15 @@ function msalOnAuthenticated(account) {
 
 // ─────────────────────────────────────────────────────────────
 // HIDDEN ADMIN PANEL — tap the header logo 6x to reveal a log of
-// sign-ins. Synced to the "Login Log" tab on the Content Calendar
-// Google Sheet via CALENDAR_APPS_SCRIPT_URL, so it's shared across
-// all staff/devices instead of being local to one browser.
+// sign-ins. Stored in localStorage only (this browser/device), since
+// there's no backend endpoint set up yet to collect this across
+// devices/staff. To make this visible to all staff regardless of
+// device, add a "logLogin" (POST) and "listLogins" (GET) action to
+// whichever Apps Script backend you want to own this, then swap the
+// localStorage calls below for fetch() calls to that endpoint.
 // ─────────────────────────────────────────────────────────────
+const ADMIN_LOGIN_LOG_KEY = 'easypc_admin_login_log';
+const ADMIN_LOG_MAX_ENTRIES = 200;
 const ADMIN_TAP_TARGET = 6;
 const ADMIN_TAP_WINDOW_MS = 2500;
 // Only this account can open the hidden admin panel via the 6-tap trigger.
@@ -4120,26 +4156,23 @@ function handleLogoTap() {
 }
 
 function logLoginActivity(account) {
-  const entry = {
-    name: account.name || '',
-    username: account.username || '',
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent
-  };
-  fetch(CALENDAR_APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ action: "logLogin", entry: entry })
-  }).catch(e => { /* offline or endpoint unreachable — skip logging silently */ });
+  try {
+    const log = JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]');
+    log.push({
+      name: account.name || '',
+      username: account.username || '',
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    });
+    // Cap the log so localStorage doesn't grow unbounded
+    while (log.length > ADMIN_LOG_MAX_ENTRIES) log.shift();
+    localStorage.setItem(ADMIN_LOGIN_LOG_KEY, JSON.stringify(log));
+  } catch (e) { /* storage unavailable — skip logging silently */ }
 }
 
-async function loadAdminLoginLog() {
-  try {
-    const response = await fetch(CALENDAR_APPS_SCRIPT_URL + "?action=listLogins&t=" + Date.now(), { cache: "no-store" });
-    const result = await response.json();
-    if (result.status === "error") return [];
-    return result.logins || [];
-  } catch (e) { return []; }
+function loadAdminLoginLog() {
+  try { return JSON.parse(localStorage.getItem(ADMIN_LOGIN_LOG_KEY) || '[]'); }
+  catch (e) { return []; }
 }
 
 function openAdminActivity() {
@@ -4152,18 +4185,19 @@ function closeAdminActivity() {
 }
 
 function clearAdminActivity() {
-  alert('Ang login log ay nasa "Login Log" tab ng Google Sheet — i-delete ang mga rows diyan direkta kung kailangan i-clear.');
+  if (!confirm('Clear the local login activity log? This cannot be undone.')) return;
+  localStorage.removeItem(ADMIN_LOGIN_LOG_KEY);
+  renderAdminActivity();
 }
 
-async function renderAdminActivity() {
+function renderAdminActivity() {
+  const log = loadAdminLoginLog().slice().reverse(); // most recent first
   const listEl = document.getElementById('adminActivityList');
-  listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">Loading...</div>`;
-  const log = (await loadAdminLoginLog()).slice().reverse(); // most recent first
   const subEl  = document.getElementById('adminActivitySub');
-  if (subEl) subEl.textContent = `${log.length} sign-in${log.length === 1 ? '' : 's'} recorded (all staff/devices)`;
+  if (subEl) subEl.textContent = `${log.length} sign-in${log.length === 1 ? '' : 's'} recorded on this device`;
 
   if (log.length === 0) {
-    listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">No login activity recorded yet.</div>`;
+    listEl.innerHTML = `<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">No login activity recorded yet on this device.</div>`;
     return;
   }
 
@@ -4945,7 +4979,6 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldType').value = entry ? entry.contentType : 'Reel/Short Video';
   document.getElementById('calFieldStatus').value = entry ? entry.status : 'Idea';
   document.getElementById('calFieldTitle').value = entry ? entry.title : '';
-  document.getElementById('calFieldTitleCount').textContent = document.getElementById('calFieldTitle').value.length + '/80';
   document.getElementById('calFieldSavedBy').value = entry ? (entry.savedBy || '') : lastSavedByName;
   document.getElementById('calFieldNotes').value = entry ? entry.notes : '';
   document.getElementById('calFieldLink').value  = entry ? (entry.link || '') : '';
@@ -5102,6 +5135,24 @@ function toISODate_(y, m, d) {
 
 let calendarViewDate = new Date();
 
+// Compact view — hides the creator/platform/status subtitle line on each
+// calendar entry pill so more fit per day while titles stay fully visible.
+// Persisted so the preference survives a page reload.
+let calendarCompactMode = localStorage.getItem('easypc_cal_compact') === '1';
+
+function toggleCalendarCompact() {
+  calendarCompactMode = !calendarCompactMode;
+  localStorage.setItem('easypc_cal_compact', calendarCompactMode ? '1' : '0');
+  syncCalendarCompactBtn();
+  if (document.getElementById('calendarMonthGrid')) renderContentCalendar();
+  if (document.getElementById('creativeMonthGrid')) renderCreativeCalendar();
+}
+
+function syncCalendarCompactBtn() {
+  const btn = document.getElementById('calCompactToggleBtn');
+  if (btn) btn.classList.toggle('active', calendarCompactMode);
+}
+
 function syncCalendarToMonthFilter(month) {
   if (!month || month === 'ALL_YEAR') return; // no single month to jump to for All Year
   const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
@@ -5124,6 +5175,7 @@ function calendarGoToday() {
 function renderContentCalendar() {
   const grid = document.getElementById('calendarMonthGrid');
   if (!grid) return;
+  syncCalendarCompactBtn();
 
   const platformFilter = document.getElementById('calendarFilterPlatform').value;
   const statusFilter = document.getElementById('calendarFilterStatus').value;
@@ -5159,6 +5211,7 @@ function renderContentCalendar() {
 
   const todayStr = new Date().toISOString().slice(0,10);
   grid.innerHTML = "";
+  grid.classList.toggle('cal-compact', calendarCompactMode);
 
   for (let i = 0; i < totalCells; i++) {
     const cell = document.createElement('div');
@@ -5190,7 +5243,7 @@ function renderContentCalendar() {
     const entriesWrap = document.createElement('div');
     entriesWrap.className = 'cal-entries';
     const dayEntries = byDate[dateStr] || [];
-    const MAX_VISIBLE = 3;
+    const MAX_VISIBLE = calendarCompactMode ? 5 : 3;
     dayEntries.slice(0, MAX_VISIBLE).forEach(entry => {
       const color   = calendarStatusColor(entry.status);
       const isDone  = entry.status === 'Posted' || entry.status === 'Done';
@@ -5203,8 +5256,8 @@ function renderContentCalendar() {
       const leftDiv = document.createElement('div');
       leftDiv.style.cssText = 'flex:1;min-width:0;overflow:hidden;';
       leftDiv.innerHTML = `
-        <div style="font-size:11px;font-weight:700;color:${isDone ? '#22C55E' : 'var(--text)'};line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.title || '(no title)'}</div>
-        <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+        <div class="cal-entry-title" style="font-size:11px;font-weight:700;color:${isDone ? '#22C55E' : 'var(--text)'};line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.title || '(no title)'}</div>
+        <div class="cal-entry-sub" style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
           ${entry.savedBy ? `<span>${entry.savedBy}</span>` : ''}
           ${entry.platform ? `<span style="color:var(--text3);">· ${entry.platform}</span>` : ''}
           <span style="color:${isDone ? '#22C55E' : color};font-weight:600;">· ${entry.status}</span>
@@ -5302,7 +5355,6 @@ function openCreativeForm(entry, presetDate) {
   document.getElementById('crFieldPriority').value = entry ? entry.priority : 'Normal';
   document.getElementById('crFieldStatus').value = entry ? entry.status : 'Received';
   document.getElementById('crFieldTitle').value = entry ? entry.title : '';
-  document.getElementById('crFieldTitleCount').textContent = document.getElementById('crFieldTitle').value.length + '/80';
   document.getElementById('crFieldClient').value = entry ? (entry.client || '') : '';
   document.getElementById('crFieldDesigner').value = entry ? (entry.designer || '') : lastCreativeDesignerName;
   document.getElementById('crFieldNotes').value = entry ? entry.notes : '';
@@ -5517,6 +5569,7 @@ function renderCreativeCalendar() {
   const todayStr      = new Date().toISOString().slice(0,10);
 
   grid.innerHTML = '';
+  grid.classList.toggle('cal-compact', calendarCompactMode);
   for (let i = 0; i < totalCells; i++) {
     const cell = document.createElement('div');
     let cellYear = year, cellMonth = month, dayNum, otherMonth = false;
@@ -5561,8 +5614,8 @@ function renderCreativeCalendar() {
       card.style.cssText = `background:${isOverdue ? 'rgba(239,68,68,0.14)' : color + '18'};border-left:3px solid ${isOverdue ? '#ef4444' : priority.color};border-radius:6px;padding:5px 8px;margin-bottom:3px;cursor:pointer;`;
       card.title = `${entry.title} · ${entry.client || 'No client'} · ${entry.designer || 'Unassigned'} · ${entry.status} · ${entry.priority}${isOverdue ? ' · OVERDUE' : ''}`;
       card.innerHTML = `
-        <div style="font-size:11px;font-weight:700;color:${isOverdue ? '#f87171' : 'var(--text)'};line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${priority.icon} ${entry.title}</div>
-        <div style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:space-between;">
+        <div class="cal-entry-title" style="font-size:11px;font-weight:700;color:${isOverdue ? '#f87171' : 'var(--text)'};line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${priority.icon} ${entry.title}</div>
+        <div class="cal-entry-sub" style="font-size:10px;color:var(--text3);display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:space-between;">
           <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
             ${entry.designer ? `<span>${entry.designer}</span>` : '<span style="color:var(--text3);font-style:italic;">Unassigned</span>'}
             ${entry.client ? `<span>· ${entry.client}</span>` : ''}
@@ -6055,7 +6108,6 @@ function addViralTopicToCalendar(title) {
   switchTab('calendar', calSidebarItem);
   openCalendarForm(null, new Date().toISOString().slice(0,10));
   document.getElementById('calFieldTitle').value = title;
-  document.getElementById('calFieldTitleCount').textContent = title.length + '/80';
 }
 
 </script>
@@ -6107,8 +6159,7 @@ function addViralTopicToCalendar(title) {
       </div>
       <div style="margin-bottom:14px;">
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Topic / Title</label>
-        <input type="text" id="calFieldTitle" maxlength="80" oninput="document.getElementById('calFieldTitleCount').textContent = this.value.length + '/80'" placeholder="e.g. RTX 5060 unboxing" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-        <div id="calFieldTitleCount" style="font-size:10px;color:var(--text3);text-align:right;margin-top:3px;">0/80</div>
+        <input type="text" id="calFieldTitle" placeholder="e.g. RTX 5060 unboxing" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
       </div>
       <div style="margin-bottom:14px;">
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Saved by</label>
@@ -6181,8 +6232,7 @@ function addViralTopicToCalendar(title) {
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px;">
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Job Order Title</label>
-          <input type="text" id="crFieldTitle" maxlength="80" oninput="document.getElementById('crFieldTitleCount').textContent = this.value.length + '/80'" placeholder="e.g. RTX 5060 Launch Poster" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
-          <div id="crFieldTitleCount" style="font-size:10px;color:var(--text3);text-align:right;margin-top:3px;">0/80</div>
+          <input type="text" id="crFieldTitle" placeholder="e.g. RTX 5060 Launch Poster" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:10px 12px;font-size:12.5px;font-family:inherit;">
         </div>
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Client / Requester</label>
@@ -6231,8 +6281,8 @@ function addViralTopicToCalendar(title) {
     <div id="calViewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCalViewModal()">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;">
-          <div style="min-width:0;flex:1;">
-            <div id="calViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;word-break:break-word;overflow-wrap:break-word;"></div>
+          <div>
+            <div id="calViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
             <div id="calViewBadges" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
           </div>
           <button onclick="closeCalViewModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;flex-shrink:0;">✕</button>
@@ -6274,8 +6324,8 @@ function addViralTopicToCalendar(title) {
     <div id="crViewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(11,11,13,0.85);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCrViewModal()">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;">
-          <div style="min-width:0;flex:1;">
-            <div id="crViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;word-break:break-word;overflow-wrap:break-word;"></div>
+          <div>
+            <div id="crViewTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
             <div id="crViewBadges" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
           </div>
           <button onclick="closeCrViewModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;flex-shrink:0;">✕</button>
@@ -6319,7 +6369,7 @@ function addViralTopicToCalendar(title) {
           <div style="font-size:15px;font-weight:700;color:var(--text);">🔁 Reassign Job Order</div>
           <button onclick="closeReassignModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
         </div>
-        <div id="reassignJobTitle" style="font-size:12px;color:var(--text2);background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:18px;font-weight:600;word-break:break-word;overflow-wrap:break-word;"></div>
+        <div id="reassignJobTitle" style="font-size:12px;color:var(--text2);background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:18px;font-weight:600;"></div>
         <div style="margin-bottom:14px;">
           <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Currently Assigned</label>
           <div id="reassignFromName" style="font-size:13px;color:var(--text);font-weight:600;padding:6px 0;"></div>
