@@ -529,6 +529,11 @@ html { overflow-x: hidden; }
   cursor: pointer;
   transition: background 0.15s;
   min-height: 104px;
+  /* Grid items don't shrink below their content's natural width by default —
+     without this, a long unbroken title/chip row forces its column wider
+     than 1fr, pushing the grid past the viewport and clipping Saturday. */
+  min-width: 0;
+  overflow-x: hidden;
 }
 .cal-day-cell.weekend { background: rgba(255,255,255,0.014); }
 .cal-day-cell:hover { background: var(--surface); }
