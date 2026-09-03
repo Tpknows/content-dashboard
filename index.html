@@ -352,18 +352,47 @@ html { overflow-x: hidden; }
 .kpi-card.pink::before   { background: linear-gradient(90deg, var(--pink), transparent); }
 .kpi-card.yellow::before { background: linear-gradient(90deg, var(--yellow), transparent); }
 
+.kpi-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.kpi-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+  font-feature-settings: "tnum";
+}
+.kpi-trend.up   { color: #22C55E; background: rgba(34,197,94,0.12); }
+.kpi-trend.down { color: #EF4444; background: rgba(239,68,68,0.12); }
 .kpi-label {
-  font-size: 12px;
-  color: var(--text3);
-  letter-spacing: 0.2px;
-  margin-bottom: 14px;
-  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--text2);
+  letter-spacing: 0.1px;
+  margin-top: 8px;
+  font-weight: 600;
 }
 .kpi-value {
-  font-size: 38px;
+  font-size: 32px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: -1.2px;
+  letter-spacing: -1px;
   font-feature-settings: "tnum";
 }
 .kpi-card.cyan .kpi-value   { color: var(--text); }
@@ -372,7 +401,7 @@ html { overflow-x: hidden; }
 .kpi-card.orange .kpi-value { color: var(--text); }
 .kpi-card.pink .kpi-value   { color: var(--text); }
 .kpi-card.yellow .kpi-value { color: var(--text); }
-.kpi-sub { font-size: 12px; color: var(--text3); margin-top: 10px; font-weight: 400; }
+.kpi-sub { font-size: 11.5px; color: var(--text3); margin-top: 5px; font-weight: 400; }
 
 /* ── PROGRESS SECTION ── */
 .progress-section {
@@ -802,9 +831,12 @@ html { overflow-x: hidden; }
 .monthly-results-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
 
 .monthly-summary-bar {
-  display: flex;
+  /* Always exactly 8 stat tiles — a fixed 4-column grid keeps two full,
+     even rows regardless of container width, instead of flex-wrap's
+     6-then-2 split. */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  flex-wrap: wrap;
   margin-bottom: 40px;
 }
 .msb-item {
@@ -813,7 +845,7 @@ html { overflow-x: hidden; }
   border-radius: var(--radius-sm);
   padding: 18px 24px;
   text-align: center;
-  min-width: 110px;
+  min-width: 0;
   box-shadow: var(--shadow-sm);
   transition: border-color 0.2s, transform 0.2s;
 }
@@ -868,6 +900,10 @@ html { overflow-x: hidden; }
   vertical-align: middle;
   color: var(--text2);
   transition: background 0.15s;
+  /* table-layout:fixed gives every column a hard width — without this, a
+     wide badge (e.g. a verbose hook/hold rate pill) doesn't wrap, it just
+     visually spills into the next column instead of clipping. */
+  overflow: hidden;
 }
 .results-table tr:last-child td { border-bottom: none; }
 .results-table tr:hover td { background: rgba(255,255,255,0.025); }
@@ -1132,8 +1168,10 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   /* ── OVERVIEW KPI ── */
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
   .kpi-card { padding: 14px 12px; }
-  .kpi-label { font-size: 10px !important; margin-bottom: 6px; letter-spacing: 0; }
+  .kpi-label { font-size: 10px !important; margin-top: 6px; letter-spacing: 0; }
   .kpi-value { font-size: 24px !important; letter-spacing: -0.5px; }
+  .kpi-icon { width: 30px; height: 30px; font-size: 13px; border-radius: 9px; }
+  .kpi-card-head { margin-bottom: 10px; }
   .kpi-sub { font-size: 10px; margin-top: 6px; }
   .progress-section { padding: 16px 14px; margin-bottom: 20px; }
   .progress-item { margin-bottom: 16px; }
@@ -1177,8 +1215,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   /* ── MONTHLY RESULTS ── */
   .monthly-results-title { font-size: 16px !important; }
   .monthly-results-header { flex-direction: column !important; gap: 10px; align-items: flex-start !important; }
-  .monthly-summary-bar { gap: 8px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
-  .msb-item { min-width: 90px; padding: 12px 14px; flex-shrink: 0; }
+  .monthly-summary-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .msb-item { padding: 12px 14px; }
 
   /* ── AI INSIGHTS ── */
   #tab-insights .msb-item { min-width: 110px; }
@@ -1427,7 +1465,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <div><div class="chart-title">👤 Creator Comparison</div><div class="chart-subtitle">Hook Rate vs Hold Rate — avg per creator</div></div>
           <span class="chart-status-badge info" id="creatorChartBadge">This month</span>
         </div>
-        <div class="chart-container" style="height:200px;"><canvas id="creatorCompareChart"></canvas></div>
+        <div class="chart-container" id="creatorCompareChartWrap" style="height:200px;max-width:460px;margin:0 auto;"><canvas id="creatorCompareChart"></canvas></div>
       </div>
       <!-- NEW: Hold Rate Leaderboard -->
       <div class="chart-card" style="grid-column:1/-1;">
@@ -1968,6 +2006,15 @@ const CALENDAR_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3R07
 // or deploy a separate script and paste its URL here.
 const CREATIVE_CALENDAR_APPS_SCRIPT_URL = CALENDAR_APPS_SCRIPT_URL;
 const KPI_TARGETS = { views: 3000000, winning: 20, thruplays: 1800000 };
+
+// Creator-level views (Creator Breakdown, Creator Comparison chart) only
+// count videos tagged to an active creator. Update this list if the roster
+// changes — everything downstream reads from it, nothing else to touch.
+const ACTIVE_CREATORS = ['Tammy Padal', 'Bianca Elisha Sanchez'];
+function isActiveCreator(name) {
+  return ACTIVE_CREATORS.includes(String(name || '').trim());
+}
+
 let DATA = {};
 let lastInsights = null;
 let lastInsightsMonth = '';
@@ -2043,7 +2090,7 @@ function parseSheetData(raw) {
       if(authentic) m.authentic++;
       if(rate>0) m._rates.push(rate);
       if(pillar==='KNOW') m.know++; else if(pillar==='LIKE') m.like++; else if(pillar==='TRUST') m.trust++;
-      if(creator){ if(!m.creators[creator]) m.creators[creator]={videos:0,views:0,thruplays:0,winning:0}; m.creators[creator].videos++; m.creators[creator].views+=views; m.creators[creator].thruplays+=thruplays; if(winning) m.creators[creator].winning++; }
+      if(creator && isActiveCreator(creator)){ if(!m.creators[creator]) m.creators[creator]={videos:0,views:0,thruplays:0,winning:0}; m.creators[creator].videos++; m.creators[creator].views+=views; m.creators[creator].thruplays+=thruplays; if(winning) m.creators[creator].winning++; }
       m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
     }
   } else if (raw.videoLog && Array.isArray(raw.videoLog)) {
@@ -2083,7 +2130,7 @@ function parseSheetData(raw) {
       if(winning)m.winning++;if(ai)m.ai++;if(authentic)m.authentic++;
       if(rate>0)m._rates.push(rate);
       if(pillar==='KNOW')m.know++;else if(pillar==='LIKE')m.like++;else if(pillar==='TRUST')m.trust++;
-      if(creator){if(!m.creators[creator])m.creators[creator]={videos:0,views:0,thruplays:0,winning:0};m.creators[creator].videos++;m.creators[creator].views+=views;m.creators[creator].thruplays+=thruplays;if(winning)m.creators[creator].winning++;}
+      if(creator && isActiveCreator(creator)){if(!m.creators[creator])m.creators[creator]={videos:0,views:0,thruplays:0,winning:0};m.creators[creator].videos++;m.creators[creator].views+=views;m.creators[creator].thruplays+=thruplays;if(winning)m.creators[creator].winning++;}
       m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
     }
   } else { return {}; }
@@ -2266,68 +2313,71 @@ function updateDashboard() {
   const prevMonth = sortedMonths[sortedMonths.indexOf(month) - 1];
   const prev = prevMonth ? DATA[prevMonth] : null;
 
-  function delta(curr, prevVal) {
+  // Small colored pill showing % change vs. last month — mirrors the KPI
+  // card's icon color so the whole card head reads as one unit.
+  function trendPill(curr, prevVal) {
     if (!prevVal || prevVal === 0) return '';
     const pct = Math.round((curr - prevVal) / prevVal * 100);
     const up = pct >= 0;
-    return `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
-      <span style="font-size:10.5px;color:var(--text3);font-weight:400">vs last month</span>
-      <span style="font-size:10.5px;font-weight:600;color:${up ? '#22C55E' : '#EF4444'};display:flex;align-items:center;gap:3px">
-        ${up ? '↑' : '↓'} ${Math.abs(pct)}%
-      </span></div>`;
+    return `<span class="kpi-trend ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${Math.abs(pct)}%</span>`;
+  }
+
+  function kpiIcon(emoji, colorVar) {
+    return `<div class="kpi-icon" style="background:${colorVar}1F;color:${colorVar};">${emoji}</div>`;
   }
 
   document.getElementById('kpiGrid').innerHTML = `
     <div class="kpi-card cyan">
-      <div class="kpi-label">Total Views</div>
+      <div class="kpi-card-head">${kpiIcon('👁️','var(--cyan)')}${trendPill(d.views, prev?.views)}</div>
       <div class="kpi-value">${fmt(d.views)}</div>
+      <div class="kpi-label">Total Views</div>
       <div class="kpi-sub">Target: ${fmt(KPI_TARGETS.views)}</div>
-      ${delta(d.views, prev?.views)}
-      <div style="margin-top:8px">${kpiStatusBadge(viewsPct)}</div>
+      <div style="margin-top:10px">${kpiStatusBadge(viewsPct)}</div>
     </div>
     <div class="kpi-card purple">
-      <div class="kpi-label">Thruplays</div>
+      <div class="kpi-card-head">${kpiIcon('▶️','var(--purple)')}${trendPill(d.thruplays, prev?.thruplays)}</div>
       <div class="kpi-value">${fmt(d.thruplays)}</div>
+      <div class="kpi-label">Thruplays</div>
       <div class="kpi-sub">Target: ${fmt(KPI_TARGETS.thruplays)}</div>
-      ${delta(d.thruplays, prev?.thruplays)}
-      <div style="margin-top:8px">${kpiStatusBadge(thruPct)}</div>
+      <div style="margin-top:10px">${kpiStatusBadge(thruPct)}</div>
     </div>
     <div class="kpi-card green">
-      <div class="kpi-label">Winning Videos</div>
+      <div class="kpi-card-head">${kpiIcon('🏆','var(--green)')}${trendPill(d.winning, prev?.winning)}</div>
       <div class="kpi-value">${d.winning}</div>
+      <div class="kpi-label">Winning Videos</div>
       <div class="kpi-sub">Target: ${KPI_TARGETS.winning}</div>
-      ${delta(d.winning, prev?.winning)}
-      <div style="margin-top:8px">${kpiStatusBadge(winPct)}</div>
+      <div style="margin-top:10px">${kpiStatusBadge(winPct)}</div>
     </div>
     <div class="kpi-card orange">
-      <div class="kpi-label">Videos Submitted</div>
+      <div class="kpi-card-head">${kpiIcon('📤','var(--orange)')}${trendPill(d.kpi_submitted, prev?.kpi_submitted)}</div>
       <div class="kpi-value">${d.kpi_submitted}</div>
+      <div class="kpi-label">Videos Submitted</div>
       <div class="kpi-sub">Video Log + Campaign Ads</div>
-      ${delta(d.kpi_submitted, prev?.kpi_submitted)}
     </div>
     <div class="kpi-card pink">
-      <div class="kpi-label">Avg Thruplay Rate</div>
+      <div class="kpi-card-head">${kpiIcon('⚡','var(--pink)')}${trendPill(d.avg_rate, prev?.avg_rate)}</div>
       <div class="kpi-value">${d.avg_rate}%</div>
+      <div class="kpi-label">Avg Thruplay Rate</div>
       <div class="kpi-sub">Authentic: ${d.authentic} videos</div>
-      ${delta(d.avg_rate, prev?.avg_rate)}
     </div>
-    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;">
+    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#22c55e,#00d4ff)"></div>
-      <div class="kpi-label">Avg Hook Rate</div>
+      <div class="kpi-card-head">${kpiIcon('🪝','#22c55e')}${trendPill(d.avg_hook_rate, prev?.avg_hook_rate)}</div>
       <div class="kpi-value" style="color:${d.avg_hook_rate>=60?'#22c55e':d.avg_hook_rate>=50?'#00d4ff':d.avg_hook_rate>=40?'#a855f7':d.avg_hook_rate>=30?'#eab308':'#ef4444'}">${d.avg_hook_rate}%</div>
+      <div class="kpi-label">Avg Hook Rate</div>
       <div class="kpi-sub">${d.avg_hook_rate>=60?'🔥 Excellent':d.avg_hook_rate>=50?'⚡ Very Strong':d.avg_hook_rate>=40?'✓ Good':d.avg_hook_rate>=30?'~ Average':'✗ Needs Work'}</div>
-      ${delta(d.avg_hook_rate, prev?.avg_hook_rate)}
     </div>
-    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;">
+    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#a855f7,#ec4899)"></div>
-      <div class="kpi-label">Avg Hold Rate</div>
+      <div class="kpi-card-head">${kpiIcon('⏱️','#a855f7')}${trendPill(d.avg_hold_rate, prev?.avg_hold_rate)}</div>
       <div class="kpi-value" style="color:${d.avg_hold_rate>=60?'#22c55e':d.avg_hold_rate>=50?'#00d4ff':d.avg_hold_rate>=40?'#a855f7':d.avg_hold_rate>=30?'#eab308':'#ef4444'}">${d.avg_hold_rate}%</div>
+      <div class="kpi-label">Avg Hold Rate</div>
       <div class="kpi-sub">${d.avg_hold_rate>=60?'🔥 Excellent':d.avg_hold_rate>=50?'⚡ Very Strong':d.avg_hold_rate>=40?'✓ Good':d.avg_hold_rate>=30?'~ Average':'✗ Needs Work'}</div>
-      ${delta(d.avg_hold_rate, prev?.avg_hold_rate)}
     </div>
     <div class="kpi-card yellow">
+      <div class="kpi-card-head">${kpiIcon('🎯','var(--yellow)')}</div>
+      <div class="kpi-value" style="font-size:16px;"><span class="status-badge status-${status}">${statusLabel}</span></div>
       <div class="kpi-label">Overall KPI Status</div>
-      <div class="kpi-value" style="font-size:16px;margin-top:4px"><span class="status-badge status-${status}">${statusLabel}</span></div>
       <div class="kpi-sub">${viewsPct}% views · ${winPct}% wins · ${thruPct}% thruplays</div>
     </div>
   `;
@@ -2492,7 +2542,7 @@ function renderCreatorCompareChart(month) {
   // Group by creator — avg hook + hold rate
   const byCreator = {};
   videos.forEach(v => {
-    if (!v.creator) return;
+    if (!v.creator || !isActiveCreator(v.creator)) return;
     if (!byCreator[v.creator]) byCreator[v.creator] = { hookTotal: 0, holdTotal: 0, hookCount: 0, holdCount: 0 };
     if (v.hook_rate > 0) { byCreator[v.creator].hookTotal += v.hook_rate; byCreator[v.creator].hookCount++; }
     if (v.hold_rate > 0) { byCreator[v.creator].holdTotal += v.hold_rate; byCreator[v.creator].holdCount++; }
@@ -2806,9 +2856,30 @@ function renderMonthlyResults() {
     const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link">▶ Watch</a>` : '—';
     const dateDisplay = v.dateTimestamp ? (() => { const d = new Date(v.dateTimestamp); return (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0') + '/' + d.getFullYear(); })() : v.datePosted;
     const dateHTML = dateDisplay ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;">${dateDisplay}</span>` : '<span style="color:#333;font-size:11px;">—</span>';
-    rows += `<tr><td style="color:#555;font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div></td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}</td><td style="color:#a855f7">${fmt(v.thruplays)}</td><td>${getHookBadge(v.hook_rate)}</td><td>${getHoldBadge(v.hold_rate)}</td><td style="color:#888">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:#333;font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
+    rows += `<tr><td style="color:#555;font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div></td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}</td><td style="color:#a855f7">${fmt(v.thruplays)}</td><td>${getHookBadgeCompact(v.hook_rate)}</td><td>${getHoldBadgeCompact(v.hold_rate)}</td><td style="color:#888">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:#333;font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
   });
   document.getElementById('monthlyTableBody').innerHTML = rows || '<tr><td colspan="12" style="text-align:center;color:#444;padding:30px">No videos match your filter</td></tr>';
+}
+
+// Compact version for the Monthly Results table — same colors/thresholds as
+// getHookBadge/getHoldBadge, but emoji+percent only (no "Excellent"/"Very
+// Strong" suffix) since a fixed-width table column is too narrow for the
+// full label and it was visually spilling into the next column.
+function getHookBadgeCompact(r) {
+  if (!r || r <= 0) return '<span class="hook-none">N/A</span>';
+  if (r >= 60) return `<span class="hook-excellent" title="${r}% — Excellent">🔥 ${r}%</span>`;
+  if (r >= 50) return `<span class="hook-strong" title="${r}% — Very Strong">⚡ ${r}%</span>`;
+  if (r >= 40) return `<span class="hook-good" title="${r}% — Good">✓ ${r}%</span>`;
+  if (r >= 30) return `<span class="hook-average" title="${r}% — Average">~ ${r}%</span>`;
+  return `<span class="hook-weak" title="${r}% — Weak">✗ ${r}%</span>`;
+}
+function getHoldBadgeCompact(r) {
+  if (!r || r <= 0) return '<span class="hold-none">N/A</span>';
+  if (r >= 60) return `<span class="hold-excellent" title="${r}% — Excellent">🔥 ${r}%</span>`;
+  if (r >= 50) return `<span class="hold-strong" title="${r}% — Very Strong">⚡ ${r}%</span>`;
+  if (r >= 40) return `<span class="hold-good" title="${r}% — Good">✓ ${r}%</span>`;
+  if (r >= 30) return `<span class="hold-average" title="${r}% — Average">~ ${r}%</span>`;
+  return `<span class="hold-weak" title="${r}% — Weak">✗ ${r}%</span>`;
 }
 
 function getHookBadge(r) {
@@ -4324,7 +4395,8 @@ function checkForNewArticles() {
   const badge = document.getElementById('newsBadgeDot');
   if (!badge || newsArticles.length === 0) return;
 
-  const lastVisited = localStorage.getItem(NEWS_LAST_VISITED_KEY);
+  let lastVisited;
+  try { lastVisited = localStorage.getItem(NEWS_LAST_VISITED_KEY); } catch(e) { return; }
   if (!lastVisited) {
     // First time ever — don't show badge, just set the baseline.
     badge.style.display = 'none';
@@ -4337,7 +4409,7 @@ function checkForNewArticles() {
 }
 
 function markNewsAsVisited() {
-  localStorage.setItem(NEWS_LAST_VISITED_KEY, new Date().toISOString());
+  try { localStorage.setItem(NEWS_LAST_VISITED_KEY, new Date().toISOString()); } catch(e) {}
   const badge = document.getElementById('newsBadgeDot');
   if (badge) badge.style.display = 'none';
 }
@@ -6041,7 +6113,7 @@ async function generateViralTopics() {
 
   const creatorStats = {};
   allVideos.forEach(v => {
-    if (!v.creator) return;
+    if (!v.creator || !isActiveCreator(v.creator)) return;
     if (!creatorStats[v.creator]) creatorStats[v.creator] = { views: 0, winning: 0, count: 0 };
     creatorStats[v.creator].views += v.views;
     creatorStats[v.creator].count += 1;
