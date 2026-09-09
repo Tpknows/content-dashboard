@@ -2865,25 +2865,28 @@ function renderMonthlyResults() {
   document.getElementById('monthlyTableBody').innerHTML = rows || '<tr><td colspan="12" style="text-align:center;color:#444;padding:30px">No videos match your filter</td></tr>';
 }
 
-// Compact version for the Monthly Results table — same colors/thresholds as
-// getHookBadge/getHoldBadge, but emoji+percent only (no "Excellent"/"Very
-// Strong" suffix) since a fixed-width table column is too narrow for the
-// full label and it was visually spilling into the next column.
+// Compact version for the Monthly Results table (and the Top 20/AI Content
+// cards) — same colors/thresholds as getHookBadge/getHoldBadge, but emoji+
+// percent only (no "Excellent"/"Very Strong" suffix) since a fixed-width
+// table column is too narrow for the full label and it was visually
+// spilling into the next column. Prefixed with 🪝/⏱️ so it's clear which
+// metric this is at a glance — the performance emoji (🔥/⚡/etc.) alone
+// doesn't say "Hook Rate" vs "Hold Rate" to someone unfamiliar with it.
 function getHookBadgeCompact(r) {
-  if (!r || r <= 0) return '<span class="hook-none">N/A</span>';
-  if (r >= 60) return `<span class="hook-excellent" title="${r}% — Excellent">🔥 ${r}%</span>`;
-  if (r >= 50) return `<span class="hook-strong" title="${r}% — Very Strong">⚡ ${r}%</span>`;
-  if (r >= 40) return `<span class="hook-good" title="${r}% — Good">✓ ${r}%</span>`;
-  if (r >= 30) return `<span class="hook-average" title="${r}% — Average">~ ${r}%</span>`;
-  return `<span class="hook-weak" title="${r}% — Weak">✗ ${r}%</span>`;
+  if (!r || r <= 0) return '<span class="hook-none">🪝 N/A</span>';
+  if (r >= 60) return `<span class="hook-excellent" title="Hook Rate: ${r}% — Excellent">🪝 🔥 ${r}%</span>`;
+  if (r >= 50) return `<span class="hook-strong" title="Hook Rate: ${r}% — Very Strong">🪝 ⚡ ${r}%</span>`;
+  if (r >= 40) return `<span class="hook-good" title="Hook Rate: ${r}% — Good">🪝 ✓ ${r}%</span>`;
+  if (r >= 30) return `<span class="hook-average" title="Hook Rate: ${r}% — Average">🪝 ~ ${r}%</span>`;
+  return `<span class="hook-weak" title="Hook Rate: ${r}% — Weak">🪝 ✗ ${r}%</span>`;
 }
 function getHoldBadgeCompact(r) {
-  if (!r || r <= 0) return '<span class="hold-none">N/A</span>';
-  if (r >= 60) return `<span class="hold-excellent" title="${r}% — Excellent">🔥 ${r}%</span>`;
-  if (r >= 50) return `<span class="hold-strong" title="${r}% — Very Strong">⚡ ${r}%</span>`;
-  if (r >= 40) return `<span class="hold-good" title="${r}% — Good">✓ ${r}%</span>`;
-  if (r >= 30) return `<span class="hold-average" title="${r}% — Average">~ ${r}%</span>`;
-  return `<span class="hold-weak" title="${r}% — Weak">✗ ${r}%</span>`;
+  if (!r || r <= 0) return '<span class="hold-none">⏱️ N/A</span>';
+  if (r >= 60) return `<span class="hold-excellent" title="Hold Rate: ${r}% — Excellent">⏱️ 🔥 ${r}%</span>`;
+  if (r >= 50) return `<span class="hold-strong" title="Hold Rate: ${r}% — Very Strong">⏱️ ⚡ ${r}%</span>`;
+  if (r >= 40) return `<span class="hold-good" title="Hold Rate: ${r}% — Good">⏱️ ✓ ${r}%</span>`;
+  if (r >= 30) return `<span class="hold-average" title="Hold Rate: ${r}% — Average">⏱️ ~ ${r}%</span>`;
+  return `<span class="hold-weak" title="Hold Rate: ${r}% — Weak">⏱️ ✗ ${r}%</span>`;
 }
 
 // Neutral/muted badge for a card's *secondary* rate — e.g. Hold Rate shown
