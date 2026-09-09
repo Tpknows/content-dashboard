@@ -2706,6 +2706,8 @@ function renderTop10(month) {
         </div>
         <div class="top10-meta">
           ${getPillarBadge(v.pillar)}
+          ${getHookBadgeCompact(v.hook_rate)}
+          ${getHoldBadgeCompact(v.hold_rate)}
           ${v.ai ? '<span class="ai-tag">AI</span>' : ''}
           ${linkHTML}
         </div>
@@ -2760,6 +2762,8 @@ function renderAI(month) {
           </div>
           <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
+            ${getHookBadgeCompact(v.hook_rate)}
+            ${getHoldBadgeCompact(v.hold_rate)}
             ${v.thruplay_rate > 0 ? `<span style="color:#555;font-size:10px">${v.thruplay_rate}% rate</span>` : ''}
             ${linkHTML}
           </div>
@@ -2882,6 +2886,15 @@ function getHoldBadgeCompact(r) {
   return `<span class="hold-weak" title="${r}% — Weak">✗ ${r}%</span>`;
 }
 
+// Neutral/muted badge for a card's *secondary* rate — e.g. Hold Rate shown
+// on a card in the Hook Rate tab. Deliberately not color-coded by
+// performance tier (unlike getHookBadgeCompact/getHoldBadgeCompact) so it
+// never competes with the tab's own primary, color-coded rate badge.
+function mutedRateBadge(icon, rate) {
+  if (!rate || rate <= 0) return `<span style="font-size:10px;color:var(--text3);opacity:0.6;">${icon} N/A</span>`;
+  return `<span style="font-size:10px;color:var(--text3);background:rgba(255,255,255,0.04);border:1px solid var(--border2);padding:3px 8px;border-radius:99px;font-weight:600;">${icon} ${rate}%</span>`;
+}
+
 function getHookBadge(r) {
   if (!r || r <= 0) return '<span class="hook-none">N/A</span>';
   if (r >= 60) return `<span class="hook-excellent">🔥 ${r}% Excellent</span>`;
@@ -2973,6 +2986,7 @@ function renderHook(month) {
           <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
             ${getHookBadge(v.hook_rate)}
+            ${mutedRateBadge('⏱️', v.hold_rate)}
             ${linkHTML}
           </div>
         </div>
@@ -3038,6 +3052,7 @@ function renderHold(month) {
           <div class="top10-meta">
             ${getPillarBadge(v.pillar)}
             ${getHoldBadge(v.hold_rate)}
+            ${mutedRateBadge('🪝', v.hook_rate)}
             ${linkHTML}
           </div>
         </div>
