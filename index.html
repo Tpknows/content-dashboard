@@ -1042,6 +1042,57 @@ html { overflow-x: hidden; }
 .hold-stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
 .hold-stat-label { font-size: 10.5px; color: var(--text3); margin-top: 10px; font-weight: 500; letter-spacing: 0.2px; }
 
+/* ── HOOK BANK — hook types ranked by avg Hook Rate, all months/all year ── */
+.hookbank-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+.hookbank-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.hookbank-card:hover { transform: translateY(-3px); border-color: var(--border2); box-shadow: var(--shadow); }
+.hookbank-rank {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text3);
+  letter-spacing: 0.3px;
+}
+.hookbank-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  padding-right: 32px;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+.hookbank-value-row { display: flex; align-items: baseline; gap: 8px; }
+.hookbank-value { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; font-feature-settings: "tnum"; }
+.hookbank-value-label { font-size: 10px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.hookbank-tier { font-size: 11px; font-weight: 700; margin-top: 4px; }
+.hookbank-hold-wrap { margin-top: 14px; }
+.hookbank-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text3);
+}
+
 /* ── AI INSIGHTS TAB ── */
 #tab-insights .msb-item { min-width: 130px; }
 
@@ -1314,6 +1365,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div class="sidebar-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon">✦</span>AI Content</div>
       <div class="sidebar-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon">🪝</span>Hook Rate</div>
       <div class="sidebar-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon">⏱️</span>Hold Rate</div>
+      <div class="sidebar-item" onclick="switchTab('hookbank', this)"><span class="sidebar-item-icon">🎣</span>Hook Bank</div>
       <div class="sidebar-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon">🗓️</span>Content Calendar</div>
       <div class="sidebar-item" onclick="switchTab('creative-calendar', this)"><span class="sidebar-item-icon">🎨</span>Creative Calendar <span id="creativeCountBadge" style="display:none;background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:auto;">0</span></div>
       <div class="sidebar-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon">🔥</span>Viral Topics</div>
@@ -1421,6 +1473,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('ai', this)"><span class="sidebar-item-icon">✦</span>AI Content</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('hook', this)"><span class="sidebar-item-icon">🪝</span>Hook Rate</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon">⏱️</span>Hold Rate</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('hookbank', this)"><span class="sidebar-item-icon">🎣</span>Hook Bank</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon">🗓️</span>Calendar</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('creative-calendar', this)"><span class="sidebar-item-icon">🎨</span>Creative <span id="creativeCountBadgeMobile" style="display:none;background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;margin-left:4px;">0</span></div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon">🔥</span>Viral Topics</div>
@@ -1520,6 +1573,37 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
     <div class="hold-summary" id="holdSummary" style="margin-bottom:24px;"></div>
     <div class="top10-list" id="holdCardGrid"></div>
+  </div>
+  <div id="tab-hookbank" class="tab-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff;">🎣 Hook Bank</div>
+        <div style="font-size:11px;color:#555;margin-top:6px;">Every hook type used across all months and all year, ranked by average Hook Rate — so you know which hooks to reuse</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;">
+        <span class="hook-excellent">60%+ Excellent</span>
+        <span class="hook-strong">50–59% Very Strong</span>
+        <span class="hook-good">40–49% Good</span>
+        <span class="hook-average">30–39% Average</span>
+        <span class="hook-weak">&lt;30% Weak</span>
+      </div>
+    </div>
+    <div class="filter-row" style="margin-bottom:16px;">
+      <select id="hookBankFilterType" class="filter-select" onchange="renderHookBank()">
+        <option value="">All Hook Types</option>
+        <option>Moving Hook</option>
+        <option>Text Hook</option>
+        <option>Visual Hook</option>
+        <option>Sound Hook</option>
+        <option>Question Hook</option>
+        <option>Statement Hook</option>
+        <option>Contrast Hook</option>
+        <option>Story Hook</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="hook-summary" id="hookBankSummary" style="margin-bottom:24px;"></div>
+    <div class="hookbank-grid" id="hookBankGrid"></div>
   </div>
   <div id="tab-calendar" class="tab-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
@@ -2898,6 +2982,157 @@ function mutedRateBadge(icon, rate) {
   return `<span style="font-size:10px;color:var(--text3);background:rgba(255,255,255,0.04);border:1px solid var(--border2);padding:3px 8px;border-radius:99px;font-weight:600;">${icon} ${rate}%</span>`;
 }
 
+function hookRateTierColor(r) {
+  if (r>=60) return '#22c55e';
+  if (r>=50) return '#00d4ff';
+  if (r>=40) return '#a855f7';
+  if (r>=30) return '#eab308';
+  return '#ef4444';
+}
+function hookRateTierLabel(r) {
+  if (r>=60) return '🔥 Excellent';
+  if (r>=50) return '⚡ Very Strong';
+  if (r>=40) return '✓ Good';
+  if (r>=30) return '~ Average';
+  return '✗ Weak';
+}
+
+// ─────────────────────────────────────────────────────────────
+// HOOK BANK — every hook type used across ALL months/all year,
+// ranked by average Hook Rate, with muted Hold Rate as context.
+// Goal: surface which hook types actually work, independent of
+// whichever month is currently selected elsewhere in the dashboard.
+// ─────────────────────────────────────────────────────────────
+let hookBankRows = [];
+
+function renderHookBank() {
+  const grid = document.getElementById('hookBankGrid');
+  if (!grid) return;
+  const filterEl = document.getElementById('hookBankFilterType');
+  const filterType = filterEl ? filterEl.value : '';
+  const allVideos = getVideos('ALL_YEAR');
+  const videos = filterType ? allVideos.filter(v => (v.hookType || '').trim() === filterType) : allVideos;
+
+  if (!allVideos.length) {
+    document.getElementById('hookBankSummary').innerHTML = '';
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:#444;font-size:13px;">No video data yet.</div>`;
+    return;
+  }
+  if (!videos.length) {
+    document.getElementById('hookBankSummary').innerHTML = '';
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:#444;font-size:13px;">No videos tagged "${filterType}" yet.</div>`;
+    return;
+  }
+
+  const byType = {};
+  videos.forEach(v => {
+    const type = (v.hookType || '').trim() || 'Not Tagged';
+    if (!byType[type]) byType[type] = { videos:0, totalViews:0, winning:0, hookSum:0, hookCount:0, holdSum:0, holdCount:0, list:[] };
+    const b = byType[type];
+    b.videos++;
+    b.totalViews += v.views || 0;
+    if (v.winning) b.winning++;
+    if (v.hook_rate > 0) { b.hookSum += v.hook_rate; b.hookCount++; }
+    if (v.hold_rate > 0) { b.holdSum += v.hold_rate; b.holdCount++; }
+    b.list.push(v);
+  });
+
+  const rows = Object.entries(byType).map(([name, b]) => ({
+    name,
+    videos: b.videos,
+    totalViews: b.totalViews,
+    winning: b.winning,
+    winRate: b.videos > 0 ? Math.round(b.winning / b.videos * 100) : 0,
+    avgHook: b.hookCount > 0 ? Math.round(b.hookSum / b.hookCount * 10) / 10 : 0,
+    avgHold: b.holdCount > 0 ? Math.round(b.holdSum / b.holdCount * 10) / 10 : 0,
+    hasHookData: b.hookCount > 0,
+    list: [...b.list].sort((a,b2) => (b2.views||0) - (a.views||0))
+  })).filter(r => r.hasHookData).sort((a,b) => b.avgHook - a.avgHook);
+
+  hookBankRows = rows;
+
+  if (!rows.length) {
+    document.getElementById('hookBankSummary').innerHTML = '';
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:#444;font-size:13px;">No Hook Rate data available yet.<br><span style="font-size:11px;color:#333;margin-top:8px;display:block;">Make sure "Hook Type" and "Hook Rate" columns are filled in your Google Sheet.</span></div>`;
+    return;
+  }
+
+  const best = rows[0];
+  const overallAvgHook = Math.round(rows.reduce((s,r) => s + r.avgHook, 0) / rows.length * 10) / 10;
+  const totalWins = rows.reduce((s,r) => s + r.winning, 0);
+  document.getElementById('hookBankSummary').innerHTML = `
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#22c55e">${rows.length}</div><div class="hook-stat-label">Hook Types Tracked</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#00d4ff">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (All Year)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#f97316">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (all types)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#eab308">${totalWins}</div><div class="hook-stat-label">🏅 Total Winning Videos</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#a855f7;font-size:16px;line-height:1.3;">🏆 ${best.name}</div><div class="hook-stat-label">Best Hook Type</div></div>
+  `;
+
+  grid.innerHTML = rows.map((r, i) => {
+    const color = hookRateTierColor(r.avgHook);
+    return `
+    <div class="hookbank-card" onclick="openHookBankDetail(${i})" style="cursor:pointer;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${color},transparent);"></div>
+      <div class="hookbank-rank">#${i+1}</div>
+      <div class="hookbank-name">${r.name}</div>
+      <div class="hookbank-value-row">
+        <div class="hookbank-value" style="color:${color};">${r.avgHook}%</div>
+        <div class="hookbank-value-label">🪝 Avg Hook Rate</div>
+      </div>
+      <div class="hookbank-tier" style="color:${color};">${hookRateTierLabel(r.avgHook)}</div>
+      <div class="hookbank-hold-wrap">${mutedRateBadge('⏱️', r.avgHold)}</div>
+      <div class="hookbank-meta">
+        <span>${r.videos} video${r.videos !== 1 ? 's' : ''}</span>
+        <span>· ${fmt(r.totalViews)} views</span>
+        ${r.winning > 0 ? `<span class="win-badge">${r.winning} WIN${r.winning !== 1 ? 'S' : ''} (${r.winRate}%)</span>` : ''}
+        <span style="margin-left:auto;color:var(--accent);font-weight:600;">See contents →</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Drill-down modal: which actual videos make up a Hook Bank card, with
+// views/link/date posted — so "best hook type" isn't just a number, you
+// can see exactly which contents to go re-use or reference.
+function openHookBankDetail(idx) {
+  const row = hookBankRows[idx];
+  if (!row) return;
+  const modal = document.getElementById('hookBankDetailModal');
+  const titleEl = document.getElementById('hookBankDetailTitle');
+  const subEl = document.getElementById('hookBankDetailSub');
+  const list = document.getElementById('hookBankDetailList');
+  if (!modal || !titleEl || !subEl || !list) return;
+
+  const color = hookRateTierColor(row.avgHook);
+  titleEl.textContent = `🪝 ${row.name}`;
+  subEl.innerHTML = `${row.list.length} content${row.list.length !== 1 ? 's' : ''} · <span style="color:${color};font-weight:700;">${row.avgHook}% avg Hook Rate</span> · ${mutedRateBadge('⏱️', row.avgHold)}`;
+
+  list.innerHTML = row.list.map(v => {
+    const dateDisplay = v.dateTimestamp
+      ? (() => { const d = new Date(v.dateTimestamp); return (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0') + '/' + d.getFullYear(); })()
+      : (v.datePosted || '—');
+    return `
+    <div style="background:var(--surface);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.title || '(no title)'}</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--text3);">
+          <span>📅 ${dateDisplay}</span>
+          <span>· ${fmt(v.views || 0)} views</span>
+          ${v.winning ? '<span class="win-badge">WIN</span>' : ''}
+        </div>
+      </div>
+      ${v.link ? `<a href="${v.link}" target="_blank" rel="noopener noreferrer" class="fb-link" style="flex-shrink:0;">▶ Watch</a>` : `<span style="flex-shrink:0;font-size:11px;color:var(--text3);">No link</span>`}
+    </div>`;
+  }).join('');
+
+  modal.style.display = 'flex';
+}
+
+function closeHookBankDetail() {
+  const modal = document.getElementById('hookBankDetailModal');
+  if (modal) modal.style.display = 'none';
+}
+
 function getHookBadge(r) {
   if (!r || r <= 0) return '<span class="hook-none">N/A</span>';
   if (r >= 60) return `<span class="hook-excellent">🔥 ${r}% Excellent</span>`;
@@ -3080,6 +3315,7 @@ function switchTab(tab, el) {
   if (tab === 'top10') renderTop10(month);
   if (tab === 'hook') renderHook(month);
   if (tab === 'hold') renderHold(month);
+  if (tab === 'hookbank') renderHookBank();
   if (tab === 'monthly') renderMonthlyResults();
   if (tab === 'insights') { /* snapshot removed */ }
   if (tab === 'news') {
@@ -5086,6 +5322,7 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldPlatform').value = entry ? entry.platform : 'Facebook';
   document.getElementById('calFieldType').value = entry ? entry.contentType : 'Reel/Short Video';
   document.getElementById('calFieldStatus').value = entry ? entry.status : 'Idea';
+  document.getElementById('calFieldHookType').value = entry ? (entry.hookType || '') : '';
   document.getElementById('calFieldTitle').value = entry ? entry.title : '';
   document.getElementById('calFieldTitleCount').textContent = document.getElementById('calFieldTitle').value.length + '/80';
   document.getElementById('calFieldSavedBy').value = entry ? (entry.savedBy || '') : lastSavedByName;
@@ -5140,6 +5377,7 @@ async function submitCalendarEntry() {
     platform: document.getElementById('calFieldPlatform').value,
     contentType: document.getElementById('calFieldType').value,
     status: document.getElementById('calFieldStatus').value,
+    hookType: document.getElementById('calFieldHookType').value,
     title: title,
     savedBy: document.getElementById('calFieldSavedBy').value.trim(),
     notes: document.getElementById('calFieldNotes').value.trim(),
@@ -5866,6 +6104,7 @@ function openCalViewModal(entry) {
   document.getElementById('calViewPlatform').textContent = entry.platform || '—';
   document.getElementById('calViewContentType').textContent = entry.contentType || '—';
   document.getElementById('calViewSavedBy').textContent = entry.savedBy || '—';
+  document.getElementById('calViewHookType').textContent = entry.hookType || '—';
 
   const notesWrap = document.getElementById('calViewNotesWrap');
   if (entry.notes) {
@@ -6316,6 +6555,21 @@ function addViralTopicToCalendar(title) {
             <option>Done</option>
           </select>
         </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Hook Type</label>
+          <select id="calFieldHookType" class="filter-select" style="width:100%;">
+            <option value="">— Not decided yet —</option>
+            <option>Moving Hook</option>
+            <option>Text Hook</option>
+            <option>Visual Hook</option>
+            <option>Sound Hook</option>
+            <option>Question Hook</option>
+            <option>Statement Hook</option>
+            <option>Contrast Hook</option>
+            <option>Story Hook</option>
+            <option>Other</option>
+          </select>
+        </div>
       </div>
       <div style="margin-bottom:14px;">
         <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Topic / Title</label>
@@ -6428,6 +6682,18 @@ function addViralTopicToCalendar(title) {
     </div>
     </div>
 <!-- ═══ GLOBAL MODALS (outside tab panels so display:flex works) ═══ -->
+    <!-- Hook Bank drill-down — the contents behind a hook type card -->
+    <div id="hookBankDetailModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9100;align-items:flex-start;justify-content:center;padding:20px 16px;background:rgba(11,11,13,0.75);backdrop-filter:blur(6px);" onclick="if(event.target===this)closeHookBankDetail()">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:560px;max-height:80vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6);position:relative;margin-top:40px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:12px;">
+          <div id="hookBankDetailTitle" style="font-size:16px;font-weight:700;color:var(--text);"></div>
+          <button onclick="closeHookBankDetail()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;flex-shrink:0;">✕</button>
+        </div>
+        <div id="hookBankDetailSub" style="font-size:12px;color:var(--text3);margin-bottom:18px;"></div>
+        <div id="hookBankDetailList" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </div>
+
     <!-- ── VIEW DETAILS MODAL (Content Calendar) ── -->
     <!-- Day Events Popup — shows all events for a day when "+N more" is clicked -->
     <div id="calDayPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9100;align-items:flex-start;justify-content:center;padding:20px 16px;background:rgba(11,11,13,0.75);backdrop-filter:blur(6px);" onclick="if(event.target===this)closeCalDayPopup()">
@@ -6476,6 +6742,10 @@ function addViralTopicToCalendar(title) {
           <div style="background:var(--surface);border-radius:10px;padding:12px;">
             <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">SAVED BY</div>
             <div id="calViewSavedBy" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">HOOK TYPE</div>
+            <div id="calViewHookType" style="font-size:13px;font-weight:600;color:var(--text);"></div>
           </div>
         </div>
         <div id="calViewNotesWrap" style="background:var(--surface);border-radius:10px;padding:14px;margin-bottom:18px;display:none;">
