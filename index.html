@@ -2161,6 +2161,11 @@ function parseSheetData(raw) {
       const authentic = authRaw==='YES'||authRaw==='TRUE';
       const pillar = String(v.pillar||'').trim().toUpperCase();
       const creator = String(v.creator||'').trim();
+      // Skip the row entirely (not just its creator-breakdown entry) if it's
+      // not tagged to an active creator — a stale/departed creator's videos
+      // must not skew month totals, KPI cards, charts, or any tab that reads
+      // all_videos, not just the Creator Breakdown section.
+      if (!isActiveCreator(creator)) continue;
       const title = String(v.title||'').trim();
       const link = String(v.link||'').trim();
       const hookType = String(v.hookType||'').trim();
@@ -2174,7 +2179,7 @@ function parseSheetData(raw) {
       if(authentic) m.authentic++;
       if(rate>0) m._rates.push(rate);
       if(pillar==='KNOW') m.know++; else if(pillar==='LIKE') m.like++; else if(pillar==='TRUST') m.trust++;
-      if(creator && isActiveCreator(creator)){ if(!m.creators[creator]) m.creators[creator]={videos:0,views:0,thruplays:0,winning:0}; m.creators[creator].videos++; m.creators[creator].views+=views; m.creators[creator].thruplays+=thruplays; if(winning) m.creators[creator].winning++; }
+      if(!m.creators[creator]) m.creators[creator]={videos:0,views:0,thruplays:0,winning:0}; m.creators[creator].videos++; m.creators[creator].views+=views; m.creators[creator].thruplays+=thruplays; if(winning) m.creators[creator].winning++;
       m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
     }
   } else if (raw.videoLog && Array.isArray(raw.videoLog)) {
@@ -2202,6 +2207,9 @@ function parseSheetData(raw) {
       const authentic=(row[AUTH_COL]||'').toString().trim().toUpperCase()==='YES';
       const pillar=(row[PILLAR_COL]||'').toString().trim().toUpperCase();
       const creator=(row[CREATOR_COL]||'').toString().trim();
+      // Skip the row entirely (not just its creator-breakdown entry) if it's
+      // not tagged to an active creator — see matching comment above.
+      if (!isActiveCreator(creator)) continue;
       const title=(row[TITLE_COL]||'').toString().trim();
       const link=(row[LINK_COL]||'').toString().trim();
       const hookType=(row[HOOK_COL]||'').toString().trim();
@@ -2214,7 +2222,7 @@ function parseSheetData(raw) {
       if(winning)m.winning++;if(ai)m.ai++;if(authentic)m.authentic++;
       if(rate>0)m._rates.push(rate);
       if(pillar==='KNOW')m.know++;else if(pillar==='LIKE')m.like++;else if(pillar==='TRUST')m.trust++;
-      if(creator && isActiveCreator(creator)){if(!m.creators[creator])m.creators[creator]={videos:0,views:0,thruplays:0,winning:0};m.creators[creator].videos++;m.creators[creator].views+=views;m.creators[creator].thruplays+=thruplays;if(winning)m.creators[creator].winning++;}
+      if(!m.creators[creator])m.creators[creator]={videos:0,views:0,thruplays:0,winning:0};m.creators[creator].videos++;m.creators[creator].views+=views;m.creators[creator].thruplays+=thruplays;if(winning)m.creators[creator].winning++;
       m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
     }
   } else { return {}; }
