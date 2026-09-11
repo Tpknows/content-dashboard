@@ -2347,6 +2347,11 @@ function syncMonthPills() {
 }
 
 function fmt(n) {
+  // Counts (views, thruplays, etc.) are always whole numbers — round first
+  // so a value under 1000 never prints raw floating-point noise like
+  // 617.8965517241379 (which .toString() would otherwise show in full,
+  // since the K/M abbreviation below only kicks in at 1000+).
+  n = Math.round(n || 0);
   if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
   if (n >= 1000) return (n/1000).toFixed(1) + 'K';
   return n.toString();
