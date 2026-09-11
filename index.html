@@ -1578,7 +1578,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;">
       <div>
         <div style="font-size:16px;font-weight:700;color:#fff;">🎣 Hook Bank</div>
-        <div style="font-size:11px;color:#555;margin-top:6px;">Every hook type used across all months and all year, ranked by average Hook Rate — so you know which hooks to reuse</div>
+        <div style="font-size:11px;color:#555;margin-top:6px;">Ranked by average Hook Rate for the selected month above — pick "All Year" to see the best hooks across every month</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;">
         <span class="hook-excellent">60%+ Excellent</span>
@@ -2381,6 +2381,7 @@ function updateDashboard() {
     renderAI(month);
     renderHook(month);
     renderHold(month);
+    renderHookBank(month);
     return;
   }
   const d = DATA[month];
@@ -2535,6 +2536,7 @@ function updateDashboard() {
   renderAI(month);
   renderHook(month);
   renderHold(month);
+  renderHookBank(month);
   renderTrendChart();
   renderCreatorCompareChart(month);
   renderHoldLeaderChart(month);
@@ -3005,13 +3007,22 @@ function hookRateTierLabel(r) {
 // ─────────────────────────────────────────────────────────────
 let hookBankRows = [];
 
-function renderHookBank() {
+function renderHookBank(month) {
   const grid = document.getElementById('hookBankGrid');
   if (!grid) return;
+  // Falls back to whatever month is currently selected (including
+  // 'ALL_YEAR') so this behaves like every other tab — callers that don't
+  // pass month explicitly (e.g. the hook-type filter's onchange) still get
+  // the right scope instead of always forcing all-year.
+  if (!month) month = document.getElementById('monthSelect').value;
   const filterEl = document.getElementById('hookBankFilterType');
   const filterType = filterEl ? filterEl.value : '';
-  const allVideos = getVideos('ALL_YEAR');
+  // Same rule as Creator Breakdown/Creator Comparison: a video only counts
+  // here if it's tagged to an active creator, so a stale/departed creator's
+  // videos can't skew which hook types look like they're winning.
+  const allVideos = getVideos(month).filter(v => isActiveCreator(v.creator));
   const videos = filterType ? allVideos.filter(v => (v.hookType || '').trim() === filterType) : allVideos;
+  const scopeLabel = month === 'ALL_YEAR' ? 'All Year' : (month.charAt(0) + month.slice(1).toLowerCase());
 
   if (!allVideos.length) {
     document.getElementById('hookBankSummary').innerHTML = '';
@@ -3062,7 +3073,7 @@ function renderHookBank() {
   const totalWins = rows.reduce((s,r) => s + r.winning, 0);
   document.getElementById('hookBankSummary').innerHTML = `
     <div class="hook-stat"><div class="hook-stat-val" style="color:#22c55e">${rows.length}</div><div class="hook-stat-label">Hook Types Tracked</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#00d4ff">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (All Year)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#00d4ff">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (${scopeLabel})</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#f97316">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (all types)</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#eab308">${totalWins}</div><div class="hook-stat-label">🏅 Total Winning Videos</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#a855f7;font-size:16px;line-height:1.3;">🏆 ${best.name}</div><div class="hook-stat-label">Best Hook Type</div></div>
@@ -3116,6 +3127,7 @@ function openHookBankDetail(idx) {
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.title || '(no title)'}</div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--text3);">
+          ${v.creator ? `<span class="creator-tag">${v.creator}</span>` : ''}
           <span>📅 ${dateDisplay}</span>
           <span>· ${fmt(v.views || 0)} views</span>
           ${v.winning ? '<span class="win-badge">WIN</span>' : ''}
@@ -3315,7 +3327,7 @@ function switchTab(tab, el) {
   if (tab === 'top10') renderTop10(month);
   if (tab === 'hook') renderHook(month);
   if (tab === 'hold') renderHold(month);
-  if (tab === 'hookbank') renderHookBank();
+  if (tab === 'hookbank') renderHookBank(month);
   if (tab === 'monthly') renderMonthlyResults();
   if (tab === 'insights') { /* snapshot removed */ }
   if (tab === 'news') {
