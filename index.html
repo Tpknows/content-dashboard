@@ -12,7 +12,11 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg:        #000000;
+  /* EasyPC house colors (green #62B134, black #0b0b0b) — replaces the
+     prior NVIDIA-derived palette (#62B134 accent / pure #000000 chrome).
+     Everything below reads from these tokens, so this is the only place
+     a future brand-color change needs to happen. */
+  --bg:        #0b0b0b;
   --card:      #1a1a1a;
   --surface:   #1a1a1a;
   --surface2:  #242424;
@@ -21,9 +25,9 @@
   --text:      #FFFFFF;
   --text2:     #a7a7a7;
   --text3:     #898989;
-  --accent:    #76b900;
-  --accent-light: #bff230;
-  --accent-text: #76b900;
+  --accent:    #62B134;
+  --accent-light: #9CCC65;
+  --accent-text: #62B134;
   --cyan:      #4d9fff;
   --purple:    #b48cff;
   --green:     #5cb800;
@@ -37,8 +41,8 @@
   --shadow:    0 0 5px rgba(0,0,0,0.6);
   --shadow-sm: 0 0 5px rgba(0,0,0,0.6);
 
-  /* Chrome (sidebar/header/tabs/mobile-nav) surfaces — pure black canvas behind the #1a1a1a card surfaces */
-  --chrome-bg:     #000000;
+  /* Chrome (sidebar/header/tabs/mobile-nav) surfaces — EasyPC black canvas behind the #1a1a1a card surfaces */
+  --chrome-bg:     #0b0b0b;
   --chrome-text:   #FFFFFF;
   --chrome-text2:  #a7a7a7;
   --chrome-text3:  #898989;
@@ -50,7 +54,7 @@
 .dot-red { background: #ff5c5c; } .dot-orange { background: #df6500; } .dot-idle { background: #a7a7a7; }
 .dot-green { background: #5cb800; } .dot-blue { background: #4d9fff; }
 .rank-badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 4px; border-radius: 2px; border:1px solid #5e5e5e; background:#fff; font-size:11px; font-weight:700; color:#000; }
-.rank-badge.rank-1 { border-color:#76b900; border-width:2px; color:#5cb800; }
+.rank-badge.rank-1 { border-color:#62B134; border-width:2px; color:#5cb800; }
 
 body {
   background: var(--bg);
@@ -169,7 +173,7 @@ html { overflow-x: hidden; }
   font-weight: 700;
   border: 1px solid var(--accent);
 }
-.sidebar-item.active:hover { background: rgba(118,185,0,0.08); color: var(--chrome-text); }
+.sidebar-item.active:hover { background: rgba(98,177,52,0.08); color: var(--chrome-text); }
 .sidebar-item-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
 
 .main-area {
@@ -491,7 +495,7 @@ html { overflow-x: hidden; }
 }
 .chart-status-badge.good { background: rgba(92,184,0,0.1); color: var(--green); border: 1px solid rgba(92,184,0,0.2); }
 .chart-status-badge.warn { background: rgba(239,145,0,0.1); color: var(--yellow-text); border: 1px solid rgba(239,145,0,0.2); }
-.chart-status-badge.info { background: rgba(118,185,0,0.1); color: var(--accent-text); border: 1px solid rgba(118,185,0,0.2); }
+.chart-status-badge.info { background: rgba(98,177,52,0.1); color: var(--accent-text); border: 1px solid rgba(98,177,52,0.2); }
 .chart-container { position: relative; height: 260px; }
 
 /* ── BADGES ── */
@@ -663,10 +667,10 @@ html { overflow-x: hidden; }
   cursor: pointer;
   text-align: center;
   border-radius: 2px;
-  background: rgba(118,185,0,0.07);
+  background: rgba(98,177,52,0.07);
   transition: background 0.15s;
 }
-.cal-more-pill:hover { background: rgba(118,185,0,0.16); }
+.cal-more-pill:hover { background: rgba(98,177,52,0.16); }
 @media (max-width: 900px) {
   .cal-day-cell { min-height: 80px; padding: 6px 5px; }
   .cal-month-grid { grid-auto-rows: minmax(80px, auto); }
@@ -687,7 +691,7 @@ html { overflow-x: hidden; }
   cursor: pointer;
 }
 .top10-item:hover {
-  border-color: rgba(118,185,0,0.35);
+  border-color: rgba(98,177,52,0.35);
   transform: translateY(-5px);
   box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
@@ -875,7 +879,7 @@ html { overflow-x: hidden; }
 }
 .results-table th:hover { color: var(--text2); background: rgba(255,255,255,0.03); }
 .results-table th.sorted-asc,
-.results-table th.sorted-desc { color: var(--accent-text); background: rgba(118,185,0,0.06); }
+.results-table th.sorted-desc { color: var(--accent-text); background: rgba(98,177,52,0.06); }
 .results-table th .sort-arrow {
   display: inline-flex;
   flex-direction: column;
@@ -1119,7 +1123,7 @@ html { overflow-x: hidden; }
   border-radius: 50%;
   transition: 0.25s;
 }
-input:checked + .toggle-slider { background: rgba(118,185,0,0.25); border-color: var(--accent); }
+input:checked + .toggle-slider { background: rgba(98,177,52,0.25); border-color: var(--accent); }
 input:checked + .toggle-slider:before { transform: translateX(18px); background: var(--accent); }
 
 /* ── REFRESH BUTTON ── */
@@ -1297,7 +1301,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 <!-- ── MICROSOFT LOGIN WALL ── -->
 <div id="msalLoginWall" style="
   position:fixed;inset:0;z-index:99999;
-  background:#000000;
+  background:#0b0b0b;
   display:flex;align-items:center;justify-content:center;
   flex-direction:column;gap:0;
 ">
@@ -1307,14 +1311,14 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     max-width:420px;width:90%;box-shadow: 0 0 5px rgba(0,0,0,0.6);
   ">
     <div style="font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;margin-bottom:6px;">
-      EASY<span style="color:#76b900;">PC</span>
+      EASY<span style="color:#62B134;">PC</span>
     </div>
     <div style="font-size:13px;color:#a7a7a7;margin-bottom:36px;">Content Dashboard 2026</div>
 
     <div style="
-      width:56px;height:56px;background:#1a1a1a;border:2px solid #76b900;
+      width:56px;height:56px;background:#1a1a1a;border:2px solid #62B134;
       border-radius: 2px;display:flex;align-items:center;justify-content:center;
-      margin:0 auto 24px;color:#76b900;
+      margin:0 auto 24px;color:#62B134;
     "><svg class="icon" style="width:26px;height:26px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
 
     <div style="font-size:18px;font-weight:700;color:#ffffff;margin-bottom:8px;">Sign in required</div>
@@ -1323,7 +1327,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
 
     <button id="msalSignInBtn" onclick="msalSignIn()" style="
-      width:100%;background:transparent;color:#ffffff;border:2px solid #76b900;
+      width:100%;background:transparent;color:#ffffff;border:2px solid #62B134;
       padding:11px 24px;border-radius: 2px;font-size:14px;font-weight:700;
       cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
       font-family:inherit;transition:background 0.15s,color 0.15s;letter-spacing:0.2px;
@@ -1387,12 +1391,12 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       </div>
       <button onclick="closeManusPromptModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
     </div>
-    <textarea id="manusPromptText" readonly style="flex:1;min-height:420px;background:#000000;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
+    <textarea id="manusPromptText" readonly style="flex:1;min-height:420px;background:#0b0b0b;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
       <span id="manusPromptStatus" style="font-size:11.5px;color:var(--text3);"></span>
       <div style="display:flex;gap:10px;">
         <button onclick="closeManusPromptModal()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:9px 18px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
-        <button onclick="copyManusPrompt()" style="background:transparent;color:#fff;border:2px solid #76b900;padding:9px 20px;border-radius: 2px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="1"/><rect x="9" y="2" width="6" height="3" rx="1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="13" y2="16"/></svg> Copy Prompt</button>
+        <button onclick="copyManusPrompt()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:9px 20px;border-radius: 2px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="1"/><rect x="9" y="2" width="6" height="3" rx="1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="13" y2="16"/></svg> Copy Prompt</button>
       </div>
     </div>
   </div>
@@ -1420,7 +1424,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 </div>
 
 <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
-  <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.08);border-top:4px solid #76b900;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.08);border-top:4px solid #62B134;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
   <div id="loadingMsg" style="color:#A1A1AA;font-size:13px;font-weight:500;letter-spacing:0.5px;">Loading live data...</div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
@@ -1440,7 +1444,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
     <div style="display:flex;align-items:center;gap:12px;">
       <div id="msalUserInfo" style="display:none;align-items:center;gap:8px;">
-        <div style="width:30px;height:30px;border-radius:50%;background:rgba(118,185,0,0.15);border:1px solid rgba(118,185,0,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#bff230;" id="msalUserAvatar">?</div>
+        <div style="width:30px;height:30px;border-radius:50%;background:rgba(98,177,52,0.15);border:1px solid rgba(98,177,52,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#9CCC65;" id="msalUserAvatar">?</div>
         <div style="font-size:11px;color:var(--text3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="msalUserName"></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
@@ -1448,7 +1452,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()">
           <span class="toggle-slider"></span>
         </label>
-        <button onclick="manualRefresh()" style="display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius: 2px;background:rgba(118,185,0,0.1);border:1px solid rgba(118,185,0,0.22);color:#bff230;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;" onmouseover="this.style.background='rgba(118,185,0,0.18)'" onmouseout="this.style.background='rgba(118,185,0,0.1)'">↻ Refresh</button>
+        <button onclick="manualRefresh()" style="display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius: 2px;background:rgba(98,177,52,0.1);border:1px solid rgba(98,177,52,0.22);color:#9CCC65;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;" onmouseover="this.style.background='rgba(98,177,52,0.18)'" onmouseout="this.style.background='rgba(98,177,52,0.1)'">↻ Refresh</button>
         <button id="msalSignOutBtn" onclick="msalSignOut()" style="display:none;align-items:center;gap:5px;padding:7px 14px;border-radius: 2px;background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);color:#FCA5A5;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">⬡ Sign out</button>
       </div>
     </div>
@@ -1602,7 +1606,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div class="monthly-results-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> Content Calendar</div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">Plan upcoming posts — every entry saves straight to Google Sheets for reference</div>
       </div>
-      <button onclick="openCalendarForm()" id="calendarAddBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+      <button onclick="openCalendarForm()" id="calendarAddBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
         + Add to Calendar
       </button>
     </div>
@@ -1650,7 +1654,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(180,140,255,0.08);color:#b48cff;border:1px solid rgba(180,140,255,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="1"/><rect x="3" y="5" width="18" height="4"/><line x1="6" y1="5" x2="8" y2="9"/><line x1="11" y1="5" x2="13" y2="9"/><line x1="16" y1="5" x2="18" y2="9"/></svg> Filming/Design</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(77,159,255,0.08);color:#4d9fff;border:1px solid rgba(77,159,255,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/><path d="M9 17l-3 4M15 17l3 4"/></svg> Ready to post</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(92,184,0,0.08);color:#5cb800;border:1px solid rgba(92,184,0,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Posted</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(118,185,0,0.08);color:#76b900;border:1px solid rgba(118,185,0,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Done</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(98,177,52,0.08);color:#62B134;border:1px solid rgba(98,177,52,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Done</span>
     </div>
 
     <div id="calendarStatus" style="font-size:12.5px;color:var(--text3);margin-bottom:14px;"></div>
@@ -1677,7 +1681,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div class="monthly-results-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 7 0 0 0 0 14h2a2 2 0 0 0 0-4h1a3 3 0 0 0 0-6 9 7 0 0 0-3-4z"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="13" cy="8" r="1" fill="currentColor" stroke="none"/></svg> Creative Calendar</div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">Track design jobs, posters, client Job Orders, and deadlines — every entry saves to Google Sheets</div>
       </div>
-      <button onclick="openCreativeForm()" id="creativeAddBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+      <button onclick="openCreativeForm()" id="creativeAddBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
         + Add Job Order
       </button>
     </div>
@@ -1765,7 +1769,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div class="monthly-results-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg> Viral Topic Ideas</div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">AI-generated content angles based on the patterns of our own top-performing videos (All Year) — not external news</div>
       </div>
-      <button onclick="generateViralTopics()" id="generateViralBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+      <button onclick="generateViralTopics()" id="generateViralBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
         <span id="generateViralBtnIcon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg></span> Generate Viral Topic Ideas
       </button>
     </div>
@@ -1851,10 +1855,10 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <button id="insightsSubGenerate" onclick="switchInsightsView('generate')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius: 2px;cursor:pointer;background:#fff;color:#000000;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg> Generate</button>
           <button id="insightsSubRecords" onclick="switchInsightsView('records')" style="padding:8px 16px;font-size:12px;font-weight:600;border:none;border-radius: 2px;cursor:pointer;background:transparent;color:var(--text3);font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z"/></svg> Saved Records</button>
         </div>
-        <button onclick="generateInsights()" id="generateBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:11px 24px;border-radius: 2px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;">
+        <button onclick="generateInsights()" id="generateBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 24px;border-radius: 2px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;">
           <span id="generateBtnIcon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg></span> Generate Insights
         </button>
-        <button onclick="generateManusPrompt()" id="manusPromptBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:11px 24px;border-radius: 2px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:none;align-items:center;gap:8px;">
+        <button onclick="generateManusPrompt()" id="manusPromptBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 24px;border-radius: 2px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:none;align-items:center;gap:8px;">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Generate Manus Prompt
         </button>
       </div>
@@ -1870,7 +1874,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <div style="font-size:12.5px;color:var(--text2);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 4v5h8V4"/><rect x="7" y="14" width="10" height="6"/></svg> Looks good? Save this analysis to your records for future reference.</div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span id="insightsSaveStatus" style="font-size:11.5px;color:var(--text3);"></span>
-            <button id="saveInsightsBtn" onclick="saveCurrentInsights()" style="background:transparent;color:#fff;border:2px solid #76b900;padding:9px 20px;border-radius: 2px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+            <button id="saveInsightsBtn" onclick="saveCurrentInsights()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:9px 20px;border-radius: 2px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 4v5h8V4"/><rect x="7" y="14" width="10" height="6"/></svg> Save Analysis
             </button>
           </div>
@@ -1980,7 +1984,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <div style="font-size:11px;color:var(--text3);margin-top:4px;">Insights are saved to Google Sheet so you can access them from any device.</div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-          <button onclick="loadInsightsFromSheet()" id="loadFromSheetBtn" style="background:rgba(118,185,0,0.12);color:#bff230;border:1px solid rgba(118,185,0,0.25);padding:8px 16px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1-1-7.9 5 5 0 0 1 9.6-2A4.5 4.5 0 0 1 17 18H7z"/></svg> Load from Sheet</button>
+          <button onclick="loadInsightsFromSheet()" id="loadFromSheetBtn" style="background:rgba(98,177,52,0.12);color:#9CCC65;border:1px solid rgba(98,177,52,0.25);padding:8px 16px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1-1-7.9 5 5 0 0 1 9.6-2A4.5 4.5 0 0 1 17 18H7z"/></svg> Load from Sheet</button>
           <button onclick="clearAllInsightRecords()" style="background:rgba(255,92,92,0.1);color:#ff5c5c;border:1px solid rgba(255,92,92,0.2);padding:8px 16px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Clear All Records</button>
         </div>
       </div>
@@ -2035,7 +2039,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div id="topicsView-suggestions" style="display:block;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px;">
           <div style="font-size:12px;color:var(--text3);">AI-generated content angles from hardware/gadget sources — priority: TechPowerUp, Back2Gaming, Engadget</div>
-          <button onclick="generateWeeklyTopics()" id="generateTopicsBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+          <button onclick="generateWeeklyTopics()" id="generateTopicsBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
             <span id="generateTopicsBtnIcon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg></span> Generate This Week's Topics
           </button>
         </div>
@@ -2308,7 +2312,7 @@ function buildMonthPills(available) {
   if (!group) return;
   const pillStyle = `padding:5px 14px;border-radius: 2px;font-size:11.5px;font-weight:500;border:none;background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;`;
   const activeStyle = `padding:5px 14px;border-radius: 2px;font-size:11.5px;font-weight:600;border:none;background:var(--text);color:#000000;cursor:pointer;font-family:inherit;white-space:nowrap;`;
-  const allYearStyle = `padding:5px 14px;border-radius: 2px;font-size:11.5px;font-weight:600;border:none;background:transparent;border:2px solid #76b900;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;`;
+  const allYearStyle = `padding:5px 14px;border-radius: 2px;font-size:11.5px;font-weight:600;border:none;background:transparent;border:2px solid #62B134;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;`;
   const cur = document.getElementById('monthSelect').value;
   const allYearBtn = `<button style="${cur === 'ALL_YEAR' ? allYearStyle : pillStyle}" onclick="selectMonthPill('ALL_YEAR',this)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> All Year</button>`;
   const monthBtns = available.filter(m => m !== 'ALL_YEAR').map(m => {
@@ -2494,7 +2498,7 @@ function updateDashboard() {
   if (viewsChart) viewsChart.destroy();
   viewsChart = new Chart(document.getElementById('viewsChart'), {
     type: 'bar',
-    data: { labels: monthLabels, datasets: [{ label: 'Views', data: viewsData, backgroundColor: sortedMonths.map(m => m === month ? '#76b900' : 'rgba(255,255,255,0.12)'), borderRadius: 8, borderSkipped: false, maxBarThickness: 36 }] },
+    data: { labels: monthLabels, datasets: [{ label: 'Views', data: viewsData, backgroundColor: sortedMonths.map(m => m === month ? '#62B134' : 'rgba(255,255,255,0.12)'), borderRadius: 8, borderSkipped: false, maxBarThickness: 36 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600, easing: 'easeOutQuart' },
@@ -2523,7 +2527,7 @@ function updateDashboard() {
   if (pillarChart) pillarChart.destroy();
   pillarChart = new Chart(document.getElementById('pillarChart'), {
     type: 'doughnut',
-    data: { labels: ['Know', 'Like', 'Trust'], datasets: [{ data: [d.know, d.like, d.trust], backgroundColor: ['#76b900', '#b48cff', '#5cb800'], borderWidth: 0, hoverOffset: 4 }] },
+    data: { labels: ['Know', 'Like', 'Trust'], datasets: [{ data: [d.know, d.like, d.trust], backgroundColor: ['#62B134', '#b48cff', '#5cb800'], borderWidth: 0, hoverOffset: 4 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600, easing: 'easeOutQuart' },
@@ -2581,11 +2585,11 @@ function renderTrendChart() {
         {
           label: 'Views',
           data: views,
-          borderColor: '#76b900',
-          backgroundColor: 'rgba(118,185,0,0.08)',
+          borderColor: '#62B134',
+          backgroundColor: 'rgba(98,177,52,0.08)',
           borderWidth: 2.5,
           pointRadius: 4,
-          pointBackgroundColor: '#76b900',
+          pointBackgroundColor: '#62B134',
           tension: 0.4,
           fill: true,
           yAxisID: 'y'
@@ -4137,7 +4141,7 @@ function renderInsightsOutput(ins, hasPrev) {
     document.getElementById('insightsMoMLowlights').innerHTML  = toListMom(ins.mom_lowlights);
   } else if (!hasPrev) {
     momSection.style.display = 'block';
-    momSection.innerHTML = `<div style="background:rgba(118,185,0,0.06);border:1px solid rgba(118,185,0,0.2);border-radius:var(--radius);padding:18px 22px;font-size:12.5px;color:#bff230;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> <strong>First month on record</strong> — no previous month to compare against. Month-over-month highlights will appear once you have data for a second month.</div>`;
+    momSection.innerHTML = `<div style="background:rgba(98,177,52,0.06);border:1px solid rgba(98,177,52,0.2);border-radius:var(--radius);padding:18px 22px;font-size:12.5px;color:#9CCC65;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> <strong>First month on record</strong> — no previous month to compare against. Month-over-month highlights will appear once you have data for a second month.</div>`;
   } else {
     momSection.style.display = 'none';
   }
@@ -4592,7 +4596,7 @@ async function renderAdminActivity() {
     const initial = (entry.name || entry.username || '?')[0].toUpperCase();
     return `
       <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div style="width:32px;height:32px;flex-shrink:0;border-radius:50%;background:rgba(118,185,0,0.15);border:1px solid rgba(118,185,0,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#bff230;">${initial}</div>
+        <div style="width:32px;height:32px;flex-shrink:0;border-radius:50%;background:rgba(98,177,52,0.15);border:1px solid rgba(98,177,52,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#9CCC65;">${initial}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.name || entry.username || 'Unknown'}</div>
           <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.username || ''}</div>
@@ -5140,7 +5144,7 @@ function renderWeeklyTopics() {
         <div style="font-size:12.5px;color:var(--text);line-height:1.5;background:var(--surface);border-radius: 2px;padding:10px 12px;border-left:2px solid var(--accent);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16a6 6 0 1 1 6 0c-.6 1-1 1.5-1 3h-4c0-1.5-.4-2-1-3z"/><line x1="10" y1="21" x2="14" y2="21"/></svg> ${topic.angle}</div>
         <div style="display:flex;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid var(--border);">
           <a href="${topic.link}" target="_blank" rel="noopener noreferrer" class="fb-link" style="flex:1;text-align:center;background:var(--surface);border-radius: 2px;padding:7px 0;">View article</a>
-          <button onclick="saveTopicToHistory('${topic.id}')" style="flex:1;background:transparent;color:#fff;border:2px solid #76b900;border-radius: 2px;padding:7px 0;font-size:11.5px;font-weight:600;cursor:pointer;">Save to history</button>
+          <button onclick="saveTopicToHistory('${topic.id}')" style="flex:1;background:transparent;color:#fff;border:2px solid #62B134;border-radius: 2px;padding:7px 0;font-size:11.5px;font-weight:600;cursor:pointer;">Save to history</button>
         </div>
       </div>
     `;
@@ -5713,7 +5717,7 @@ function creativePriorityBadge(priority) {
     'Rush':   { color:'#ff5c5c', icon:'<span class="dot dot-red"></span>' },
     'Urgent': { color:'#fb923c', icon:'<span class="dot dot-orange"></span>' },
     'Normal': { color:'#71717A', icon:'<span class="dot dot-idle"></span>' },
-    'Low':    { color:'#76b900', icon:'<span class="dot dot-blue"></span>' }
+    'Low':    { color:'#62B134', icon:'<span class="dot dot-blue"></span>' }
   };
   return map[priority] || map['Normal'];
 }
@@ -6055,7 +6059,7 @@ function openCalDayPopup(dateStr, entries) {
           </div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
-          ${hasLink ? `<a href="${entry.link}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="font-size:11px;color:var(--accent-text);text-decoration:none;background:rgba(118,185,0,0.1);padding:3px 8px;border-radius: 2px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9,6 18,6 18,15"/></svg> Link</a>` : ''}
+          ${hasLink ? `<a href="${entry.link}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="font-size:11px;color:var(--accent-text);text-decoration:none;background:rgba(98,177,52,0.1);padding:3px 8px;border-radius: 2px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9,6 18,6 18,15"/></svg> Link</a>` : ''}
         </div>
       </div>`;
 
@@ -6490,7 +6494,7 @@ INSTRUCTIONS:
 function renderViralTopics(ideas) {
   const grid = document.getElementById('viralTopicsGrid');
   grid.innerHTML = '';
-  const pillarColor = { KNOW: '#76b900', LIKE: '#f472b6', TRUST: '#5cb800' };
+  const pillarColor = { KNOW: '#62B134', LIKE: '#f472b6', TRUST: '#5cb800' };
 
   ideas.forEach(idea => {
     const color = pillarColor[idea.pillar] || '#71717A';
@@ -6530,7 +6534,7 @@ function renderViralTopics(ideas) {
     btnWrap.style.marginTop = '6px';
     const addBtn = document.createElement('button');
     addBtn.textContent = '+ Add to Calendar';
-    addBtn.style.cssText = 'background:transparent;color:#fff;border:2px solid #76b900;padding:7px 14px;border-radius: 2px;font-size:11.5px;font-weight:600;cursor:pointer;';
+    addBtn.style.cssText = 'background:transparent;color:#fff;border:2px solid #62B134;padding:7px 14px;border-radius: 2px;font-size:11.5px;font-weight:600;cursor:pointer;';
     addBtn.onclick = () => addViralTopicToCalendar(idea.title || '');
     btnWrap.appendChild(addBtn);
     card.appendChild(btnWrap);
@@ -6630,7 +6634,7 @@ function addViralTopicToCalendar(title) {
         <div id="calFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius: 2px;padding:2px 12px;"></div>
       </div>
       <div style="display:flex;gap:10px;">
-        <button onclick="submitCalendarEntry()" id="calendarSaveBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
+        <button onclick="submitCalendarEntry()" id="calendarSaveBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
         <button onclick="closeCalendarForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
       </div>
     </div>
@@ -6713,7 +6717,7 @@ function addViralTopicToCalendar(title) {
         <div id="crFieldHistoryList" style="max-height:160px;overflow-y:auto;background:var(--surface);border-radius: 2px;padding:2px 12px;"></div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button onclick="submitCreativeEntry()" id="creativeSaveBtn" style="background:transparent;color:#fff;border:2px solid #76b900;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
+        <button onclick="submitCreativeEntry()" id="creativeSaveBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Save to Sheet</button>
         <button onclick="deleteCreativeEntry(editingCreativeId)" id="creativeDeleteBtn" style="display:none;background:rgba(255,92,92,0.1);color:#ff5c5c;border:1px solid rgba(255,92,92,0.2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Delete</button>
         <button onclick="closeCreativeForm()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
       </div>
@@ -6795,7 +6799,7 @@ function addViralTopicToCalendar(title) {
           <div id="calViewHistoryList" style="max-height:150px;overflow-y:auto;background:var(--surface);border-radius: 2px;padding:2px 12px;"></div>
         </div>
         <div style="display:flex;gap:10px;">
-          <button id="calViewEditBtn" onclick="calViewToEdit()" style="background:transparent;color:#fff;border:2px solid #76b900;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Edit</button>
+          <button id="calViewEditBtn" onclick="calViewToEdit()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Edit</button>
           <button onclick="closeCalViewModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>
         </div>
       </div>
@@ -6838,7 +6842,7 @@ function addViralTopicToCalendar(title) {
           <div id="crViewHistoryList" style="max-height:150px;overflow-y:auto;background:var(--surface);border-radius: 2px;padding:2px 12px;"></div>
         </div>
         <div style="display:flex;gap:10px;">
-          <button id="crViewEditBtn" onclick="crViewToEdit()" style="background:transparent;color:#fff;border:2px solid #76b900;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Edit</button>
+          <button id="crViewEditBtn" onclick="crViewToEdit()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Edit</button>
           <button onclick="openReassignModal(crViewCurrentId)" style="background:rgba(180,140,255,0.1);color:#b48cff;border:1px solid rgba(180,140,255,0.2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Reassign</button>
           <button onclick="closeCrViewModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>
         </div>
@@ -6886,7 +6890,7 @@ function addViralTopicToCalendar(title) {
           <div id="reassignHistoryList" style="max-height:120px;overflow-y:auto;background:var(--surface);border-radius: 2px;padding:2px 12px;"></div>
         </div>
         <div style="display:flex;gap:10px;">
-          <button onclick="confirmReassign()" style="background:transparent;color:#fff;border:2px solid #76b900;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;flex:1;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Reassign</button>
+          <button onclick="confirmReassign()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;flex:1;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Reassign</button>
           <button onclick="closeReassignModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
         </div>
       </div>
