@@ -702,7 +702,23 @@ html { overflow-x: hidden; }
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
+.top10-thumb-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.top10-thumb-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top10-thumb-watermark { width: 34px; height: 34px; opacity: 0.55; }
 .top10-rank-badge {
   position: absolute;
   top: 10px;
@@ -2376,6 +2392,40 @@ function getPillarBadge(p) {
   return '';
 }
 
+// The video-card thumbnail area has no real image (the Sheet only stores a
+// link, not a thumbnail) — it used to just be a flat empty box behind the
+// play icon. This fills it with the real thumbnail when we can actually get
+// one for free with no auth (YouTube's img.youtube.com CDN), and otherwise a
+// pillar-tinted placeholder (same color as that video's K/L/T badge) with a
+// large muted image glyph, so every card has *some* visual identity instead
+// of looking identically blank.
+function youtubeThumbUrl(link) {
+  if (!link) return null;
+  const m = link.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{6,})/i);
+  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
+}
+function pillarTintColor(pillar) {
+  if (pillar === 'KNOW') return 'var(--cyan)';
+  if (pillar === 'LIKE') return 'var(--purple)';
+  if (pillar === 'TRUST') return 'var(--green)';
+  return 'var(--text3)';
+}
+function renderThumbFill(v) {
+  const ytThumb = youtubeThumbUrl(v.link);
+  if (ytThumb) {
+    return `<img src="${ytThumb}" class="top10-thumb-img" alt="" loading="lazy" onerror="this.remove()">`;
+  }
+  const tint = pillarTintColor(v.pillar);
+  return `
+    <div class="top10-thumb-placeholder" style="background:${tint}14;">
+      <svg class="icon top10-thumb-watermark" style="color:${tint};" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2"/>
+        <circle cx="8.5" cy="10" r="1.5"/>
+        <path d="M21 15l-5-4-4 3-3-2-5 4"/>
+      </svg>
+    </div>`;
+}
+
 function kpiStatusBadge(pct) {
   if (pct >= 100) return `<span style="color:#62B134;font-size:11px;font-weight:700">✓ ACHIEVED ${pct}%</span>`;
   if (pct >= 70) return `<span style="color:#FBBF24;font-size:11px;font-weight:700"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg> AT RISK ${pct}%</span>`;
@@ -2801,6 +2851,7 @@ function renderTop10(month) {
     html += `
     <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
       <div class="top10-thumb-area">
+        ${renderThumbFill(v)}
         <div class="top10-rank-badge">${rankIcon}</div>
         <div class="top10-play-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg></div>
         <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
@@ -2860,6 +2911,7 @@ function renderAI(month) {
       html += `
       <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
         <div class="top10-thumb-area">
+          ${renderThumbFill(v)}
           <div class="top10-rank-badge">${rankIcon}</div>
           <div class="top10-play-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg></div>
           <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
@@ -3251,6 +3303,7 @@ function renderHook(month) {
       html += `
       <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
         <div class="top10-thumb-area">
+          ${renderThumbFill(v)}
           <div class="top10-rank-badge">${rankIcon}</div>
           <div class="top10-play-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg></div>
           <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
@@ -3321,6 +3374,7 @@ function renderHold(month) {
       html += `
       <div class="top10-item ${rankClass}" onclick="${v.link ? `window.open('${v.link}','_blank')` : ''}">
         <div class="top10-thumb-area">
+          ${renderThumbFill(v)}
           <div class="top10-rank-badge">${rankIcon}</div>
           <div class="top10-play-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg></div>
           <div class="top10-views-overlay ${viewsClass}">${fmt(v.views)} views</div>
