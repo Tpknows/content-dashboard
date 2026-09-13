@@ -2787,7 +2787,11 @@ function renderTop10(month) {
   sorted.forEach((v, i) => {
     const rank = i + 1;
     const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-    const rankIcon = rank === 1 ? '<span class="rank-badge rank-1">1</span>' : rank === 2 ? '<span class="rank-badge rank-2">2</span>' : rank === 3 ? '<span class="rank-badge rank-3">3</span>' : `#${rank}`;
+    // Plain text content — the outer .top10-rank-badge chip (dark bg,
+    // gold/silver/bronze/gray text via the .rank-1/2/3/other ancestor
+    // classes on .top10-item) already does the full badge styling. Nesting
+    // a second .rank-badge chip inside it looked like a box-in-a-box.
+    const rankIcon = rank === 1 ? '1' : rank === 2 ? '2' : rank === 3 ? '3' : `#${rank}`;
     const viewsClass = v.views >= TARGET ? 'views-hit' : 'views-miss';
     const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '';
     html += `
@@ -2842,7 +2846,11 @@ function renderAI(month) {
     sorted.forEach((v, i) => {
       const rank = i + 1;
       const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-      const rankIcon = rank === 1 ? '<span class="rank-badge rank-1">1</span>' : rank === 2 ? '<span class="rank-badge rank-2">2</span>' : rank === 3 ? '<span class="rank-badge rank-3">3</span>' : `#${rank}`;
+      // Plain text content — the outer .top10-rank-badge chip (dark bg,
+    // gold/silver/bronze/gray text via the .rank-1/2/3/other ancestor
+    // classes on .top10-item) already does the full badge styling. Nesting
+    // a second .rank-badge chip inside it looked like a box-in-a-box.
+    const rankIcon = rank === 1 ? '1' : rank === 2 ? '2' : rank === 3 ? '3' : `#${rank}`;
       const viewsClass = v.views >= TARGET ? 'views-hit' : 'views-miss';
       const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '';
       html += `
@@ -3228,7 +3236,11 @@ function renderHook(month) {
     sorted.forEach((v, i) => {
       const rank = i + 1;
       const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-      const rankIcon = rank === 1 ? '<span class="rank-badge rank-1">1</span>' : rank === 2 ? '<span class="rank-badge rank-2">2</span>' : rank === 3 ? '<span class="rank-badge rank-3">3</span>' : `#${rank}`;
+      // Plain text content — the outer .top10-rank-badge chip (dark bg,
+    // gold/silver/bronze/gray text via the .rank-1/2/3/other ancestor
+    // classes on .top10-item) already does the full badge styling. Nesting
+    // a second .rank-badge chip inside it looked like a box-in-a-box.
+    const rankIcon = rank === 1 ? '1' : rank === 2 ? '2' : rank === 3 ? '3' : `#${rank}`;
       const viewsClass = v.views >= TARGET_VIEWS ? 'views-hit' : 'views-miss';
       const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '';
       const overlayClass = getHookOverlayClass(v.hook_rate);
@@ -3294,7 +3306,11 @@ function renderHold(month) {
     sorted.forEach((v, i) => {
       const rank = i + 1;
       const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-      const rankIcon = rank === 1 ? '<span class="rank-badge rank-1">1</span>' : rank === 2 ? '<span class="rank-badge rank-2">2</span>' : rank === 3 ? '<span class="rank-badge rank-3">3</span>' : `#${rank}`;
+      // Plain text content — the outer .top10-rank-badge chip (dark bg,
+    // gold/silver/bronze/gray text via the .rank-1/2/3/other ancestor
+    // classes on .top10-item) already does the full badge styling. Nesting
+    // a second .rank-badge chip inside it looked like a box-in-a-box.
+    const rankIcon = rank === 1 ? '1' : rank === 2 ? '2' : rank === 3 ? '3' : `#${rank}`;
       const viewsClass = v.views >= TARGET_VIEWS ? 'views-hit' : 'views-miss';
       const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link" style="font-size:10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '';
       const overlayClass = getHoldOverlayClass(v.hold_rate);
