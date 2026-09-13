@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-13T00:00:00Z",
+  "title": "Design System: EasyPC Content Dashboard",
+  "extensions": {
+    "colorMeta": {
+      "nvidia-green": { "role": "primary", "displayName": "NVIDIA Green", "canonical": "#76b900", "tonalRamp": ["#1e2f00", "#2f4a00", "#3f6300", "#57880a", "#76b900", "#9dd200", "#bff230", "#e2fa8f"] },
+      "accent-text": { "role": "primary-text-safe", "displayName": "Accent Text (Darkened Green)", "canonical": "#4d7a00", "tonalRamp": ["#101a00", "#1e3300", "#2e4d00", "#3d6400", "#4d7a00", "#639c1a", "#84c24a", "#b3e089"] },
+      "nvidia-green-light": { "role": "primary-on-black", "displayName": "NVIDIA Green Light", "canonical": "#bff230", "tonalRamp": ["#2a3300", "#454000", "#606100", "#8f9c10", "#bff230", "#d0f562", "#e2f994", "#f2fcc8"] },
+      "black-chrome": { "role": "neutral", "displayName": "True Black Chrome", "canonical": "#000000", "tonalRamp": ["#000000", "#1a1a1a", "#333333", "#4d4d4d", "#666666", "#808080", "#b3b3b3", "#e6e6e6"] },
+      "white-surface": { "role": "neutral", "displayName": "True White Surface", "canonical": "#FFFFFF", "tonalRamp": ["#e6e6e6", "#eeeeee", "#f2f2f2", "#f5f5f5", "#f8f8f8", "#fafafa", "#fdfdfd", "#ffffff"] },
+      "text-secondary": { "role": "neutral-text", "displayName": "Text Secondary (Two-Gray Compromise)", "canonical": "#757575", "tonalRamp": ["#1e1e1e", "#333333", "#494949", "#606060", "#757575", "#8f8f8f", "#aaaaaa", "#c6c6c6"] },
+      "chrome-text2": { "role": "neutral-text-on-black", "displayName": "Chrome Text Secondary", "canonical": "#a7a7a7", "tonalRamp": ["#2b2b2b", "#464646", "#616161", "#7d7d7d", "#a7a7a7", "#bcbcbc", "#d2d2d2", "#e9e9e9"] },
+      "chrome-text3": { "role": "neutral-text-on-black", "displayName": "Chrome Text Tertiary", "canonical": "#898989", "tonalRamp": ["#232323", "#3a3a3a", "#525252", "#6b6b6b", "#898989", "#a3a3a3", "#c0c0c0", "#dedede"] },
+      "cyan-info": { "role": "semantic-quality", "displayName": "Cyan (Very Strong / Info)", "canonical": "#0046A4", "tonalRamp": ["#00122b", "#001f47", "#002d63", "#003a83", "#0046a4", "#1a63c4", "#5a90d8", "#a8c6ec"] },
+      "purple": { "role": "semantic-quality", "displayName": "Purple (Good, mid-tier)", "canonical": "#4d1368", "tonalRamp": ["#140518", "#230a2b", "#321040", "#3f1354", "#4d1368", "#6b2a8a", "#9457b3", "#c9a4dd"] },
+      "green-success": { "role": "semantic-quality", "displayName": "Green (Excellent / On Track)", "canonical": "#3f8500", "tonalRamp": ["#102100", "#1c3900", "#295200", "#336c00", "#3f8500", "#57a80a", "#82c94a", "#bde48f"] },
+      "orange": { "role": "kpi-stripe", "displayName": "Orange (KPI accent stripe only)", "canonical": "#df6500", "tonalRamp": ["#391a00", "#5c2b00", "#803c00", "#a34e00", "#df6500", "#ea8a33", "#f2b077", "#f9d7b8"] },
+      "pink": { "role": "kpi-stripe", "displayName": "Pink (KPI accent stripe only)", "canonical": "#8c1c55", "tonalRamp": ["#230709", "#3e0d20", "#5a1330", "#711742", "#8c1c55", "#ad3d76", "#cd759f", "#e8b8cf"] },
+      "yellow": { "role": "kpi-stripe", "displayName": "Yellow (raw, stripe/tint only, never text)", "canonical": "#ef9100", "tonalRamp": ["#3d2500", "#663d00", "#8f5500", "#b86e00", "#ef9100", "#f2a933", "#f7c877", "#fbe3bb"] },
+      "yellow-text": { "role": "semantic-quality-text-safe", "displayName": "Yellow Text (Darkened, Average/Warn)", "canonical": "#b35400", "tonalRamp": ["#2d1500", "#4a2300", "#663000", "#853f00", "#b35400", "#ce7833", "#e3a877", "#f1cdb8"] },
+      "red-alert": { "role": "semantic-quality", "displayName": "Red (Weak / Behind / Alert)", "canonical": "#e52020", "tonalRamp": ["#3a0808", "#611010", "#871515", "#ac1a1a", "#e52020", "#eb5252", "#f28f8f", "#f8c9c9" ] }
+    },
+    "typographyMeta": {
+      "kpi-value": { "displayName": "Stat/KPI Display", "purpose": "Large numeric readouts: KPI cards, AI stat panels, Hook Bank value, Hook/Hold stat panels." },
+      "title": { "displayName": "Title", "purpose": "Header logo, monthly-results title, sidebar logo." },
+      "card-title": { "displayName": "Card Title", "purpose": "Chart card titles, KPI card head, creator name." },
+      "body": { "displayName": "Body", "purpose": "Default reading size for prose and table cells." },
+      "label": { "displayName": "Label", "purpose": "Sidebar group labels, tabs, badges, chart subtitles — the dense functional-text tier." }
+    },
+    "shadows": [
+      { "name": "interaction-shadow", "value": "0 0 5px rgba(0,0,0,0.3)", "purpose": "The only shadow token. Applied on hover-lift for kpi-card/hookbank-card/#generateBtn, and on all open modal/dialog surfaces. Never present at rest." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Sidebar chevron rotation, sidebar subitem max-height expand, tab hover/active transitions." },
+      { "name": "hover-lift", "value": "transform: translateY(-3px) (cards) / translateY(-1px) (primary button)", "purpose": "Paired with interaction-shadow on hover for kpi-card, hookbank-card, and #generateBtn." }
+    ],
+    "breakpoints": [
+      { "name": "mobile-nav-switch", "value": "900px", "purpose": "Below this width the fixed sidebar hides and the horizontal .mobile-nav tab strip takes over; header and KPI grid also collapse to mobile paddings/sizes." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Transparent, green-bordered call-to-action button; the only filled-with-color-in-border control in the system.",
+      "html": "<button class=\"ds-btn-primary\"><span class=\"ds-btn-icon\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" width=\"16\" height=\"16\"><path d=\"M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18\"/></svg></span> Generate Insights</button>",
+      "css": ".ds-btn-primary { background: transparent; color: #000; border: 2px solid #76b900; padding: 11px 24px; border-radius: 2px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; font-family: Archivo, Arial, Helvetica, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s; } .ds-btn-primary:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 0 5px rgba(0,0,0,0.3); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; } .ds-btn-icon { display: inline-flex; }"
+    },
+    {
+      "name": "KPI Card",
+      "kind": "card",
+      "refersTo": "kpi-card",
+      "description": "The primary data-readout card: white surface, hairline border, colored 2px top stripe keyed to its role, hover-lift with the one shadow token.",
+      "html": "<div class=\"ds-kpi-card ds-kpi-green\"><div class=\"ds-kpi-head\">Total Views</div><div class=\"ds-kpi-value\">1.2M</div><div class=\"ds-kpi-sub\">+8.4% vs last month</div></div>",
+      "css": ".ds-kpi-card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.12); border-radius: 2px; padding: 28px; position: relative; overflow: hidden; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; font-family: Archivo, Arial, Helvetica, sans-serif; } .ds-kpi-card:hover { transform: translateY(-3px); border-color: rgba(0,0,0,0.22); box-shadow: 0 0 5px rgba(0,0,0,0.3); } .ds-kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; } .ds-kpi-green::before { background: #3f8500; } .ds-kpi-head { font-size: 16px; font-weight: 600; color: #000; margin-bottom: 8px; } .ds-kpi-value { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; color: #000; } .ds-kpi-sub { font-size: 13px; color: #757575; margin-top: 6px; }"
+    },
+    {
+      "name": "Quality Badge (Hook/Hold Rate)",
+      "kind": "chip",
+      "refersTo": "quality-badge",
+      "description": "The five-tier semantic quality ramp used throughout Hook Rate and Hold Rate views: Excellent/Very Strong/Good/Average/Weak mapped to green/cyan/purple/yellow-text/red.",
+      "html": "<span class=\"ds-badge ds-badge-excellent\">Excellent</span> <span class=\"ds-badge ds-badge-strong\">Very Strong</span> <span class=\"ds-badge ds-badge-good\">Good</span> <span class=\"ds-badge ds-badge-average\">Average</span> <span class=\"ds-badge ds-badge-weak\">Weak</span>",
+      "css": ".ds-badge { display: inline-block; padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; font-family: Archivo, Arial, Helvetica, sans-serif; } .ds-badge-excellent { background: rgba(63,133,0,0.1); color: #3f8500; border: 1px solid rgba(63,133,0,0.2); } .ds-badge-strong { background: rgba(0,70,164,0.1); color: #0046a4; border: 1px solid rgba(0,70,164,0.2); } .ds-badge-good { background: rgba(77,19,104,0.1); color: #4d1368; border: 1px solid rgba(77,19,104,0.2); } .ds-badge-average { background: rgba(239,145,0,0.1); color: #b35400; border: 1px solid rgba(239,145,0,0.2); } .ds-badge-weak { background: rgba(229,32,32,0.1); color: #e52020; border: 1px solid rgba(229,32,32,0.2); }"
+    },
+    {
+      "name": "Status Dot",
+      "kind": "custom",
+      "refersTo": "status-dot",
+      "description": "8px circular status indicator with five fixed color roles, used in tables/lists without an accompanying text label.",
+      "html": "<span class=\"ds-dot ds-dot-green\"></span>",
+      "css": ".ds-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; } .ds-dot-red { background: #e52020; } .ds-dot-orange { background: #df6500; } .ds-dot-idle { background: #a7a7a7; } .ds-dot-green { background: #3f8500; } .ds-dot-blue { background: #0046a4; }"
+    },
+    {
+      "name": "Rank Badge",
+      "kind": "custom",
+      "refersTo": "rank-badge",
+      "description": "Leaderboard rank chip; rank 1 gets a distinct 2px accent-green border and green text to mark the top performer.",
+      "html": "<span class=\"ds-rank-badge ds-rank-1\">1</span> <span class=\"ds-rank-badge\">2</span>",
+      "css": ".ds-rank-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 2px; border: 1px solid #5e5e5e; background: #fff; font-size: 11px; font-weight: 700; color: #000; font-family: Archivo, Arial, Helvetica, sans-serif; } .ds-rank-1 { border-color: #76b900; border-width: 2px; color: #3f8500; }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "sidebar-item-active",
+      "description": "Black-chrome sidebar item; the active state is the sidebar's only use of color, a 1px accent-green border with no fill.",
+      "html": "<div class=\"ds-sidebar-item ds-active\">Overview</div><div class=\"ds-sidebar-item\">Hook Rate</div>",
+      "css": ".ds-sidebar-item { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 2px; font-size: 12.5px; font-weight: 400; color: #898989; cursor: pointer; white-space: nowrap; transition: background 0.2s, color 0.2s, border-color 0.2s; border: 1px solid transparent; font-family: Archivo, Arial, Helvetica, sans-serif; background: #000; } .ds-sidebar-item:hover { color: #a7a7a7; background: rgba(255,255,255,0.06); } .ds-sidebar-item.ds-active { background: transparent; color: #FFFFFF; font-weight: 700; border: 1px solid #76b900; } .ds-sidebar-item.ds-active:hover { background: rgba(118,185,0,0.08); color: #FFFFFF; }"
+    },
+    {
+      "name": "Select Input",
+      "kind": "input",
+      "refersTo": "month-select",
+      "description": "Flat, hairline-bordered select used in the tabs bar (month picker); focus shifts border to solid accent green with no glow.",
+      "html": "<select class=\"ds-select\"><option>September 2026</option></select>",
+      "css": ".ds-select { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.22); color: #000; padding: 9px 16px; border-radius: 2px; font-size: 12px; font-weight: 600; cursor: pointer; outline: none; font-family: Archivo, Arial, Helvetica, sans-serif; transition: border-color 0.2s, background 0.2s; } .ds-select:hover { background: #F5F5F5; } .ds-select:focus { border-color: #76b900; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Instrument Panel",
+    "overview": "The dashboard reads as a precision measuring instrument, not a decorative product page: true-black chrome (sidebar, header, tabs bar) frames true-white data surfaces (cards, tables, charts), with a single NVIDIA-green (#76b900) accent doing all the signaling — active nav item, focused input, primary-action border. This directly replaces an earlier dark-glass, radial-glow, heavily-rounded theme; that incumbent look is confirmed rejected by the shipped code (no gradients, no blur, no radius above 2px anywhere in the stylesheet). The Meta-brand-token reference (design.hagicode.com/designs/nvidia) was the pinned starting point, but the shipped system is not a literal copy of it: two tokens were deliberately darkened for on-white text contrast, and the type scale settled on a font the spec didn't call for.\n\nDensity is high and functional — three different audiences (contributors, the content manager, leadership) read tables, KPI cards, and calendars packed at a small type scale, and the shipped system accepted that density rather than inflating it for legibility theater. Color is otherwise reserved: outside the semantic quality-tier badges, the only saturated color on any screen is the one green accent.",
+    "keyCharacteristics": [
+      "True-black chrome / true-white data-surface split, never mixed on the same panel.",
+      "One accent (#76b900) reserved for active/focus/primary-border states only.",
+      "A five-tier semantic color ramp (green/cyan/purple/orange-text/red) is the one deliberate exception to \"one accent\" — it carries real Hook Rate/Hold Rate quality meaning, not decoration.",
+      "Flat by default: no gradients, no blur; the one shadow token appears only on hover-lift and open modals.",
+      "2px corner radius everywhere; no exceptions found in the shipped CSS."
+    ],
+    "rules": [
+      { "name": "The One Signal Rule", "body": "#76b900 marks exactly one thing per screen: what is active, focused, or primary. It never appears as a text color on a white surface — text-on-white uses #4d7a00 instead.", "section": "colors" },
+      { "name": "The Two-Gray Compromise Rule", "body": "The white-surface system has only two grays, not three: --text2 and --text3 are both #757575. This was a deliberate accessibility trade — the NVIDIA reference's literal Gray-400 (#898989) fails WCAG AA as text on white, and no compliant lighter alternative was substituted, so the third tier collapsed into the second. Do not reintroduce a distinct --text3 value without confirming it clears AA contrast on white.", "section": "colors" },
+      { "name": "The Semantic-Only Saturation Rule", "body": "Outside the five-tier Hook/Hold Rate quality ramp and the KPI-card top-accent stripes, no color renders except black, white, gray, and the one green accent.", "section": "colors" },
+      { "name": "The Dense-Operate Rule", "body": "This is an Operate-mode instrument, not an editorial page: functional labels (table headers, filter chips, calendar weekday abbreviations, form field labels) run 9–11.5px throughout, well below comfortable-reading size. This was a disclosed, deliberate density decision, not an oversight.", "section": "typography" },
+      { "name": "The Flat-at-Rest Rule", "body": "No card, panel, or button carries a shadow in its default state. Shadow is always a response to open/hover, never a resting decoration.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the accent (#76b900) reserved for active/focus/primary-border states; use #4d7a00 (Accent Text) whenever the brand hue needs to render as legible text on a white surface.",
+      "Do keep the 2px radius and 1px hairline-border convention on every new card, button, chip, or input; there is no larger radius anywhere in the shipped system.",
+      "Do use the five-tier quality ramp (green/cyan/purple/yellow-text/red) whenever a new surface needs to communicate a graded quality/performance signal — it is the one sanctioned exception to the single-accent rule because it carries real data meaning.",
+      "Do treat the interaction shadow (0 0 5px rgba(0,0,0,0.3)) as a state response only: hover-lift or an open modal, never a resting card or button.",
+      "Do render every icon as an inline SVG from the shared 24x24, stroke=\"currentColor\", stroke-width=\"1.75\", round-cap/join set — this is now the only icon system in the file."
+    ],
+    "donts": [
+      "Don't introduce a third distinct gray tier for text-on-white without checking it clears WCAG AA contrast — the system currently has only two (#757575) precisely because the spec's literal third gray (#898989) failed that check.",
+      "Don't reintroduce gradients, glassmorphism blur, or radii above 2px — these were the explicitly rejected incumbent visual system and none remain in the shipped CSS.",
+      "Don't treat the 9–11.5px functional label sizes (table headers, filter chips, calendar weekday labels) as a defect to silently \"fix\" by bumping type size on a new surface; it's a disclosed, accepted density characteristic of this specific Operate-mode dashboard.",
+      "Don't treat the plain Unicode checkmark (✓) still used in a handful of transient save/copy toast textContent strings as the icon convention — the actual convention is the inline-SVG set; the checkmark is a known, disclosed leftover in low-visibility transient text, not a pattern to extend."
+    ]
+  }
+}
