@@ -2457,6 +2457,7 @@ function getVideos(month) {
 function updateDashboard() {
   const month = document.getElementById('monthSelect').value;
   syncCalendarToMonthFilter(month);
+  fetchZernioThumbnails(); // re-scoped to whichever month this just switched to
   if (month === 'ALL_YEAR') {
     // For All Year: only refresh the four content tabs, hide KPI section
     document.getElementById('kpiGrid').innerHTML = `<div style="grid-column:1/-1;padding:28px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);text-align:center;color:var(--text3);font-size:13px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> <strong style="color:var(--text)">All Year view</strong> — KPI cards show per-month targets. Select a month to see KPIs.</div>`;
@@ -4498,21 +4499,39 @@ function toggleAutoRefresh() {
 }
 
 // Fetches the { postLink -> thumbnailUrl } map from the Zernio proxy (see
-// ZERNIO_APPS_SCRIPT_URL above). Safe to call even when it isn't
-// configured yet or is unreachable — cards just keep whatever thumbnail
-// renderThumbFill() already falls back to (YouTube or the pillar-tinted
-// placeholder).
+// ZERNIO_APPS_SCRIPT_URL above), scoped to the currently-selected month.
+// Without a date range, Zernio's analytics endpoint silently defaults to
+// only the last 90 days — so switching to an older month would otherwise
+// come back with nothing to match, no matter how long you wait. Results
+// merge into zernioThumbnails (never replace it), so thumbnails already
+// found for other months you've visited this session stay put. Safe to
+// call even when the proxy isn't configured yet or is unreachable — cards
+// just keep whatever thumbnail renderThumbFill() already falls back to
+// (YouTube or the pillar-tinted placeholder).
 async function fetchZernioThumbnails() {
   if (!ZERNIO_APPS_SCRIPT_URL || ZERNIO_APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === 0) return;
+  const monthSelectEl = document.getElementById('monthSelect');
+  const month = monthSelectEl ? monthSelectEl.value : 'ALL_YEAR';
+
+  let url = ZERNIO_APPS_SCRIPT_URL + '?action=thumbnails';
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const idx = MONTHS_ORDER.indexOf(month);
+  if (idx >= 0) {
+    const pad = n => String(n).padStart(2, '0');
+    const fromDate = `2026-${pad(idx + 1)}-01`;
+    const lastDay = new Date(2026, idx + 1, 0).getDate();
+    const toDate = `2026-${pad(idx + 1)}-${pad(lastDay)}`;
+    url += '&fromDate=' + fromDate + '&toDate=' + toDate;
+  }
+
   try {
-    const res = await fetch(ZERNIO_APPS_SCRIPT_URL + '?action=thumbnails');
+    const res = await fetch(url);
     const data = await res.json();
     if (data.status === 'ok' && data.thumbnails) {
-      zernioThumbnails = data.thumbnails;
+      Object.assign(zernioThumbnails, data.thumbnails);
       // Re-render whichever video-card tabs already have data, so real
       // thumbnails replace placeholders in place without a manual refresh.
       if (Object.keys(DATA).length) {
-        const month = document.getElementById('monthSelect').value;
         renderTop10(month); renderAI(month); renderHook(month); renderHold(month);
       }
     }
