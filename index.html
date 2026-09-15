@@ -2110,6 +2110,15 @@ const CALENDAR_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3R07
 // You can point this to the same URL as CALENDAR_APPS_SCRIPT_URL if your script handles both tabs,
 // or deploy a separate script and paste its URL here.
 const CREATIVE_CALENDAR_APPS_SCRIPT_URL = CALENDAR_APPS_SCRIPT_URL;
+// Real post thumbnails (Facebook/IG/TikTok, not just YouTube) via a proxy
+// Apps Script that holds the actual Zernio API key server-side — see
+// "Zernio Thumbnail Backend.txt" for the script + setup steps. This repo
+// is public, so the raw key must never be pasted here directly. Leave the
+// placeholder as-is until that script is deployed; renderThumbFill()
+// treats an unconfigured URL as "Zernio not set up yet" and just falls
+// back to the YouTube-or-placeholder thumbnail it already had.
+const ZERNIO_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz07WcsSmUj5oP46U113V-U9uv1SepkKjlGzIEd3B5FqlZhwDX5iYpGn-HLHt3rPi1R/exec";
+let zernioThumbnails = {};
 const KPI_TARGETS = { views: 3000000, winning: 20, thruplays: 1800000 };
 
 // Creator-level views (Creator Breakdown, Creator Comparison chart) only
@@ -2411,6 +2420,12 @@ function pillarTintColor(pillar) {
   return 'var(--text3)';
 }
 function renderThumbFill(v) {
+  // Real thumbnail from Zernio (Facebook/IG/TikTok/etc.) takes priority
+  // when configured — matched by the exact post link stored in the sheet.
+  const zThumb = v.link && zernioThumbnails[v.link];
+  if (zThumb) {
+    return `<img src="${zThumb}" class="top10-thumb-img" alt="" loading="lazy" onerror="this.remove()">`;
+  }
   const ytThumb = youtubeThumbUrl(v.link);
   if (ytThumb) {
     return `<img src="${ytThumb}" class="top10-thumb-img" alt="" loading="lazy" onerror="this.remove()">`;
@@ -4482,8 +4497,31 @@ function toggleAutoRefresh() {
   }
 }
 
+// Fetches the { postLink -> thumbnailUrl } map from the Zernio proxy (see
+// ZERNIO_APPS_SCRIPT_URL above). Safe to call even when it isn't
+// configured yet or is unreachable — cards just keep whatever thumbnail
+// renderThumbFill() already falls back to (YouTube or the pillar-tinted
+// placeholder).
+async function fetchZernioThumbnails() {
+  if (!ZERNIO_APPS_SCRIPT_URL || ZERNIO_APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === 0) return;
+  try {
+    const res = await fetch(ZERNIO_APPS_SCRIPT_URL + '?action=thumbnails');
+    const data = await res.json();
+    if (data.status === 'ok' && data.thumbnails) {
+      zernioThumbnails = data.thumbnails;
+      // Re-render whichever video-card tabs already have data, so real
+      // thumbnails replace placeholders in place without a manual refresh.
+      if (Object.keys(DATA).length) {
+        const month = document.getElementById('monthSelect').value;
+        renderTop10(month); renderAI(month); renderHook(month); renderHold(month);
+      }
+    }
+  } catch (e) { /* proxy not deployed/reachable yet — keep existing fallbacks */ }
+}
+
 // On load, fetch live data
 fetchLiveData();
+fetchZernioThumbnails();
 
 /* ============================================================
    MICROSOFT AUTHENTICATION (MSAL.js)
