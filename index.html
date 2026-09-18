@@ -3849,7 +3849,16 @@ async function loadInsightsFromSheet() {
   setTimeout(() => { statusEl.style.display = 'none'; }, 6000);
 }
 
-/* ── INSIGHTS: month-over-month comparison ── */
+/* ── INSIGHTS: month-over-month comparison ──
+   When the selected month is still in progress (the real current
+   calendar month), raw cumulative totals (Views, Thruplays, Videos
+   Submitted) always look "behind" a completed previous month purely
+   because fewer days have elapsed — not because performance is
+   actually worse. For those three metrics we compare daily PACE
+   instead (value ÷ days elapsed vs value ÷ days in the prior month)
+   so a partial month gets a fair, apples-to-apples read. Rate metrics
+   (avg thruplay/hook rate) are already averages, not cumulative
+   totals, so they're compared as-is — no adjustment needed there. */
 function buildMoMInsights(month, d, prev, prevMonth) {
   const highlights = [];
   const lowlights  = [];
@@ -3861,25 +3870,40 @@ function buildMoMInsights(month, d, prev, prevMonth) {
   }
   function prevLabel() { return prevMonth.charAt(0) + prevMonth.slice(1).toLowerCase(); }
 
-  const vDiff  = pctDiff(d.views, prev.views);
-  const tDiff  = pctDiff(d.thruplays, prev.thruplays);
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const today = new Date();
+  const isInProgress = month === MONTHS_ORDER[today.getMonth()];
+  const daysElapsed = isInProgress ? today.getDate() : null;
+  const daysInPrevMonth = isInProgress ? new Date(today.getFullYear(), MONTHS_ORDER.indexOf(prevMonth) + 1, 0).getDate() : null;
+  const paceNote = isInProgress ? ` (day ${daysElapsed} of the month — compared by daily pace, not raw total)` : '';
+
+  function paceDiff(curr, prevVal) {
+    if (!isInProgress || !daysElapsed || !daysInPrevMonth) return pctDiff(curr, prevVal);
+    return pctDiff(curr / daysElapsed, prevVal / daysInPrevMonth);
+  }
+
+  const vDiff  = paceDiff(d.views, prev.views);
+  const tDiff  = paceDiff(d.thruplays, prev.thruplays);
   const wDiff  = d.winning - prev.winning;
-  const sDiff  = d.kpi_submitted - prev.kpi_submitted;
+  const sCountDiff = d.kpi_submitted - prev.kpi_submitted; // raw count, used for completed months
+  const sPaceDiff   = paceDiff(d.kpi_submitted, prev.kpi_submitted); // % pace, used while in progress
   const rDiff  = pctDiff(d.avg_rate, prev.avg_rate);
   const hDiff  = (d.avg_hook_rate && prev.avg_hook_rate) ? pctDiff(d.avg_hook_rate, prev.avg_hook_rate) : null;
   const aiDiff = d.ai - (prev.ai || 0);
 
   if (vDiff !== null) {
-    (vDiff >= 0 ? highlights : lowlights).push(`Views ${vDiff >= 0 ? 'up' : 'down'} <strong>${Math.abs(vDiff)}%</strong> vs ${prevLabel()} (${fmt(d.views)} vs ${fmt(prev.views)}).`);
+    (vDiff >= 0 ? highlights : lowlights).push(`Views ${vDiff >= 0 ? 'up' : 'down'} <strong>${Math.abs(vDiff)}%</strong> vs ${prevLabel()}${paceNote} (${fmt(d.views)} vs ${fmt(prev.views)} total).`);
   }
   if (tDiff !== null) {
-    (tDiff >= 0 ? highlights : lowlights).push(`Thruplays ${tDiff >= 0 ? 'up' : 'down'} <strong>${Math.abs(tDiff)}%</strong> vs ${prevLabel()} (${fmt(d.thruplays)} vs ${fmt(prev.thruplays)}).`);
+    (tDiff >= 0 ? highlights : lowlights).push(`Thruplays ${tDiff >= 0 ? 'up' : 'down'} <strong>${Math.abs(tDiff)}%</strong> vs ${prevLabel()}${paceNote} (${fmt(d.thruplays)} vs ${fmt(prev.thruplays)} total).`);
   }
   if (wDiff !== 0) {
-    (wDiff > 0 ? highlights : lowlights).push(`Winning videos ${wDiff > 0 ? 'increased by' : 'dropped by'} <strong>${Math.abs(wDiff)}</strong> vs ${prevLabel()} (${d.winning} vs ${prev.winning}).`);
+    (wDiff > 0 ? highlights : lowlights).push(`Winning videos ${wDiff > 0 ? 'increased by' : 'dropped by'} <strong>${Math.abs(wDiff)}</strong> vs ${prevLabel()} (${d.winning} vs ${prev.winning})${isInProgress ? `, though ${prevLabel()} had the full month to accumulate wins` : ''}.`);
   }
-  if (sDiff !== 0) {
-    (sDiff > 0 ? highlights : lowlights).push(`Submitted ${Math.abs(sDiff)} ${sDiff > 0 ? 'more' : 'fewer'} videos than ${prevLabel()} (${d.kpi_submitted} vs ${prev.kpi_submitted}).`);
+  if (isInProgress && sPaceDiff !== null && sPaceDiff !== 0) {
+    (sPaceDiff > 0 ? highlights : lowlights).push(`Submitting videos <strong>${Math.abs(sPaceDiff)}%</strong> ${sPaceDiff > 0 ? 'faster' : 'slower'} than ${prevLabel()}'s pace${paceNote} (${d.kpi_submitted} vs ${prev.kpi_submitted} total so far).`);
+  } else if (!isInProgress && sCountDiff !== 0) {
+    (sCountDiff > 0 ? highlights : lowlights).push(`Submitted ${Math.abs(sCountDiff)} ${sCountDiff > 0 ? 'more' : 'fewer'} videos than ${prevLabel()} (${d.kpi_submitted} vs ${prev.kpi_submitted}).`);
   }
   if (rDiff !== null) {
     (rDiff >= 0 ? highlights : lowlights).push(`Avg thruplay rate ${rDiff >= 0 ? 'improved' : 'dropped'} <strong>${Math.abs(rDiff)}%</strong> vs ${prevLabel()} (${d.avg_rate}% vs ${prev.avg_rate}%).`);
