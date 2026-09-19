@@ -110,15 +110,6 @@ html { overflow-x: hidden; }
   font-weight: 400;
 }
 
-.sidebar-group-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: var(--chrome-text3);
-  letter-spacing: 1px;
-  padding: 20px 12px 10px;
-  text-transform: uppercase;
-}
-
 .sidebar-group-header {
   display: flex;
   align-items: center;
@@ -509,10 +500,6 @@ html { overflow-x: hidden; }
   font-weight: 700;
   letter-spacing: 0.4px;
 }
-.status-on-track { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2); }
-.status-at-risk  { background: rgba(251,191,36,0.1); color: var(--yellow-text); border: 1px solid rgba(251,191,36,0.2); }
-.status-behind   { background: rgba(248,113,113,0.1);  color: var(--red);    border: 1px solid rgba(248,113,113,0.2); }
-
 .pillar-k { background: rgba(56,189,248,0.1); color: var(--cyan);   border: 1px solid rgba(56,189,248,0.2);  padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
 .pillar-l { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
 .pillar-t { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
@@ -580,14 +567,6 @@ html { overflow-x: hidden; }
   background: rgba(248,113,113,0.14) !important;
   border-left-color: #F87171 !important;
   animation: overdueFlash 2.5s ease-in-out infinite;
-}
-.creative-overdue-tag {
-  font-size: 9px;
-  font-weight: 700;
-  color: #F87171;
-  letter-spacing: 0.3px;
-  display: block;
-  margin-top: 2px;
 }
 @keyframes overdueFlash {
   0%, 100% { opacity: 1; }
@@ -812,32 +791,6 @@ html { overflow-x: hidden; }
 }
 .ai-stat-val { font-size: 30px; font-weight: 700; color: var(--text); letter-spacing: -1px; }
 .ai-stat-label { font-size: 11px; color: var(--text3); margin-top: 10px; font-weight: 500; }
-
-/* ── TABLES ── */
-.ai-table { width: 100%; border-collapse: collapse; }
-.ai-table th {
-  background: var(--surface);
-  color: var(--text3);
-  font-size: 10.5px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 14px 18px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-}
-.ai-table td {
-  padding: 15px 18px;
-  border-bottom: 1px solid var(--border);
-  font-size: 12.5px;
-  vertical-align: middle;
-  color: var(--text2);
-  transition: background 0.15s;
-}
-.ai-table tr:last-child td { border-bottom: none; }
-.ai-table tr:hover td { background: rgba(255,255,255,0.025); }
 
 /* ── MONTHLY RESULTS ── */
 .monthly-results-header {
@@ -1257,7 +1210,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
   .ai-stat { padding: 16px 12px; }
   .ai-stat-val { font-size: 22px; }
   .ai-stat-label { font-size: 10px; margin-top: 6px; }
-  .ai-table th, .ai-table td { padding: 9px 7px; font-size: 11px; }
 
   /* ── HOOK RATE ── */
   .hook-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
@@ -3482,31 +3434,6 @@ function toggleSidebarGroup(groupName) {
   if (group) group.classList.toggle('open');
 }
 
-function renderInsightsSnapshot(month) {
-  const d = DATA[month];
-  if (!d) return;
-  document.getElementById('insightsTitle').textContent = month.charAt(0) + month.slice(1).toLowerCase() + ' — AI Insights';
-  const viewsPct = Math.round(d.views / KPI_TARGETS.views * 100);
-  const winPct   = Math.round(d.winning / KPI_TARGETS.winning * 100);
-  const thruPct  = Math.round(d.thruplays / KPI_TARGETS.thruplays * 100);
-  const hookColor = d.avg_hook_rate>=60?'#62B134':d.avg_hook_rate>=50?'#38BDF8':d.avg_hook_rate>=40?'#A78BFA':d.avg_hook_rate>=30?'#FBBF24':'#F87171';
-  const snap = [
-    { label:'Total Views',       val: fmt(d.views),              pct: viewsPct, color:'#38BDF8' },
-    { label:'Thruplays',         val: fmt(d.thruplays),          pct: thruPct,  color:'#A78BFA' },
-    { label:'Winning Videos',    val: d.winning,                 pct: winPct,   color:'#62B134' },
-    { label:'Videos Submitted',  val: d.kpi_submitted,           pct: null,     color:'#FB923C' },
-    { label:'Avg Thruplay Rate', val: d.avg_rate + '%',          pct: null,     color:'#f472b6' },
-    { label:'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Avg Hook Rate',  val: (d.avg_hook_rate||0) + '%', pct: null,    color: hookColor },
-    { label:'AI Tagged',         val: d.ai,                      pct: null,     color:'#FBBF24' },
-  ];
-  document.getElementById('insightsSnapshot').innerHTML = snap.map(s => `
-    <div style="background:#1a1d2e;border:1px solid #2a2d3e;border-radius: 2px;padding:14px;text-align:center;">
-      <div style="font-size:20px;font-weight:800;color:${s.color}">${s.val}</div>
-      <div style="font-size:10px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:1px">${s.label}</div>
-      ${s.pct !== null ? `<div style="font-size:10px;margin-top:4px;color:${s.pct>=100?'#62B134':s.pct>=70?'#FBBF24':'#F87171'};font-weight:700">${s.pct}% of target</div>` : ''}
-    </div>`).join('');
-}
-
 /* ── INSIGHTS: sub-view switcher ── */
 function switchInsightsView(view) {
   document.getElementById('insightsView-generate').style.display = view === 'generate' ? 'block' : 'none';
@@ -5720,15 +5647,6 @@ function scheduleTypeMeta(type) {
     'Other Task':  { color: '#FB923C', icon: '📌' }
   };
   return map[type] || map['Content'];
-}
-
-function formatCalDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr + 'T00:00:00');
-  if (isNaN(d.getTime())) return dateStr;
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  return `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
 }
 
 function toISODate_(y, m, d) {
