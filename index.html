@@ -600,12 +600,18 @@ html { overflow-x: hidden; }
 .cal-entry-pill {
   padding: 5px 8px;
   border-radius: 2px;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: grab;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
 }
 .cal-entry-pill:hover {
   transform: translateY(-1px);
   box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+.cal-entry-pill.dragging { opacity: 0.35; cursor: grabbing; }
+.cal-day-cell.drag-over {
+  background: rgba(98,177,52,0.1);
+  outline: 2px dashed #62B134;
+  outline-offset: -2px;
 }
 .cal-entry-title {
   font-size: 11.5px;
@@ -3842,7 +3848,24 @@ function buildMoMInsights(month, d, prev, prevMonth) {
     (aiDiff > 0 ? highlights : lowlights).push(`AI-tagged content ${aiDiff > 0 ? 'increased by' : 'decreased by'} <strong>${Math.abs(aiDiff)}</strong> video${Math.abs(aiDiff) !== 1 ? 's' : ''} vs ${prevLabel()}.`);
   }
 
-  if (highlights.length === 0) highlights.push(`No metrics showed notable improvement vs ${prevLabel()}.`);
+  if (highlights.length === 0) {
+    // Nothing actually beat the previous month — rather than leaving this
+    // blank, name the metric that came closest, with its real number, so
+    // there's still something concrete to look at instead of a dead end.
+    const closestCandidates = [
+      { label: 'Views', diff: vDiff },
+      { label: 'Thruplays', diff: tDiff },
+      { label: `Videos submitted${isInProgress ? ' (pace)' : ''}`, diff: sPaceDiff },
+      { label: 'Avg thruplay rate', diff: rDiff },
+      { label: 'Avg hook rate', diff: hDiff },
+    ].filter(c => c.diff !== null);
+    if (closestCandidates.length > 0) {
+      const closest = closestCandidates.sort((a, b) => b.diff - a.diff)[0];
+      highlights.push(`No metric beat ${prevLabel()} yet${paceNote} — closest is <strong>${closest.label}</strong>, only <strong>${Math.abs(closest.diff)}%</strong> behind.`);
+    } else {
+      highlights.push(`No metrics showed notable improvement vs ${prevLabel()}.`);
+    }
+  }
   if (lowlights.length === 0)  lowlights.push(`No metrics declined vs ${prevLabel()} — great consistency!`);
 
   return { mom_highlights: highlights, mom_lowlights: lowlights };
@@ -5738,6 +5761,14 @@ function renderContentCalendar() {
     const isWeekend = weekdayIdx === 0 || weekdayIdx === 6;
     cell.className = 'cal-day-cell' + (otherMonth ? ' other-month' : '') + (isWeekend ? ' weekend' : '');
     cell.onclick = () => openCalendarForm(null, dateStr);
+    cell.ondragover = (ev) => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; cell.classList.add('drag-over'); };
+    cell.ondragleave = () => cell.classList.remove('drag-over');
+    cell.ondrop = (ev) => {
+      ev.preventDefault();
+      cell.classList.remove('drag-over');
+      const id = ev.dataTransfer.getData('text/plain');
+      if (id) moveCalendarEntryToDate(id, dateStr);
+    };
 
     const numSpan = document.createElement('div');
     numSpan.className = 'cal-day-num' + (dateStr === todayStr ? ' today' : '');
@@ -5757,7 +5788,14 @@ function renderContentCalendar() {
       const card = document.createElement('div');
       card.className = 'cal-entry-pill';
       card.style.cssText = `background:${pillColor}16;border-left:3px solid ${pillColor};display:flex;align-items:center;gap:4px;`;
-      card.title = `${entry.title} · ${entry.scheduleType || 'Content'} · ${entry.platform} · ${entry.status}${entry.savedBy ? ' · ' + entry.savedBy : ''}`;
+      card.title = `${entry.title} · ${entry.scheduleType || 'Content'} · ${entry.platform} · ${entry.status}${entry.savedBy ? ' · ' + entry.savedBy : ''} — drag to another date to reschedule`;
+      card.draggable = true;
+      card.ondragstart = (ev) => {
+        ev.dataTransfer.setData('text/plain', entry.id);
+        ev.dataTransfer.effectAllowed = 'move';
+        card.classList.add('dragging');
+      };
+      card.ondragend = () => card.classList.remove('dragging');
 
       const leftDiv = document.createElement('div');
       leftDiv.style.cssText = 'flex:1;min-width:0;';
@@ -5922,6 +5960,37 @@ function renderCalDatePickerGrid() {
 function calDatePickerSelect(dateStr) {
   if (calDatePickerTarget) calDatePickerTarget.value = dateStr;
   closeCalDatePicker();
+}
+
+// Drag-and-drop reschedule: moves an entry to whatever day cell it's
+// dropped on. Updates the grid immediately (optimistic) and reverts
+// if the Sheet write fails, so a flaky connection can't silently
+// leave the calendar showing a date that never actually saved.
+async function moveCalendarEntryToDate(id, newDateStr) {
+  const entry = contentCalendar.find(e => e.id === id);
+  if (!entry || entry.date === newDateStr) return;
+
+  const prevDate = entry.date;
+  entry.date = newDateStr;
+  renderContentCalendar();
+
+  try {
+    const response = await fetch(CALENDAR_APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "update", calendarType: "content", entry: { ...entry, date: newDateStr } })
+    });
+    const result = await response.json();
+    if (result.status === "error") {
+      entry.date = prevDate;
+      renderContentCalendar();
+      alert("Hindi na-move ang entry: " + result.message);
+    }
+  } catch (err) {
+    entry.date = prevDate;
+    renderContentCalendar();
+    alert("May error sa pag-move. Subukan ulit. (" + err.message + ")");
+  }
 }
 
 async function deleteCalendarEntry(id) {
