@@ -1365,6 +1365,10 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       </div>
       <button onclick="closeManusPromptModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
     </div>
+    <div style="display:flex;gap:8px;padding:14px 24px 0;">
+      <button id="manusModeMom" onclick="switchManusPromptMode('mom')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid #62B134;border-radius:2px;cursor:pointer;background:#62B134;color:#000;font-family:inherit;">Month-over-Month</button>
+      <button id="manusModeWorking" onclick="switchManusPromptMode('working')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid var(--border2);border-radius:2px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;">What's Working</button>
+    </div>
     <textarea id="manusPromptText" readonly style="flex:1;min-height:420px;background:#0b0b0b;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
       <span id="manusPromptStatus" style="font-size:11.5px;color:var(--text3);"></span>
@@ -3507,8 +3511,9 @@ async function saveCurrentInsights() {
     hook_recs:        stripArr(ins.hook_recs),
     hold_recs:        stripArr(ins.hold_recs),
 
-    // Manus presentation prompt (if generated before saving)
-    manus_prompt:     ins.manus_prompt || ''
+    // Manus presentation prompt (if generated before saving) — two framings
+    manus_prompt:         ins.manus_prompt || '',
+    manus_prompt_working: ins.manus_prompt_working || ''
   };
 
   records[month] = record;
@@ -3606,7 +3611,8 @@ function renderInsightRecords() {
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius: 2px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${r.kpi_status}</span>
-          ${r.manus_prompt ? `<button onclick="copyRecordManusPrompt('${r.month}')" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy Manus Prompt</button>` : ''}
+          ${r.manus_prompt ? `<button onclick="copyRecordManusPrompt('${r.month}','mom')" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy MoM Prompt</button>` : ''}
+          ${r.manus_prompt_working ? `<button onclick="copyRecordManusPrompt('${r.month}','working')" style="background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy What's Working Prompt</button>` : ''}
           <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(248,113,113,0.1);color:#F87171;border:1px solid rgba(248,113,113,0.2);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Delete</button>
         </div>
       </div>
@@ -4324,8 +4330,40 @@ function generateManusPrompt() {
    Creator: ${v.creator || '—'} · Views: ${fmt(v.views)} · Thruplay: ${v.thruplay_rate || 0}%${hookStr}${holdStr} · Pillar: ${v.pillar || '—'}${aiStr}${linkStr}`;
       }).join('\n\n');
 
-  const prompt =
-`Create a professional, minimalist business presentation titled "EasyPC Content Performance Report — ${monthLabel} 2026".
+  // Two framings for Slide 3, picked via the toggle in the modal:
+  // "mom" compares against the previous month (can look empty/negative
+  // on a slow or still-in-progress month); "working" instead leads with
+  // this month's own standalone strengths, which always has something
+  // to say regardless of how the month compares to the last one.
+  const momBlock = {
+    header: 'MONTH-OVER-MONTH PERFORMANCE',
+    leftLabel: 'HIGHLIGHTS',
+    leftBody: listOrNone(ins.mom_highlights),
+    rightLabel: 'LOWLIGHTS',
+    rightBody: listOrNone(ins.mom_lowlights),
+    note: '(vs previous month)'
+  };
+  const workingBlock = {
+    header: "WHAT'S WORKING THIS MONTH",
+    leftLabel: "WHAT'S WORKING",
+    leftBody: listOrNone(ins.working),
+    rightLabel: "WHAT'S NOT WORKING",
+    rightBody: listOrNone(ins.not_working),
+    note: '(standalone — not a comparison to last month)'
+  };
+  // "mom" mode leads with the previous-month comparison, then this
+  // month's standalone strengths as backup context. "working" mode
+  // flips the priority — useful when the comparison has nothing
+  // positive to say (e.g. a slow or still-in-progress month) but the
+  // month still has real strengths worth leading with.
+  const framingByMode = {
+    mom:     { slide3: momBlock,     slide4: workingBlock },
+    working: { slide3: workingBlock, slide4: momBlock }
+  };
+
+  function buildPromptText(mode) {
+    const { slide3: sl3, slide4: sl4 } = framingByMode[mode] || framingByMode.mom;
+    return `Create a professional, minimalist business presentation titled "EasyPC Content Performance Report — ${monthLabel} 2026".
 
 BRAND & STYLE DIRECTION
 - Modern corporate design, widescreen 16:9.
@@ -4358,19 +4396,19 @@ Below the cards, show 3 progress bars against targets:
 - Thruplays: ${fmt(s.thruplays || 0)} / ${fmt(s.thruplays_target || 1800000)} target (${s.thruplays_pct || 0}%)
 - Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
 
-SLIDE 3 — MONTH-OVER-MONTH PERFORMANCE (two-column layout)
-Left column "HIGHLIGHTS" (vs previous month):
-${listOrNone(ins.mom_highlights)}
+SLIDE 3 — ${sl3.header} (two-column layout)
+Left column "${sl3.leftLabel}" ${sl3.note}:
+${sl3.leftBody}
 
-Right column "LOWLIGHTS" (vs previous month):
-${listOrNone(ins.mom_lowlights)}
+Right column "${sl3.rightLabel}" ${sl3.note}:
+${sl3.rightBody}
 
-SLIDE 4 — WHAT'S WORKING & WHAT'S NOT (two-column layout)
-Left column "WHAT'S WORKING":
-${listOrNone(ins.working)}
+SLIDE 4 — ${sl4.header} (two-column layout)
+Left column "${sl4.leftLabel}" ${sl4.note}:
+${sl4.leftBody}
 
-Right column "WHAT'S NOT WORKING":
-${listOrNone(ins.not_working)}
+Right column "${sl4.rightLabel}" ${sl4.note}:
+${sl4.rightBody}
 
 SLIDE 5 — HOOK RATE ANALYSIS
 - Headline: Avg hook rate this month is ${s.avg_hook_rate || 0}%.
@@ -4429,17 +4467,41 @@ SLIDE 10 — CLOSING (dark background)
 
 TONE
 Keep all text concise and data-driven, matching the tone of a monthly marketing/content performance report for a Philippine computer retail brand.`;
+  }
+
+  const promptMom = buildPromptText('mom');
+  const promptWorking = buildPromptText('working');
 
   // Persist onto the in-memory insight object so it rides along with Save Analysis
-  lastInsights.manus_prompt = prompt;
-  if (_currentInsightsData && _currentInsightsData.ins) _currentInsightsData.ins.manus_prompt = prompt;
+  lastInsights.manus_prompt = promptMom;
+  lastInsights.manus_prompt_working = promptWorking;
+  if (_currentInsightsData && _currentInsightsData.ins) {
+    _currentInsightsData.ins.manus_prompt = promptMom;
+    _currentInsightsData.ins.manus_prompt_working = promptWorking;
+  }
 
-  const ta = document.getElementById('manusPromptText');
-  if (ta) ta.value = prompt;
+  manusPromptVariants = { mom: promptMom, working: promptWorking };
+  switchManusPromptMode('mom');
   const statusEl = document.getElementById('manusPromptStatus');
   if (statusEl) statusEl.textContent = 'Not yet saved — click "Save Analysis" to keep this with your record.';
   const modal = document.getElementById('manusPromptModal');
   if (modal) modal.style.display = 'flex';
+}
+
+let manusPromptVariants = { mom: '', working: '' };
+let manusPromptActiveMode = 'mom';
+
+function switchManusPromptMode(mode) {
+  manusPromptActiveMode = mode;
+  const ta = document.getElementById('manusPromptText');
+  if (ta) ta.value = manusPromptVariants[mode] || '';
+
+  const activeStyle = 'padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid #62B134;border-radius:2px;cursor:pointer;background:#62B134;color:#000;font-family:inherit;';
+  const idleStyle   = 'padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid var(--border2);border-radius:2px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;';
+  const btnMom = document.getElementById('manusModeMom');
+  const btnWorking = document.getElementById('manusModeWorking');
+  if (btnMom) btnMom.style.cssText = mode === 'mom' ? activeStyle : idleStyle;
+  if (btnWorking) btnWorking.style.cssText = mode === 'working' ? activeStyle : idleStyle;
 }
 
 function closeManusPromptModal() {
@@ -4465,16 +4527,18 @@ function copyManusPrompt() {
   });
 }
 
-function copyRecordManusPrompt(month) {
+function copyRecordManusPrompt(month, mode) {
   const records = loadInsightRecords();
   const r = records[month];
-  if (!r || !r.manus_prompt) { alert('Walang saved Manus prompt para sa buwang ito. I-generate at i-save ulit ang analysis.'); return; }
-  navigator.clipboard.writeText(r.manus_prompt).then(() => {
+  const field = mode === 'working' ? 'manus_prompt_working' : 'manus_prompt';
+  const text = r && r[field];
+  if (!text) { alert('Walang saved ' + (mode === 'working' ? "\"What's Working\"" : "Month-over-Month") + ' na Manus prompt para sa buwang ito. I-generate at i-save ulit ang analysis.'); return; }
+  navigator.clipboard.writeText(text).then(() => {
     alert('✓ Manus prompt copied to clipboard!');
   }).catch(() => {
     try {
       const tmp = document.createElement('textarea');
-      tmp.value = r.manus_prompt;
+      tmp.value = text;
       document.body.appendChild(tmp);
       tmp.select();
       document.execCommand('copy');
