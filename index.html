@@ -4779,7 +4779,24 @@ function disconnectTeamsCalendar() {
 function teamsNeedsInteraction_(err) {
   const code = String((err && (err.errorCode || err.name)) || '');
   return (typeof msal !== 'undefined' && msal.InteractionRequiredAuthError && err instanceof msal.InteractionRequiredAuthError)
-    || /interaction_required|consent_required|login_required|no_tokens_found/i.test(code);
+    || /interaction_required|consent_required|login_required|no_tokens_found|monitor_window_timeout|timed_out|empty_window/i.test(code);
+}
+
+// For someone who already connected Teams on this browser: if the silent
+// token can't be renewed, quietly redo the Microsoft step instead of making
+// them click Reconnect. Once per browser session, so a persistent failure
+// (e.g. approval pulled) falls back to the button rather than looping.
+function autoReconnectTeams_() {
+  const accounts = msalInstance.getAllAccounts();
+  if (!accounts.length) return false;
+  try {
+    if (sessionStorage.getItem('easypc_teams_reconnect_tried') === '1') return false;
+    sessionStorage.setItem('easypc_teams_reconnect_tried', '1');
+  } catch (e) { return false; }
+  setTeamsStatus('loading', 'Reconnecting to Teams…');
+  msalInstance.acquireTokenRedirect({ scopes: GRAPH_CAL_SCOPES, account: accounts[0] })
+    .catch(() => setTeamsStatus('needs-connect', 'Teams needs reconnecting'));
+  return true;
 }
 
 async function getGraphToken_() {
@@ -4833,7 +4850,10 @@ async function loadTeamsMeetings() {
     let token;
     try { token = await getGraphToken_(); }
     catch (err) {
-      if (teamsNeedsInteraction_(err)) { setTeamsStatus('needs-connect', 'Teams needs reconnecting'); return; }
+      if (teamsNeedsInteraction_(err)) {
+        if (!autoReconnectTeams_()) setTeamsStatus('needs-connect', 'Teams needs reconnecting');
+        return;
+      }
       throw err;
     }
     // Cover the whole visible grid (incl. leading/trailing days of neighbouring months).
@@ -4849,7 +4869,10 @@ async function loadTeamsMeetings() {
     const found = [];
     for (let page = 0; url && page < 5; page++) {
       const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token, Prefer: 'outlook.timezone="Asia/Manila"' } });
-      if (res.status === 401) { setTeamsStatus('needs-connect', 'Teams needs reconnecting'); return; }
+      if (res.status === 401) {
+        if (!autoReconnectTeams_()) setTeamsStatus('needs-connect', 'Teams needs reconnecting');
+        return;
+      }
       if (res.status === 403) { setTeamsStatus('blocked', 'Teams calendar access not approved'); return; }
       if (!res.ok) throw new Error('Graph ' + res.status);
       const body = await res.json();
