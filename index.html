@@ -1595,6 +1595,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div style="display:flex;align-items:center;gap:8px;">
         <button onclick="calendarGoToday()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 16px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Today</button>
         <button onclick="loadContentCalendar()" title="Refresh from Sheet" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 12px;border-radius: 2px;font-size:13px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg></button>
+        <button id="teamsConnectBtn" onclick="connectTeamsCalendar()" title="Show your Teams meetings on this calendar (read-only, visible only to you)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 12px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">Connect Teams</button>
+        <span id="teamsCalStatus" style="display:none;font-size:11.5px;font-weight:600;padding:6px 10px;border:1px solid var(--border2);border-radius: 2px;"></span>
         <button onclick="calendarChangeMonth(-1)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius: 2px;font-size:14px;cursor:pointer;">‹</button>
         <button onclick="calendarChangeMonth(1)" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius: 2px;font-size:14px;cursor:pointer;">›</button>
         <div id="calendarMonthLabel" style="font-size:16px;font-weight:700;color:var(--text);margin-left:6px;"></div>
@@ -4668,6 +4670,12 @@ async function msalInit() {
   // Fast path — check existing session first, no delay
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
+    // Coming back from the Calendars.Read consent redirect: MSAL only
+    // exchanges the auth code in the URL when handleRedirectPromise runs.
+    if (/(^|[#&?])(code|error)=/.test(window.location.hash)) {
+      try { await msalInstance.handleRedirectPromise(); }
+      catch (err) { teamsRedirectError_ = err; }
+    }
     msalOnAuthenticated(accounts[0]);
     return;
   }
@@ -4717,7 +4725,192 @@ function msalOnAuthenticated(account) {
   if (infoEl)   infoEl.style.display  = 'flex';
   if (outBtn)   outBtn.style.display  = 'flex';
   logLoginActivity(account);
+  // Deferred so the rest of the script (calendar state) has finished loading.
+  setTimeout(initTeamsCalendar_, 0);
 }
+
+// ─────────────────────────────────────────────────────────────
+// TEAMS / OUTLOOK MEETINGS — read-only overlay on the Content Calendar.
+// Pulled live from Microsoft Graph with the signed-in user's own token and
+// held in memory only (never written to the Sheet or browser storage), so
+// each person only ever sees their own meetings. Sign-in still requests just
+// User.Read; Calendars.Read is a separate opt-in step, so a consent or
+// admin-approval problem can never block logging in.
+// ─────────────────────────────────────────────────────────────
+const GRAPH_CAL_SCOPES = ['Calendars.Read'];
+const TEAMS_OPT_IN_KEY = 'easypc_teams_cal_on';
+const TEAMS_REFRESH_MS = 5 * 60 * 1000;
+let teamsMeetings = [];
+let teamsRedirectError_ = null;
+let _teamsLoading = false;
+
+function teamsOptedIn() {
+  try { return localStorage.getItem(TEAMS_OPT_IN_KEY) === '1'; } catch (e) { return false; }
+}
+function setTeamsOptIn(on) {
+  try { on ? localStorage.setItem(TEAMS_OPT_IN_KEY, '1') : localStorage.removeItem(TEAMS_OPT_IN_KEY); } catch (e) {}
+}
+
+function setTeamsStatus(state, text) {
+  const btn = document.getElementById('teamsConnectBtn');
+  const chip = document.getElementById('teamsCalStatus');
+  const connected = state === 'on' || state === 'loading';
+  if (btn) {
+    btn.style.display = connected ? 'none' : 'inline-flex';
+    btn.textContent = state === 'needs-connect' ? 'Reconnect Teams' : 'Connect Teams';
+  }
+  if (chip) {
+    chip.style.display = text ? 'inline-block' : 'none';
+    chip.textContent = text || '';
+    chip.style.color = (state === 'blocked' || state === 'error' || state === 'needs-connect') ? '#FBBF24' : 'var(--text3)';
+    chip.style.cursor = state === 'on' ? 'pointer' : 'default';
+    chip.title = state === 'on' ? 'Click to disconnect Teams meetings' : '';
+    chip.onclick = state === 'on' ? disconnectTeamsCalendar : null;
+  }
+}
+
+function disconnectTeamsCalendar() {
+  setTeamsOptIn(false);
+  teamsMeetings = [];
+  setTeamsStatus('off', '');
+  renderContentCalendar();
+}
+
+function teamsNeedsInteraction_(err) {
+  const code = String((err && (err.errorCode || err.name)) || '');
+  return (typeof msal !== 'undefined' && msal.InteractionRequiredAuthError && err instanceof msal.InteractionRequiredAuthError)
+    || /interaction_required|consent_required|login_required|no_tokens_found/i.test(code);
+}
+
+async function getGraphToken_() {
+  const accounts = msalInstance.getAllAccounts();
+  if (!accounts.length) throw new Error('Not signed in');
+  const res = await msalInstance.acquireTokenSilent({ scopes: GRAPH_CAL_SCOPES, account: accounts[0] });
+  return res.accessToken;
+}
+
+function initTeamsCalendar_() {
+  if (teamsRedirectError_) {
+    const e = teamsRedirectError_;
+    teamsRedirectError_ = null;
+    setTeamsOptIn(false);
+    const detail = String(e.errorMessage || e.message || '') + ' ' + String(e.errorCode || '');
+    setTeamsStatus('blocked', /AADSTS65001|AADSTS90094|AADSTS650057|consent|admin/i.test(detail)
+      ? 'Needs admin approval for Calendars.Read' : 'Teams connect failed');
+    console.warn('Teams consent redirect error:', e);
+    return;
+  }
+  if (teamsOptedIn()) loadTeamsMeetings(); else setTeamsStatus('off', '');
+}
+
+async function connectTeamsCalendar() {
+  const accounts = msalInstance.getAllAccounts();
+  if (!accounts.length) return;
+  setTeamsOptIn(true);
+  setTeamsStatus('loading', 'Connecting to Teams…');
+  try {
+    await getGraphToken_();
+  } catch (err) {
+    if (teamsNeedsInteraction_(err)) {
+      // First-time consent: full-page redirect like sign-in; lands back in msalInit.
+      try { await msalInstance.acquireTokenRedirect({ scopes: GRAPH_CAL_SCOPES, account: accounts[0] }); }
+      catch (e) { setTeamsOptIn(false); setTeamsStatus('error', 'Could not start Teams consent'); }
+      return;
+    }
+    setTeamsOptIn(false);
+    setTeamsStatus('error', 'Could not connect to Teams');
+    console.warn('Teams token error:', err);
+    return;
+  }
+  loadTeamsMeetings();
+}
+
+async function loadTeamsMeetings() {
+  if (!teamsOptedIn() || _teamsLoading || !msalInstance.getAllAccounts().length) return;
+  _teamsLoading = true;
+  setTeamsStatus('loading', 'Loading Teams meetings…');
+  try {
+    let token;
+    try { token = await getGraphToken_(); }
+    catch (err) {
+      if (teamsNeedsInteraction_(err)) { setTeamsStatus('needs-connect', 'Teams needs reconnecting'); return; }
+      throw err;
+    }
+    // Cover the whole visible grid (incl. leading/trailing days of neighbouring months).
+    const y = calendarViewDate.getFullYear(), m = calendarViewDate.getMonth();
+    const pad = n => String(n).padStart(2, '0');
+    // Explicit +08:00 (Philippines) — Graph reads offset-less query times as UTC.
+    const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T00:00:00+08:00`;
+    let url = 'https://graph.microsoft.com/v1.0/me/calendarView'
+      + '?startDateTime=' + encodeURIComponent(iso(new Date(y, m, 1 - 7)))
+      + '&endDateTime=' + encodeURIComponent(iso(new Date(y, m + 1, 8)))
+      + '&$select=id,subject,start,end,isAllDay,isCancelled,isOnlineMeeting,webLink'
+      + '&$orderby=start/dateTime&$top=100';
+    const found = [];
+    for (let page = 0; url && page < 5; page++) {
+      const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token, Prefer: 'outlook.timezone="Asia/Manila"' } });
+      if (res.status === 401) { setTeamsStatus('needs-connect', 'Teams needs reconnecting'); return; }
+      if (res.status === 403) { setTeamsStatus('blocked', 'Teams calendar access not approved'); return; }
+      if (!res.ok) throw new Error('Graph ' + res.status);
+      const body = await res.json();
+      (body.value || []).forEach(ev => {
+        if (ev.isCancelled || ev.isAllDay || !ev.isOnlineMeeting || !ev.start || !ev.start.dateTime) return;
+        found.push({
+          _teams: true,
+          id: 'teams_' + ev.id,
+          title: ev.subject || '(no subject)',
+          date: ev.start.dateTime.slice(0, 10),
+          startTime: ev.start.dateTime.slice(11, 16),
+          endTime: ev.end && ev.end.dateTime ? ev.end.dateTime.slice(11, 16) : '',
+          scheduleType: 'Meeting',
+          webLink: /^https:\/\//i.test(ev.webLink || '') ? ev.webLink : ''
+        });
+      });
+      url = body['@odata.nextLink'] || null;
+    }
+    teamsMeetings = found;
+    setTeamsStatus('on', `Teams: ${found.length} meeting${found.length === 1 ? '' : 's'}`);
+    renderContentCalendar();
+  } catch (err) {
+    setTeamsStatus('error', 'Could not load Teams meetings');
+    console.warn('Teams calendar load failed:', err);
+  } finally {
+    _teamsLoading = false;
+  }
+}
+
+function teamsTime_(hhmm) {
+  const [h, m] = String(hhmm || '').split(':').map(Number);
+  if (isNaN(h) || isNaN(m)) return '';
+  return `${((h + 11) % 12) + 1}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
+}
+
+// Subjects come from whoever sent the invite, so everything here is set via
+// textContent (never innerHTML).
+function buildTeamsPill_(ev) {
+  const color = '#38BDF8';
+  const card = document.createElement('div');
+  card.className = 'cal-entry-pill';
+  card.style.cssText = `background:${color}16;border-left:3px solid ${color};cursor:${ev.webLink ? 'pointer' : 'default'};`;
+  const range = ev.endTime ? `${teamsTime_(ev.startTime)}–${teamsTime_(ev.endTime)}` : teamsTime_(ev.startTime);
+  card.title = `${ev.title} · ${range} · Teams meeting (read-only)`;
+  const title = document.createElement('div');
+  title.className = 'cal-entry-title';
+  title.textContent = scheduleTypeMeta('Meeting').icon + ' ' + ev.title;
+  const meta = document.createElement('div');
+  meta.className = 'cal-entry-meta';
+  const chip = document.createElement('span');
+  chip.className = 'cal-entry-chip';
+  chip.style.cssText = `background:${color}26;color:${color};`;
+  chip.textContent = teamsTime_(ev.startTime) + ' · Teams';
+  meta.appendChild(chip);
+  card.appendChild(title);
+  card.appendChild(meta);
+  card.onclick = (e) => { e.stopPropagation(); if (ev.webLink) window.open(ev.webLink, '_blank', 'noopener'); };
+  return card;
+}
+
+setInterval(() => { loadTeamsMeetings(); }, TEAMS_REFRESH_MS);
 
 // ─────────────────────────────────────────────────────────────
 // HIDDEN ADMIN PANEL — tap the header logo 6x to reveal a log of
@@ -5709,6 +5902,7 @@ async function loadContentCalendar() {
     contentCalendar = result.entries || [];
     statusEl.textContent = `${contentCalendar.length} scheduled entries.`;
     renderContentCalendar();
+    loadTeamsMeetings();
   } catch (err) {
     console.error(err);
     statusEl.textContent = "May error sa pag-load. (" + err.message + ")";
@@ -5754,11 +5948,13 @@ function syncCalendarToMonthFilter(month) {
 function calendarChangeMonth(delta) {
   calendarViewDate.setMonth(calendarViewDate.getMonth() + delta);
   renderContentCalendar();
+  loadTeamsMeetings();
 }
 
 function calendarGoToday() {
   calendarViewDate = new Date();
   renderContentCalendar();
+  loadTeamsMeetings();
 }
 
 function renderContentCalendar() {
@@ -5788,6 +5984,18 @@ function renderContentCalendar() {
     if (!byDate[e.date]) byDate[e.date] = [];
     byDate[e.date].push(e);
   });
+
+  // Teams meetings have no platform/status/saved-by, so they only show when
+  // those filters are off (and the Type filter allows Meetings).
+  const showTeams = platformFilter === 'all' && statusFilter === 'all' && savedByFilter === 'all'
+    && (scheduleTypeFilter === 'all' || scheduleTypeFilter === 'Meeting');
+  const teamsByDate = {};
+  if (showTeams) {
+    [...teamsMeetings].sort((a, b) => a.startTime.localeCompare(b.startTime)).forEach(ev => {
+      if (!teamsByDate[ev.date]) teamsByDate[ev.date] = [];
+      teamsByDate[ev.date].push(ev);
+    });
+  }
 
   const year = calendarViewDate.getFullYear();
   const month = calendarViewDate.getMonth();
@@ -5841,9 +6049,10 @@ function renderContentCalendar() {
 
     const entriesWrap = document.createElement('div');
     entriesWrap.className = 'cal-entries';
-    const dayEntries = byDate[dateStr] || [];
+    const dayEntries = [...(teamsByDate[dateStr] || []), ...(byDate[dateStr] || [])];
     const MAX_VISIBLE = 3;
     dayEntries.slice(0, MAX_VISIBLE).forEach(entry => {
+      if (entry._teams) { entriesWrap.appendChild(buildTeamsPill_(entry)); return; }
       const color     = calendarStatusColor(entry.status);
       const isDone    = entry.status === 'Posted' || entry.status === 'Done';
       const hasLink   = entry.link && entry.link.trim();
@@ -5963,7 +6172,7 @@ function renderCalDatePickerGrid() {
   if (!pop || pop.style.display === 'none') return;
 
   const byDate = {};
-  contentCalendar.forEach(e => {
+  [...contentCalendar, ...teamsMeetings].forEach(e => {
     if (!e.date) return;
     if (!byDate[e.date]) byDate[e.date] = [];
     byDate[e.date].push(e);
@@ -6420,6 +6629,7 @@ function openCalDayPopup(dateStr, entries) {
 
   list.innerHTML = '';
   entries.forEach(entry => {
+    if (entry._teams) { list.appendChild(buildTeamsPill_(entry)); return; }
     const color = calendarStatusColor(entry.status);
     const isDone = entry.status === 'Posted' || entry.status === 'Done';
     const card = document.createElement('div');
