@@ -1624,7 +1624,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div>
         <div class="monthly-results-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Weekly Progress</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:6px;">Completed vs started content, tasks and projects, counted by each item's Content Calendar date. Weeks run Saturday to Friday, so the Friday review covers the whole week.</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">Completed vs started content, tasks and projects, counted by each item's Content Calendar date. Weeks run Monday to Sunday.</div>
       </div>
       <button onclick="openProgressEntryForm('Task')" title="Pick Task or Project in the Type field" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 22px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;">+ Add Task / Project</button>
     </div>
@@ -6083,8 +6083,8 @@ function syncCalFormForType(preferredStatus) {
 
 /* ── WEEKLY PROGRESS ──
    Reads the same Content Calendar entries. A task belongs to the week its
-   calendar date falls in; weeks run Saturday → Friday so the Friday review
-   covers the full week. Content, Tasks and Projects count; Meetings and
+   calendar date falls in; weeks run Monday → Sunday. Content, Tasks and
+   Projects count; Meetings and
    "Scheduled" entries are left out. */
 const PROGRESS_DONE_STATUSES = ['Posted', 'Done'];
 const PROGRESS_NOT_STARTED_STATUSES = ['Idea', 'To do'];
@@ -6093,18 +6093,18 @@ const PROGRESS_NOT_STARTED_STATUSES = ['Idea', 'To do'];
 const PROGRESS_VISIBLE_CREATORS = { 'Tammy Padal': ['tammy', 'tammy padal'] };
 const PROGRESS_DEFAULT_SAVED_BY = 'Tammy';
 const PROGRESS_TREND_WEEKS = 12; // weeks listed in the week dropdown
-let progressWeekEnd = null; // the Friday that closes the selected week
+let progressWeekEnd = null; // the Sunday that closes the selected week
 
-function progressFridayOnOrAfter_(date) {
+function progressSundayOnOrAfter_(date) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7));
+  d.setDate(d.getDate() + ((7 - d.getDay()) % 7));
   return d;
 }
 function progressIso_(d) { return toISODate_(d.getFullYear(), d.getMonth(), d.getDate()); }
-function progressWeek_(friday) {
-  const start = new Date(friday);
+function progressWeek_(sunday) {
+  const start = new Date(sunday);
   start.setDate(start.getDate() - 6);
-  return { start: progressIso_(start), end: progressIso_(friday), startDate: start, endDate: friday };
+  return { start: progressIso_(start), end: progressIso_(sunday), startDate: start, endDate: sunday };
 }
 function progressShortDate_(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
 function progressEsc_(s) {
@@ -6158,7 +6158,7 @@ function progressStats_(week, creator, type = 'all') {
 }
 
 async function openWeeklyProgress() {
-  if (!progressWeekEnd) progressWeekEnd = progressFridayOnOrAfter_(new Date());
+  if (!progressWeekEnd) progressWeekEnd = progressSundayOnOrAfter_(new Date());
   if (contentCalendar.length) renderWeeklyProgress();
   else await refreshWeeklyProgress();
 }
@@ -6179,7 +6179,7 @@ async function refreshWeeklyProgress() {
 }
 
 function progressChangeWeek(delta) {
-  const d = new Date(progressWeekEnd || progressFridayOnOrAfter_(new Date()));
+  const d = new Date(progressWeekEnd || progressSundayOnOrAfter_(new Date()));
   d.setDate(d.getDate() + delta * 7);
   progressWeekEnd = d;
   renderWeeklyProgress();
@@ -6190,7 +6190,7 @@ function progressPickWeek(endIso) {
   renderWeeklyProgress();
 }
 function progressGoThisWeek() {
-  progressWeekEnd = progressFridayOnOrAfter_(new Date());
+  progressWeekEnd = progressSundayOnOrAfter_(new Date());
   renderWeeklyProgress();
 }
 function progressOpenTask(id) {
@@ -6264,9 +6264,9 @@ function renderProgressTrend() {
 }
 
 // Opens the Content Calendar form as a Task or Project, dated today if today
-// is in the selected week, otherwise on that week's Friday.
+// is in the selected week, otherwise on that week's Sunday.
 function openProgressEntryForm(type) {
-  const week = progressWeek_(progressWeekEnd || progressFridayOnOrAfter_(new Date()));
+  const week = progressWeek_(progressWeekEnd || progressSundayOnOrAfter_(new Date()));
   const today = progressIso_(new Date());
   openCalendarForm(null, today >= week.start && today <= week.end ? today : week.end);
   document.getElementById('calFieldScheduleType').value = type;
@@ -6275,12 +6275,12 @@ function openProgressEntryForm(type) {
 }
 
 function renderWeeklyProgress() {
-  if (!progressWeekEnd) progressWeekEnd = progressFridayOnOrAfter_(new Date());
+  if (!progressWeekEnd) progressWeekEnd = progressSundayOnOrAfter_(new Date());
   const week = progressWeek_(progressWeekEnd);
-  const isThisWeek = week.end === progressIso_(progressFridayOnOrAfter_(new Date()));
+  const isThisWeek = week.end === progressIso_(progressSundayOnOrAfter_(new Date()));
 
   document.getElementById('progressWeekLabel').innerHTML =
-    `Sat, ${progressShortDate_(week.startDate)} – Fri, ${progressShortDate_(week.endDate)}, ${week.endDate.getFullYear()}` +
+    `Mon, ${progressShortDate_(week.startDate)} – Sun, ${progressShortDate_(week.endDate)}, ${week.endDate.getFullYear()}` +
     (isThisWeek ? ' <span class="progress-tag" style="color:var(--green);background:rgba(98,177,52,0.12);">THIS WEEK</span>' : '');
 
   // Creator filter — hidden while only one creator is visible
@@ -6326,15 +6326,15 @@ function renderWeeklyProgress() {
   // week and the ones before it, newest first, reaching back far enough to
   // include the selected week; a future selected week is listed at the top.
   const weekSelect = document.getElementById('progressTrendWeek');
-  const thisFriday = progressFridayOnOrAfter_(new Date());
-  const newest = progressWeekEnd > thisFriday ? new Date(progressWeekEnd) : thisFriday;
+  const thisSunday = progressSundayOnOrAfter_(new Date());
+  const newest = progressWeekEnd > thisSunday ? new Date(progressWeekEnd) : thisSunday;
   const options = [];
   for (let i = 0; ; i++) {
     const fri = new Date(newest);
     fri.setDate(fri.getDate() - i * 7);
     const w = progressWeek_(fri);
     if (i >= PROGRESS_TREND_WEEKS && w.end < week.end) break;
-    const tag = w.end === progressIso_(thisFriday) ? ' (this week)' : '';
+    const tag = w.end === progressIso_(thisSunday) ? ' (this week)' : '';
     options.push(`<option value="${w.end}">${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}${tag}</option>`);
   }
   weekSelect.innerHTML = options.join('');
