@@ -1658,7 +1658,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div class="card" style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
         <div style="font-size:14px;font-weight:700;color:var(--text);">Week progress</div>
-        <select id="progressTrendWeek" onchange="renderProgressTrend()" class="filter-select" aria-label="Week to show"></select>
+        <select id="progressTrendWeek" onchange="progressPickWeek(this.value)" class="filter-select" aria-label="Week to show"></select>
       </div>
       <div id="progressTrend"></div>
     </div>
@@ -6092,9 +6092,8 @@ const PROGRESS_NOT_STARTED_STATUSES = ['Idea', 'To do'];
 // "Saved by" spellings (lowercase) that count as them in the sheet.
 const PROGRESS_VISIBLE_CREATORS = { 'Tammy Padal': ['tammy', 'tammy padal'] };
 const PROGRESS_DEFAULT_SAVED_BY = 'Tammy';
-const PROGRESS_TREND_WEEKS = 12; // weeks listed in the "Week progress" dropdown
+const PROGRESS_TREND_WEEKS = 12; // weeks listed in the week dropdown
 let progressWeekEnd = null; // the Friday that closes the selected week
-let progressTrendAnchor = null; // page week the dropdown was last built for
 
 function progressFridayOnOrAfter_(date) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -6183,6 +6182,11 @@ function progressChangeWeek(delta) {
   const d = new Date(progressWeekEnd || progressFridayOnOrAfter_(new Date()));
   d.setDate(d.getDate() + delta * 7);
   progressWeekEnd = d;
+  renderWeeklyProgress();
+}
+function progressPickWeek(endIso) {
+  if (!endIso) return;
+  progressWeekEnd = new Date(endIso + 'T00:00:00');
   renderWeeklyProgress();
 }
 function progressGoThisWeek() {
@@ -6318,21 +6322,23 @@ function renderWeeklyProgress() {
       </tr>`;
     }).join('') : '<tr><td colspan="6" style="color:var(--text3);">No creators with tasks this week.</td></tr>'}</tbody>`;
 
-  // Week dropdown: the selected week and the ones before it, newest first.
-  // Follows the page's week whenever that changes; otherwise keeps the pick.
+  // Week dropdown drives the whole tab (same as the ‹ › arrows). Lists this
+  // week and the ones before it, newest first, reaching back far enough to
+  // include the selected week; a future selected week is listed at the top.
   const weekSelect = document.getElementById('progressTrendWeek');
-  const keepPick = progressTrendAnchor === week.end ? weekSelect.value : week.end;
-  progressTrendAnchor = week.end;
+  const thisFriday = progressFridayOnOrAfter_(new Date());
+  const newest = progressWeekEnd > thisFriday ? new Date(progressWeekEnd) : thisFriday;
   const options = [];
-  for (let i = 0; i < PROGRESS_TREND_WEEKS; i++) {
-    const fri = new Date(progressWeekEnd);
+  for (let i = 0; ; i++) {
+    const fri = new Date(newest);
     fri.setDate(fri.getDate() - i * 7);
     const w = progressWeek_(fri);
-    options.push(`<option value="${w.end}">${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}${i === 0 ? ' (selected week)' : ''}</option>`);
+    if (i >= PROGRESS_TREND_WEEKS && w.end < week.end) break;
+    const tag = w.end === progressIso_(thisFriday) ? ' (this week)' : '';
+    options.push(`<option value="${w.end}">${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}${tag}</option>`);
   }
   weekSelect.innerHTML = options.join('');
-  weekSelect.value = keepPick;
-  if (weekSelect.value !== keepPick) weekSelect.value = week.end;
+  weekSelect.value = week.end;
   renderProgressTrend();
 
   // Task lists
