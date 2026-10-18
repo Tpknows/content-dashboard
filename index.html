@@ -822,6 +822,24 @@ html { overflow-x: hidden; }
 .progress-list-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; justify-content: space-between; }
 .progress-task { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--text3); border-radius: 2px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; }
 .progress-task:hover { border-color: var(--border2); }
+.progress-task[draggable="true"] { cursor: grab; }
+
+/* ── POSTED VIDEOS ON CONTENT CALENDAR ── */
+.cal-day-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.cal-posted-mark { background: transparent; border: 1px solid rgba(98,177,52,0.3); color: var(--text3); font-size: 9.5px; font-weight: 700; font-family: inherit; line-height: 1; padding: 2px 5px; border-radius: 2px; cursor: pointer; font-feature-settings: "tnum"; }
+.cal-posted-mark:hover, .cal-posted-mark:focus-visible { color: var(--green); border-color: var(--green); }
+.posted-card { display: flex; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; padding: 14px; margin-bottom: 10px; }
+.posted-thumb { width: 72px; height: 128px; object-fit: cover; border-radius: 2px; flex-shrink: 0; background: var(--surface2); }
+.posted-title { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.35; word-break: break-word; overflow-wrap: break-word; }
+.posted-badge { font-size: 10px; font-weight: 600; color: var(--text2); border: 1px solid var(--border2); padding: 2px 7px; border-radius: 2px; }
+.posted-badge.win { color: var(--green); border-color: rgba(98,177,52,0.4); }
+.posted-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.posted-stat-val { font-size: 15px; font-weight: 700; color: var(--text); font-feature-settings: "tnum"; }
+.posted-stat-label { font-size: 10.5px; color: var(--text3); margin-top: 2px; }
+.posted-open { font-size: 12px; font-weight: 600; color: var(--green); text-decoration: none; }
+@media (max-width: 600px) { .posted-thumb { width: 56px; height: 100px; } }
+.progress-task.dragging { opacity: 0.35; cursor: grabbing; }
+.progress-drop.drag-over { border-color: var(--green); background: rgba(98,177,52,0.06); }
 .progress-task-title { font-size: 12.5px; font-weight: 600; color: var(--text); word-break: break-word; overflow-wrap: break-word; }
 .progress-task-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
 .progress-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 2px; margin-left: 4px; }
@@ -1607,7 +1625,11 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div>
         <div class="monthly-results-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Weekly Progress</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:6px;">Completed vs started tasks per creator, counted by each task's Content Calendar date. Weeks run Saturday to Friday, so the Friday review covers the whole week.</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">Completed vs started content, tasks and projects, counted by each item's Content Calendar date. Weeks run Saturday to Friday, so the Friday review covers the whole week.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="openProgressEntryForm('Task')" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 18px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;">+ Add Task</button>
+        <button onclick="openProgressEntryForm('Project')" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 18px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;">+ Add Project</button>
       </div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
@@ -1619,6 +1641,12 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div id="progressWeekLabel" style="font-size:16px;font-weight:700;color:var(--text);margin-left:6px;"></div>
       </div>
       <div class="filter-row" style="margin-bottom:0;">
+        <select id="progressFilterType" onchange="renderWeeklyProgress()" class="filter-select">
+          <option value="all">All types</option>
+          <option>Content</option>
+          <option>Task</option>
+          <option>Project</option>
+        </select>
         <select id="progressFilterCreator" onchange="renderWeeklyProgress()" class="filter-select">
           <option value="all">All creators</option>
         </select>
@@ -1684,6 +1712,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <select id="calendarFilterScheduleType" onchange="renderContentCalendar()" class="filter-select">
           <option value="all">All types</option>
           <option>Content</option>
+          <option>Task</option>
+          <option>Project</option>
           <option>Meeting</option>
           <option>Other Task</option>
         </select>
@@ -2351,6 +2381,7 @@ async function fetchLiveData() {
     const res = await fetch(APPS_SCRIPT_URL);
     const raw = await res.json();
     DATA = parseSheetData(raw);
+    if (calendarLoaded) renderContentCalendar(); // refresh posted-video markers
     // Show server-side lastUpdated from Apps Script if available
     if (raw.lastUpdated) {
       const stampEl = document.getElementById('lastUpdatedStamp');
@@ -5858,7 +5889,8 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldPlatform').value = entry ? entry.platform : 'Facebook';
   document.getElementById('calFieldType').value = entry ? entry.contentType : 'Reel/Short Video';
   document.getElementById('calFieldStatus').value = entry ? entry.status : 'Idea';
-  document.getElementById('calFieldScheduleType').value = entry ? (entry.scheduleType || 'Content') : 'Content';
+  document.getElementById('calFieldScheduleType').value = entry ? normScheduleType_(entry.scheduleType) : 'Content';
+  syncCalFormForType(entry ? entry.status : 'Idea');
   document.getElementById('calFieldHookType').value = entry ? (entry.hookType || '') : '';
   document.getElementById('calFieldTitle').value = entry ? entry.title : '';
   document.getElementById('calFieldTitleCount').textContent = document.getElementById('calFieldTitle').value.length + '/80';
@@ -5924,6 +5956,11 @@ async function submitCalendarEntry() {
   };
 
   if (payload.savedBy) lastSavedByName = payload.savedBy;
+  if (WORK_ITEM_TYPES.includes(payload.scheduleType)) {
+    payload.platform = '';
+    payload.contentType = '';
+    payload.hookType = '';
+  }
 
   // Build/append status history — only adds a record when the status actually changed
   const previousEntry = editingCalendarId ? contentCalendar.find(e => e.id === editingCalendarId) : null;
@@ -5962,6 +5999,7 @@ async function submitCalendarEntry() {
 
     closeCalendarForm();
     renderContentCalendar();
+    if (document.getElementById('tab-progress').classList.contains('active')) renderWeeklyProgress();
   } catch (err) {
     console.error(err);
     alert("May error sa pag-save. Subukan ulit. (" + err.message + ")");
@@ -6003,7 +6041,9 @@ function calendarStatusColor(status) {
     'Ready to post': '#38BDF8',
     'Posted': '#62B134',
     'Done': '#62B134',
-    'Scheduled': '#94A3B8'
+    'Scheduled': '#94A3B8',
+    'To do': '#71717A',
+    'In progress': '#FBBF24'
   };
   return map[status] || '#71717A';
 }
@@ -6011,20 +6051,51 @@ function calendarStatusColor(status) {
 function scheduleTypeMeta(type) {
   const map = {
     'Content':     { color: '#62B134', icon: '🎬' },
+    'Task':        { color: '#F472B6', icon: '✅' },
+    'Project':     { color: '#B48CFF', icon: '📁' },
     'Meeting':     { color: '#38BDF8', icon: '📅' },
     'Other Task':  { color: '#FB923C', icon: '📌' }
   };
   return map[type] || map['Content'];
 }
 
+// Some older sheet rows hold a timestamp in the Type column; anything that
+// isn't a known type is treated as Content, same as scheduleTypeMeta does.
+const CALENDAR_SCHEDULE_TYPES = ['Content', 'Task', 'Project', 'Meeting', 'Other Task'];
+function normScheduleType_(type) { return CALENDAR_SCHEDULE_TYPES.includes(type) ? type : 'Content'; }
+
+// Tasks and Projects use a short workflow instead of the content pipeline,
+// and don't need platform / content type / hook type.
+const WORK_ITEM_TYPES = ['Task', 'Project'];
+const WORK_ITEM_STATUSES = ['To do', 'In progress', 'Done'];
+const CONTENT_STATUSES = ['Idea', 'Scripting', 'Filming/Design', 'Ready to post', 'Posted', 'Done', 'Scheduled'];
+
+function syncCalFormForType(preferredStatus) {
+  const isWorkItem = WORK_ITEM_TYPES.includes(document.getElementById('calFieldScheduleType').value);
+  const statusSel = document.getElementById('calFieldStatus');
+  const keep = preferredStatus || statusSel.value;
+  const options = isWorkItem ? WORK_ITEM_STATUSES : CONTENT_STATUSES;
+  statusSel.innerHTML = options.map(s => `<option>${s}</option>`).join('');
+  statusSel.value = options.includes(keep) ? keep : options[0];
+  ['calFieldPlatform', 'calFieldType', 'calFieldHookType'].forEach(id => {
+    document.getElementById(id).parentElement.style.display = isWorkItem ? 'none' : '';
+  });
+}
+
 /* ── WEEKLY PROGRESS ──
    Reads the same Content Calendar entries. A task belongs to the week its
    calendar date falls in; weeks run Saturday → Friday so the Friday review
-   covers the full week. Meetings, "Other Task" and "Scheduled" entries are
-   not content work and are left out. */
+   covers the full week. Content, Tasks and Projects count; Meetings and
+   "Scheduled" entries are left out. */
 const PROGRESS_DONE_STATUSES = ['Posted', 'Done'];
+const PROGRESS_NOT_STARTED_STATUSES = ['Idea', 'To do'];
+// Only these creators show on Weekly Progress for now. Each one lists the
+// "Saved by" spellings (lowercase) that count as them in the sheet.
+const PROGRESS_VISIBLE_CREATORS = { 'Tammy Padal': ['tammy', 'tammy padal'] };
+const PROGRESS_DEFAULT_SAVED_BY = 'Tammy';
 const PROGRESS_TREND_WEEKS = 6;
 let progressWeekEnd = null; // the Friday that closes the selected week
+let progressOverdueOpen = false;
 
 function progressFridayOnOrAfter_(date) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -6043,14 +6114,24 @@ function progressEsc_(s) {
 }
 function progressCreatorKey_(name) { return String(name || '').trim().toLowerCase().replace(/\s+/g, ' '); }
 
+function progressCreatorOf_(e) {
+  const key = progressCreatorKey_(e.savedBy);
+  return Object.keys(PROGRESS_VISIBLE_CREATORS).find(name => PROGRESS_VISIBLE_CREATORS[name].includes(key)) || null;
+}
+// "Other Task" entries from before Task existed are grouped with Task
+function progressTypeOf_(e) {
+  const t = normScheduleType_(e.scheduleType);
+  return t === 'Other Task' ? 'Task' : t;
+}
+
 function isProgressTask_(e) {
   if (!e || !e.date) return false;
   if (e.status === 'Scheduled') return false;
-  if (e.scheduleType && e.scheduleType !== 'Content') return false;
-  return true;
+  if (progressTypeOf_(e) === 'Meeting') return false;
+  return progressCreatorOf_(e) !== null;
 }
 function isProgressDone_(e) { return PROGRESS_DONE_STATUSES.includes(e.status); }
-function isProgressStarted_(e) { return e.status !== 'Idea'; } // anything past Idea, including done
+function isProgressStarted_(e) { return !PROGRESS_NOT_STARTED_STATUSES.includes(e.status); } // includes done
 
 // Day the task last moved into Posted/Done, from its status history ('' if unknown)
 function progressCompletedOn_(e) {
@@ -6061,20 +6142,10 @@ function progressCompletedOn_(e) {
   return isNaN(d) ? '' : progressIso_(d);
 }
 
-// key → display name, keeping the first spelling seen; active creators always listed
-function progressCreators_() {
-  const names = new Map();
-  ACTIVE_CREATORS.forEach(n => names.set(progressCreatorKey_(n), n));
-  contentCalendar.filter(isProgressTask_).forEach(e => {
-    const key = progressCreatorKey_(e.savedBy);
-    if (!names.has(key)) names.set(key, key ? e.savedBy.trim() : 'Unassigned');
-  });
-  return names;
-}
-
-function progressStats_(week, creatorKey) {
+function progressStats_(week, creator, type = 'all') {
   const mine = contentCalendar.filter(e => isProgressTask_(e) &&
-    (creatorKey === 'all' || progressCreatorKey_(e.savedBy) === creatorKey));
+    (creator === 'all' || progressCreatorOf_(e) === creator) &&
+    (type === 'all' || progressTypeOf_(e) === type));
   const tasks = mine.filter(e => e.date >= week.start && e.date <= week.end)
     .sort((a, b) => a.date.localeCompare(b.date));
   const started = tasks.filter(isProgressStarted_);
@@ -6126,6 +6197,66 @@ function progressOpenTask(id) {
   if (entry) openCalViewModal(entry);
 }
 
+// Status a card gets when dropped into a list. Content enters "In progress"
+// at Scripting; Tasks and Projects use their own To do / In progress / Done.
+function progressStatusForGroup_(e, group) {
+  const isWorkItem = WORK_ITEM_TYPES.includes(progressTypeOf_(e));
+  if (group === 'notStarted') return isWorkItem ? 'To do' : 'Idea';
+  if (group === 'inProgress') return isWorkItem ? 'In progress' : 'Scripting';
+  if (group === 'completed') return 'Done';
+  return null;
+}
+function progressGroupOf_(e) {
+  if (isProgressDone_(e)) return 'completed';
+  return isProgressStarted_(e) ? 'inProgress' : 'notStarted';
+}
+
+async function moveProgressEntry(id, group) {
+  const entry = contentCalendar.find(e => String(e.id) === String(id));
+  // Dropped back into the list it already belongs to: nothing to change
+  if (!entry || progressGroupOf_(entry) === group) return;
+  const newStatus = progressStatusForGroup_(entry, group);
+  if (!newStatus) return;
+
+  const prev = { status: entry.status, statusHistory: entry.statusHistory };
+  const by = entry.savedBy || PROGRESS_DEFAULT_SAVED_BY;
+  entry.status = newStatus;
+  entry.statusHistory = [...(Array.isArray(prev.statusHistory) ? prev.statusHistory : []),
+    { from: prev.status, to: newStatus, by, at: new Date().toISOString() }];
+  renderWeeklyProgress();
+  renderContentCalendar();
+
+  const revert = (msg) => {
+    entry.status = prev.status;
+    entry.statusHistory = prev.statusHistory;
+    renderWeeklyProgress();
+    renderContentCalendar();
+    alert(msg);
+  };
+  try {
+    const response = await fetch(CALENDAR_APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "update", calendarType: "content", entry: { ...entry } })
+    });
+    const result = await response.json();
+    if (result.status === "error") revert("Hindi na-update ang status: " + result.message);
+  } catch (err) {
+    revert("May error sa pag-update ng status. Subukan ulit. (" + err.message + ")");
+  }
+}
+
+// Opens the Content Calendar form as a Task or Project, dated today if today
+// is in the selected week, otherwise on that week's Friday.
+function openProgressEntryForm(type) {
+  const week = progressWeek_(progressWeekEnd || progressFridayOnOrAfter_(new Date()));
+  const today = progressIso_(new Date());
+  openCalendarForm(null, today >= week.start && today <= week.end ? today : week.end);
+  document.getElementById('calFieldScheduleType').value = type;
+  syncCalFormForType('To do');
+  if (!document.getElementById('calFieldSavedBy').value) document.getElementById('calFieldSavedBy').value = PROGRESS_DEFAULT_SAVED_BY;
+}
+
 function renderWeeklyProgress() {
   if (!progressWeekEnd) progressWeekEnd = progressFridayOnOrAfter_(new Date());
   const week = progressWeek_(progressWeekEnd);
@@ -6135,33 +6266,33 @@ function renderWeeklyProgress() {
     `Sat, ${progressShortDate_(week.startDate)} – Fri, ${progressShortDate_(week.endDate)}, ${week.endDate.getFullYear()}` +
     (isThisWeek ? ' <span class="progress-tag" style="color:var(--green);background:rgba(98,177,52,0.12);">THIS WEEK</span>' : '');
 
-  // Creator filter — rebuilt each render so new "Saved by" names appear
-  const creators = progressCreators_();
+  // Creator filter — hidden while only one creator is visible
+  const creators = Object.keys(PROGRESS_VISIBLE_CREATORS);
   const select = document.getElementById('progressFilterCreator');
   const selected = select.value || 'all';
   select.innerHTML = '<option value="all">All creators</option>' +
-    [...creators].map(([key, name]) => `<option value="${progressEsc_(key)}">${progressEsc_(name)}</option>`).join('');
-  select.value = creators.has(selected) ? selected : 'all';
+    creators.map(name => `<option value="${progressEsc_(name)}">${progressEsc_(name)}</option>`).join('');
+  select.value = creators.includes(selected) ? selected : 'all';
+  select.style.display = creators.length > 1 ? '' : 'none';
   const creatorKey = select.value;
+  const typeFilter = document.getElementById('progressFilterType').value;
 
-  const s = progressStats_(week, creatorKey);
+  const s = progressStats_(week, creatorKey, typeFilter);
   const ratePct = s.rate === null ? null : Math.round(s.rate * 100);
   document.getElementById('progressStatus').textContent =
     `As of ${new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })} · source: Content Calendar sheet`;
 
   document.getElementById('progressKpis').innerHTML = `
-    <div class="kpi-card cyan"><div class="kpi-value">${s.tasks.length}</div><div class="kpi-label">Tasks dated this week</div><div class="kpi-sub">${s.notStarted.length} still at Idea</div></div>
+    <div class="kpi-card cyan"><div class="kpi-value">${s.tasks.length}</div><div class="kpi-label">Tasks dated this week</div><div class="kpi-sub">${s.notStarted.length} not started yet</div></div>
     <div class="kpi-card purple"><div class="kpi-value">${s.started.length}</div><div class="kpi-label">Started</div><div class="kpi-sub">${s.inProgress.length} in progress</div></div>
     <div class="kpi-card green"><div class="kpi-value">${s.completed.length}</div><div class="kpi-label">Completed</div><div class="kpi-sub">${s.late.length ? s.late.length + ' finished after their date' : 'Posted or Done'}</div></div>
     <div class="kpi-card yellow"><div class="kpi-value">${ratePct === null ? '—' : ratePct + '%'}</div><div class="kpi-label">Completion rate</div><div class="kpi-sub">${s.completed.length} of ${s.started.length} started</div></div>`;
 
   // Per-creator table
-  const rows = [...creators].filter(([key]) => creatorKey === 'all' || key === creatorKey).map(([key, name]) => {
-    const c = progressStats_(week, key);
-    return { key, name, c };
-  }).filter(r => creatorKey !== 'all' || r.c.tasks.length || r.c.overdue.length || ACTIVE_CREATORS.some(n => progressCreatorKey_(n) === r.key));
+  const rows = creators.filter(name => creatorKey === 'all' || name === creatorKey)
+    .map(name => ({ name, c: progressStats_(week, name, typeFilter) }));
   document.getElementById('progressCreatorTable').innerHTML = `
-    <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Started</th><th class="num">Completed</th><th class="num">At Idea</th><th>Completion rate</th><th class="num">Open from earlier weeks</th></tr></thead>
+    <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Started</th><th class="num">Completed</th><th class="num">Not started</th><th>Completion rate</th><th class="num">Open from earlier weeks</th></tr></thead>
     <tbody>${rows.length ? rows.map(({ name, c }) => {
       const pct = c.rate === null ? null : Math.round(c.rate * 100);
       return `<tr>
@@ -6181,7 +6312,7 @@ function renderWeeklyProgress() {
     const fri = new Date(progressWeekEnd);
     fri.setDate(fri.getDate() - i * 7);
     const w = progressWeek_(fri);
-    trend.push({ w, c: progressStats_(w, creatorKey), current: i === 0 });
+    trend.push({ w, c: progressStats_(w, creatorKey, typeFilter), current: i === 0 });
   }
   document.getElementById('progressTrend').innerHTML = trend.map(({ w, c, current }) => {
     const pct = c.rate === null ? null : Math.round(c.rate * 100);
@@ -6193,26 +6324,51 @@ function renderWeeklyProgress() {
   }).join('');
 
   // Task lists
-  const showCreator = creatorKey === 'all';
+  const showCreator = creatorKey === 'all' && creators.length > 1;
   const taskCard = (e, extraTag) => {
     const d = new Date(e.date + 'T00:00:00');
-    const meta = [d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }), e.platform, e.status];
-    if (showCreator) meta.push(e.savedBy || 'Unassigned');
-    return `<div class="progress-task" style="border-left-color:${calendarStatusColor(e.status)};" onclick="progressOpenTask('${progressEsc_(e.id)}')">
-      <div class="progress-task-title">${progressEsc_(e.title || '(no title)')}${extraTag || ''}</div>
+    const type = progressTypeOf_(e);
+    const meta = [d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }), type, type === 'Content' ? e.platform : '', e.status];
+    if (showCreator) meta.push(progressCreatorOf_(e));
+    return `<div class="progress-task" draggable="true" data-id="${progressEsc_(e.id)}" title="Click to open · drag to another list to change status" style="border-left-color:${calendarStatusColor(e.status)};" onclick="progressOpenTask('${progressEsc_(e.id)}')">
+      <div class="progress-task-title">${scheduleTypeMeta(type).icon} ${progressEsc_(e.title || '(no title)')}${extraTag || ''}</div>
       <div class="progress-task-meta">${meta.filter(Boolean).map(progressEsc_).join(' · ')}</div>
     </div>`;
   };
-  const list = (title, items, emptyText, tagFor) => `<div class="card">
+  const list = (group, title, items, emptyText, tagFor) => `<div class="card progress-drop" data-progress-drop="${group}">
     <div class="progress-list-title"><span>${title}</span><span style="color:var(--text3);">${items.length}</span></div>
     ${items.length ? items.map(e => taskCard(e, tagFor ? tagFor(e) : '')).join('') : `<div style="font-size:12px;color:var(--text3);">${emptyText}</div>`}
   </div>`;
   const lateIds = new Set(s.late.map(e => e.id));
-  document.getElementById('progressLists').innerHTML =
-    list('Completed', s.completed, 'Nothing completed yet this week.', e => lateIds.has(e.id) ? '<span class="progress-tag late">LATE</span>' : '') +
-    list('In progress', s.inProgress, 'Nothing in progress.') +
-    list('Not started', s.notStarted, 'Every task this week has started.') +
-    (s.overdue.length ? list('Open from earlier weeks', s.overdue, '', () => '<span class="progress-tag overdue">OVERDUE</span>') : '');
+  const listsEl = document.getElementById('progressLists');
+  listsEl.innerHTML =
+    list('notStarted', 'Not started', s.notStarted, 'Every task this week has started.') +
+    list('inProgress', 'In progress', s.inProgress, 'Nothing in progress.') +
+    list('completed', 'Completed', s.completed, 'Nothing completed yet this week.', e => lateIds.has(e.id) ? '<span class="progress-tag late">LATE</span>' : '') +
+    (s.overdue.length ? `<details class="card" style="grid-column:1 / -1;"${progressOverdueOpen ? ' open' : ''} ontoggle="progressOverdueOpen = this.open">
+      <summary class="progress-list-title" style="cursor:pointer;margin-bottom:0;"><span>Open from earlier weeks — dated before this week, not yet Posted or Done. Drag one into a list above to update it.</span><span style="color:#F87171;">${s.overdue.length}</span></summary>
+      <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 12px;">${s.overdue.map(e => taskCard(e, '<span class="progress-tag overdue">OVERDUE</span>')).join('')}</div>
+    </details>` : '');
+
+  // Drag a card into another list to change its status
+  listsEl.querySelectorAll('.progress-task[data-id]').forEach(card => {
+    card.ondragstart = (ev) => {
+      ev.dataTransfer.setData('text/plain', card.dataset.id);
+      ev.dataTransfer.effectAllowed = 'move';
+      card.classList.add('dragging');
+    };
+    card.ondragend = () => card.classList.remove('dragging');
+  });
+  listsEl.querySelectorAll('[data-progress-drop]').forEach(zone => {
+    zone.ondragover = (ev) => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; zone.classList.add('drag-over'); };
+    zone.ondragleave = (ev) => { if (!zone.contains(ev.relatedTarget)) zone.classList.remove('drag-over'); };
+    zone.ondrop = (ev) => {
+      ev.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = ev.dataTransfer.getData('text/plain');
+      if (id) moveProgressEntry(id, zone.dataset.progressDrop);
+    };
+  });
 }
 
 function toISODate_(y, m, d) {
@@ -6259,7 +6415,7 @@ function renderContentCalendar() {
   const filtered = contentCalendar.filter(e => {
     if (platformFilter !== 'all' && e.platform !== platformFilter) return false;
     if (statusFilter !== 'all' && e.status !== statusFilter) return false;
-    if (scheduleTypeFilter !== 'all' && (e.scheduleType || 'Content') !== scheduleTypeFilter) return false;
+    if (scheduleTypeFilter !== 'all' && normScheduleType_(e.scheduleType) !== scheduleTypeFilter) return false;
     if (savedByFilter !== 'all' && (e.savedBy || '') !== savedByFilter) return false;
     return true;
   });
@@ -6293,6 +6449,7 @@ function renderContentCalendar() {
   const totalCells = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
 
   const todayStr = new Date().toISOString().slice(0,10);
+  const postedByDate = postedVideosByDate_();
   grid.innerHTML = "";
 
   for (let i = 0; i < totalCells; i++) {
@@ -6330,7 +6487,20 @@ function renderContentCalendar() {
     const numSpan = document.createElement('div');
     numSpan.className = 'cal-day-num' + (dateStr === todayStr ? ' today' : '');
     numSpan.textContent = dayNum;
-    cell.appendChild(numSpan);
+    const dayHead = document.createElement('div');
+    dayHead.className = 'cal-day-head';
+    dayHead.appendChild(numSpan);
+    const postedToday = postedByDate[dateStr];
+    if (postedToday) {
+      const mark = document.createElement('button');
+      mark.type = 'button';
+      mark.className = 'cal-posted-mark';
+      mark.textContent = `▶ ${postedToday.length}`;
+      mark.title = `${postedToday.length} posted video${postedToday.length > 1 ? 's' : ''} — click for details`;
+      mark.onclick = (ev) => { ev.stopPropagation(); openPostedDayModal(dateStr, postedToday); };
+      dayHead.appendChild(mark);
+    }
+    cell.appendChild(dayHead);
 
     const entriesWrap = document.createElement('div');
     entriesWrap.className = 'cal-entries';
@@ -6346,7 +6516,7 @@ function renderContentCalendar() {
       const card = document.createElement('div');
       card.className = 'cal-entry-pill';
       card.style.cssText = `background:${pillColor}16;border-left:3px solid ${pillColor};display:flex;align-items:center;gap:4px;`;
-      card.title = `${entry.title} · ${entry.scheduleType || 'Content'} · ${entry.platform} · ${entry.status}${entry.savedBy ? ' · ' + entry.savedBy : ''} — drag to another date to reschedule`;
+      card.title = `${entry.title} · ${normScheduleType_(entry.scheduleType)} · ${entry.platform} · ${entry.status}${entry.savedBy ? ' · ' + entry.savedBy : ''} — drag to another date to reschedule`;
       card.draggable = true;
       card.ondragstart = (ev) => {
         ev.dataTransfer.setData('text/plain', entry.id);
@@ -6359,7 +6529,7 @@ function renderContentCalendar() {
       leftDiv.style.cssText = 'flex:1;min-width:0;';
       const metaBits = [entry.savedBy, entry.platform].filter(Boolean).join(' · ');
       leftDiv.innerHTML = `
-        <div class="cal-entry-title"><span title="${entry.scheduleType || 'Content'}">${typeMeta.icon}</span> ${entry.title || '(no title)'}</div>
+        <div class="cal-entry-title"><span title="${normScheduleType_(entry.scheduleType)}">${typeMeta.icon}</span> ${entry.title || '(no title)'}</div>
         <div class="cal-entry-meta">
           <span class="cal-entry-chip" style="background:${pillColor}26;color:${pillColor};">${entry.status}</span>
           ${metaBits ? `<span class="cal-entry-by">${metaBits}</span>` : ''}
@@ -6395,6 +6565,81 @@ function renderContentCalendar() {
 
     grid.appendChild(cell);
   }
+}
+
+// ── Posted videos on the Content Calendar ─
+// Video Log rows (the same data as the performance tabs) keyed by the day
+// they were posted, so each calendar day can show a small marker.
+function postedVideosByDate_() {
+  const map = {};
+  Object.values(DATA || {}).forEach(m => (m.all_videos || []).forEach(v => {
+    if (!v.dateTimestamp) return;
+    const d = new Date(v.dateTimestamp);
+    const key = toISODate_(d.getFullYear(), d.getMonth(), d.getDate());
+    (map[key] = map[key] || []).push(v);
+  }));
+  Object.values(map).forEach(list => list.sort((a, b) => b.views - a.views));
+  return map;
+}
+
+function postedPlatform_(link) {
+  const l = String(link || '').toLowerCase();
+  if (l.includes('instagram.com')) return 'Instagram';
+  if (l.includes('tiktok.com')) return 'TikTok';
+  if (l.includes('youtube.com') || l.includes('youtu.be')) return 'YouTube';
+  if (l.includes('facebook.com') || l.includes('fb.watch')) return 'Facebook';
+  return '';
+}
+
+function openPostedDayModal(dateStr, videos) {
+  let modal = document.getElementById('postedDayModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'postedDayModal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,0.85);';
+    modal.onclick = (ev) => { if (ev.target === modal) closePostedDayModal(); };
+    document.body.appendChild(modal);
+  }
+  const esc = progressEsc_;
+  const day = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const stat = (label, val) => `<div class="posted-stat"><div class="posted-stat-val">${val}</div><div class="posted-stat-label">${label}</div></div>`;
+  const pct = n => n > 0 ? (Math.round(n * 10) / 10) + '%' : '—';
+  const cards = videos.map(v => {
+    const safeLink = /^https?:\/\//i.test(v.link || '') ? v.link : '';
+    const thumb = safeLink && zernioThumbnails[safeLink];
+    const badges = [postedPlatform_(v.link), v.creator, v.pillar, v.hookType].filter(Boolean)
+      .map(b => `<span class="posted-badge">${esc(b)}</span>`).join('') +
+      (v.winning ? '<span class="posted-badge win">WINNING</span>' : '');
+    return `<div class="posted-card">
+      ${thumb ? `<img class="posted-thumb" src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}
+      <div style="min-width:0;flex:1;">
+        <div class="posted-title">${esc(v.title || '(no title)')}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px;">${badges}</div>
+        <div class="posted-stats">
+          ${stat('Views', fmt(v.views))}${stat('ThruPlays', fmt(v.thruplays))}${stat('Hook rate', pct(v.hook_rate))}${stat('Hold rate', pct(v.hold_rate))}${stat('ThruPlay rate', pct(v.thruplay_rate))}
+        </div>
+        ${safeLink ? `<a href="${esc(safeLink)}" target="_blank" rel="noopener noreferrer" class="posted-open">Open post ↗</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  modal.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;">
+      <div style="min-width:0;">
+        <div style="font-size:17px;font-weight:800;color:var(--text);">Posted on ${esc(day)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">${videos.length} video${videos.length > 1 ? 's' : ''} · source: Video Log sheet, numbers as of the last sync</div>
+      </div>
+      <button type="button" onclick="closePostedDayModal()" aria-label="Close" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;flex-shrink:0;">✕</button>
+    </div>
+    ${cards}
+  </div>`;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closePostedDayModal() {
+  const modal = document.getElementById('postedDayModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 // ── Custom date picker: shows which dates already have entries ─
@@ -6484,7 +6729,7 @@ function renderCalDatePickerGrid() {
 
     const dateStr = toISODate_(cellYear, cellMonth, dayNum);
     const dayEntries = byDate[dateStr] || [];
-    const types = Array.from(new Set(dayEntries.map(e => e.scheduleType || 'Content')));
+    const types = Array.from(new Set(dayEntries.map(e => normScheduleType_(e.scheduleType))));
     const dots = types.slice(0, 3).map(t => `<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:${scheduleTypeMeta(t).color};margin:0 1px;"></span>`).join('');
 
     const isToday = dateStr === todayStr;
@@ -7025,7 +7270,7 @@ function openCalViewModal(entry) {
   `;
   document.getElementById('calViewDate').textContent = entry.date || '—';
   const viewTypeMeta = scheduleTypeMeta(entry.scheduleType);
-  document.getElementById('calViewScheduleType').textContent = `${viewTypeMeta.icon} ${entry.scheduleType || 'Content'}`;
+  document.getElementById('calViewScheduleType').textContent = `${viewTypeMeta.icon} ${normScheduleType_(entry.scheduleType)}`;
   document.getElementById('calViewPlatform').textContent = entry.platform || '—';
   document.getElementById('calViewContentType').textContent = entry.contentType || '—';
   document.getElementById('calViewSavedBy').textContent = entry.savedBy || '—';
@@ -7449,8 +7694,10 @@ function addViralTopicToCalendar(title) {
         </div>
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Type</label>
-          <select id="calFieldScheduleType" class="filter-select" style="width:100%;">
+          <select id="calFieldScheduleType" class="filter-select" style="width:100%;" onchange="syncCalFormForType()">
             <option>Content</option>
+            <option>Task</option>
+            <option>Project</option>
             <option>Meeting</option>
             <option>Other Task</option>
           </select>
