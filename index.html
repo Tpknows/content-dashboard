@@ -1656,7 +1656,10 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div style="overflow-x:auto;"><table class="progress-table" id="progressCreatorTable"></table></div>
     </div>
     <div class="card" style="margin-bottom:24px;">
-      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Last 6 weeks</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:700;color:var(--text);">Week progress</div>
+        <select id="progressTrendWeek" onchange="renderProgressTrend()" class="filter-select" aria-label="Week to show"></select>
+      </div>
       <div id="progressTrend"></div>
     </div>
     <div class="progress-lists" id="progressLists"></div>
@@ -6089,8 +6092,9 @@ const PROGRESS_NOT_STARTED_STATUSES = ['Idea', 'To do'];
 // "Saved by" spellings (lowercase) that count as them in the sheet.
 const PROGRESS_VISIBLE_CREATORS = { 'Tammy Padal': ['tammy', 'tammy padal'] };
 const PROGRESS_DEFAULT_SAVED_BY = 'Tammy';
-const PROGRESS_TREND_WEEKS = 6;
+const PROGRESS_TREND_WEEKS = 12; // weeks listed in the "Week progress" dropdown
 let progressWeekEnd = null; // the Friday that closes the selected week
+let progressTrendAnchor = null; // page week the dropdown was last built for
 
 function progressFridayOnOrAfter_(date) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -6239,6 +6243,22 @@ async function moveProgressEntry(id, group) {
   }
 }
 
+// Progress bar for the week picked in the "Week progress" dropdown,
+// using the same creator / type filters as the rest of the tab.
+function renderProgressTrend() {
+  const end = document.getElementById('progressTrendWeek').value;
+  if (!end) return;
+  const w = progressWeek_(new Date(end + 'T00:00:00'));
+  const c = progressStats_(w, document.getElementById('progressFilterCreator').value || 'all', document.getElementById('progressFilterType').value);
+  const pct = c.rate === null ? null : Math.round(c.rate * 100);
+  document.getElementById('progressTrend').innerHTML = `<div class="progress-trend-row current">
+      <span>${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}</span>
+      <div class="progress-bar"><span style="width:${pct || 0}%"></span></div>
+      <span style="text-align:right;">${c.completed.length}/${c.started.length} · ${pct === null ? '—' : pct + '%'}</span>
+    </div>
+    <div style="font-size:11.5px;color:var(--text3);margin-top:6px;">${c.tasks.length} dated · ${c.notStarted.length} not started · ${c.inProgress.length} in progress · ${c.completed.length} completed</div>`;
+}
+
 // Opens the Content Calendar form as a Task or Project, dated today if today
 // is in the selected week, otherwise on that week's Friday.
 function openProgressEntryForm(type) {
@@ -6298,22 +6318,22 @@ function renderWeeklyProgress() {
       </tr>`;
     }).join('') : '<tr><td colspan="6" style="color:var(--text3);">No creators with tasks this week.</td></tr>'}</tbody>`;
 
-  // Trend: the selected week and the ones before it
-  const trend = [];
-  for (let i = PROGRESS_TREND_WEEKS - 1; i >= 0; i--) {
+  // Week dropdown: the selected week and the ones before it, newest first.
+  // Follows the page's week whenever that changes; otherwise keeps the pick.
+  const weekSelect = document.getElementById('progressTrendWeek');
+  const keepPick = progressTrendAnchor === week.end ? weekSelect.value : week.end;
+  progressTrendAnchor = week.end;
+  const options = [];
+  for (let i = 0; i < PROGRESS_TREND_WEEKS; i++) {
     const fri = new Date(progressWeekEnd);
     fri.setDate(fri.getDate() - i * 7);
     const w = progressWeek_(fri);
-    trend.push({ w, c: progressStats_(w, creatorKey, typeFilter), current: i === 0 });
+    options.push(`<option value="${w.end}">${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}${i === 0 ? ' (selected week)' : ''}</option>`);
   }
-  document.getElementById('progressTrend').innerHTML = trend.map(({ w, c, current }) => {
-    const pct = c.rate === null ? null : Math.round(c.rate * 100);
-    return `<div class="progress-trend-row${current ? ' current' : ''}">
-      <span>${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}</span>
-      <div class="progress-bar"><span style="width:${pct || 0}%"></span></div>
-      <span style="text-align:right;">${c.completed.length}/${c.started.length} · ${pct === null ? '—' : pct + '%'}</span>
-    </div>`;
-  }).join('');
+  weekSelect.innerHTML = options.join('');
+  weekSelect.value = keepPick;
+  if (weekSelect.value !== keepPick) weekSelect.value = week.end;
+  renderProgressTrend();
 
   // Task lists
   const showCreator = creatorKey === 'all' && creators.length > 1;
