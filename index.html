@@ -809,6 +809,29 @@ html { overflow-x: hidden; }
 }
 .monthly-results-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
 
+/* ── WEEKLY PROGRESS ── */
+.progress-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 560px; }
+.progress-table th { text-align: left; font-size: 10.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); padding: 8px 10px; border-bottom: 1px solid var(--border2); }
+.progress-table td { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text); font-feature-settings: "tnum"; }
+.progress-table th.num, .progress-table td.num { text-align: right; }
+.progress-bar { height: 6px; background: var(--surface2); border-radius: 2px; overflow: hidden; min-width: 80px; }
+.progress-bar > span { display: block; height: 100%; background: var(--green); }
+.progress-trend-row { display: grid; grid-template-columns: 150px 1fr 90px; gap: 12px; align-items: center; padding: 6px 0; font-size: 12px; color: var(--text2); }
+.progress-trend-row.current { color: var(--text); font-weight: 600; }
+.progress-lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.progress-list-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; justify-content: space-between; }
+.progress-task { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--text3); border-radius: 2px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; }
+.progress-task:hover { border-color: var(--border2); }
+.progress-task-title { font-size: 12.5px; font-weight: 600; color: var(--text); word-break: break-word; overflow-wrap: break-word; }
+.progress-task-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.progress-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 2px; margin-left: 4px; }
+.progress-tag.late { color: #FBBF24; background: rgba(251,191,36,0.12); }
+.progress-tag.overdue { color: #F87171; background: rgba(248,113,113,0.12); }
+@media (max-width: 900px) {
+  .progress-lists { grid-template-columns: 1fr; }
+  .progress-trend-row { grid-template-columns: 110px 1fr 70px; }
+}
+
 .monthly-summary-bar {
   /* Always exactly 8 stat tiles — a fixed 4-column grid keeps two full,
      even rows regardless of container width, instead of flex-wrap's
@@ -1336,6 +1359,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div class="sidebar-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span>Hold Rate</div>
       <div class="sidebar-item" onclick="switchTab('hookbank', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg></span>Hook Bank</div>
       <div class="sidebar-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></span>Content Calendar</div>
+      <div class="sidebar-item" onclick="switchTab('progress', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>Weekly Progress</div>
       <div class="sidebar-item" onclick="switchTab('creative-calendar', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 7 0 0 0 0 14h2a2 2 0 0 0 0-4h1a3 3 0 0 0 0-6 9 7 0 0 0-3-4z"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="13" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span>Creative Calendar <span id="creativeCountBadge" style="display:none;background:#e52020;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius: 2px;margin-left:auto;">0</span></div>
       <div class="sidebar-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg></span>Viral Topics</div>
     </div>
@@ -1448,6 +1472,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('hold', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span>Hold Rate</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('hookbank', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg></span>Hook Bank</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('calendar', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></span>Calendar</div>
+    <div class="sidebar-item mobile-nav-item" onclick="switchTab('progress', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>Progress</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('creative-calendar', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 7 0 0 0 0 14h2a2 2 0 0 0 0-4h1a3 3 0 0 0 0-6 9 7 0 0 0-3-4z"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="13" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span>Creative <span id="creativeCountBadgeMobile" style="display:none;background:#e52020;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius: 2px;margin-left:4px;">0</span></div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('viral', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg></span>Viral Topics</div>
     <div class="sidebar-item mobile-nav-item" onclick="switchTab('monthly', this)"><span class="sidebar-item-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></span>Monthly</div>
@@ -1578,6 +1603,41 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div class="hook-summary" id="hookBankSummary" style="margin-bottom:24px;"></div>
     <div class="hookbank-grid" id="hookBankGrid"></div>
   </div>
+  <div id="tab-progress" class="tab-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="monthly-results-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Weekly Progress</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">Completed vs started tasks per creator, counted by each task's Content Calendar date. Weeks run Saturday to Friday, so the Friday review covers the whole week.</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button onclick="progressGoThisWeek()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 16px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">This week</button>
+        <button onclick="refreshWeeklyProgress()" title="Refresh from Sheet" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:8px 12px;border-radius: 2px;font-size:13px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg></button>
+        <button onclick="progressChangeWeek(-1)" aria-label="Previous week" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius: 2px;font-size:14px;cursor:pointer;">‹</button>
+        <button onclick="progressChangeWeek(1)" aria-label="Next week" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);width:32px;height:32px;border-radius: 2px;font-size:14px;cursor:pointer;">›</button>
+        <div id="progressWeekLabel" style="font-size:16px;font-weight:700;color:var(--text);margin-left:6px;"></div>
+      </div>
+      <div class="filter-row" style="margin-bottom:0;">
+        <select id="progressFilterCreator" onchange="renderWeeklyProgress()" class="filter-select">
+          <option value="all">All creators</option>
+        </select>
+      </div>
+    </div>
+    <div id="progressStatus" style="font-size:12px;color:var(--text3);margin-bottom:14px;"></div>
+    <div class="kpi-grid" id="progressKpis"></div>
+    <div class="card" style="margin-bottom:24px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Per creator</div>
+      <div style="font-size:11.5px;color:var(--text3);margin-bottom:14px;">Completion rate = completed ÷ started. Creator is the name in the task's "Saved by" field.</div>
+      <div style="overflow-x:auto;"><table class="progress-table" id="progressCreatorTable"></table></div>
+    </div>
+    <div class="card" style="margin-bottom:24px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Last 6 weeks</div>
+      <div id="progressTrend"></div>
+    </div>
+    <div class="progress-lists" id="progressLists"></div>
+  </div>
+
   <div id="tab-calendar" class="tab-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div>
@@ -3441,6 +3501,7 @@ function switchTab(tab, el) {
   }
   if (tab === 'calendar') loadContentCalendar();
   if (tab === 'creative-calendar') loadCreativeCalendar();
+  if (tab === 'progress') openWeeklyProgress();
 }
 
 function toggleSidebarGroup(groupName) {
@@ -5954,6 +6015,204 @@ function scheduleTypeMeta(type) {
     'Other Task':  { color: '#FB923C', icon: '📌' }
   };
   return map[type] || map['Content'];
+}
+
+/* ── WEEKLY PROGRESS ──
+   Reads the same Content Calendar entries. A task belongs to the week its
+   calendar date falls in; weeks run Saturday → Friday so the Friday review
+   covers the full week. Meetings, "Other Task" and "Scheduled" entries are
+   not content work and are left out. */
+const PROGRESS_DONE_STATUSES = ['Posted', 'Done'];
+const PROGRESS_TREND_WEEKS = 6;
+let progressWeekEnd = null; // the Friday that closes the selected week
+
+function progressFridayOnOrAfter_(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7));
+  return d;
+}
+function progressIso_(d) { return toISODate_(d.getFullYear(), d.getMonth(), d.getDate()); }
+function progressWeek_(friday) {
+  const start = new Date(friday);
+  start.setDate(start.getDate() - 6);
+  return { start: progressIso_(start), end: progressIso_(friday), startDate: start, endDate: friday };
+}
+function progressShortDate_(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function progressEsc_(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function progressCreatorKey_(name) { return String(name || '').trim().toLowerCase().replace(/\s+/g, ' '); }
+
+function isProgressTask_(e) {
+  if (!e || !e.date) return false;
+  if (e.status === 'Scheduled') return false;
+  if (e.scheduleType && e.scheduleType !== 'Content') return false;
+  return true;
+}
+function isProgressDone_(e) { return PROGRESS_DONE_STATUSES.includes(e.status); }
+function isProgressStarted_(e) { return e.status !== 'Idea'; } // anything past Idea, including done
+
+// Day the task last moved into Posted/Done, from its status history ('' if unknown)
+function progressCompletedOn_(e) {
+  const hist = Array.isArray(e.statusHistory) ? e.statusHistory : [];
+  const hit = [...hist].reverse().find(h => h && h.type !== 'reassign' && PROGRESS_DONE_STATUSES.includes(h.to) && h.at);
+  if (!hit) return '';
+  const d = new Date(hit.at);
+  return isNaN(d) ? '' : progressIso_(d);
+}
+
+// key → display name, keeping the first spelling seen; active creators always listed
+function progressCreators_() {
+  const names = new Map();
+  ACTIVE_CREATORS.forEach(n => names.set(progressCreatorKey_(n), n));
+  contentCalendar.filter(isProgressTask_).forEach(e => {
+    const key = progressCreatorKey_(e.savedBy);
+    if (!names.has(key)) names.set(key, key ? e.savedBy.trim() : 'Unassigned');
+  });
+  return names;
+}
+
+function progressStats_(week, creatorKey) {
+  const mine = contentCalendar.filter(e => isProgressTask_(e) &&
+    (creatorKey === 'all' || progressCreatorKey_(e.savedBy) === creatorKey));
+  const tasks = mine.filter(e => e.date >= week.start && e.date <= week.end)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const started = tasks.filter(isProgressStarted_);
+  const completed = tasks.filter(isProgressDone_);
+  const overdue = mine.filter(e => e.date < week.start && !isProgressDone_(e))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const late = completed.filter(e => { const on = progressCompletedOn_(e); return on && on > e.date; });
+  return {
+    tasks, started, completed, overdue, late,
+    inProgress: started.filter(e => !isProgressDone_(e)),
+    notStarted: tasks.filter(e => !isProgressStarted_(e)),
+    rate: started.length ? completed.length / started.length : null
+  };
+}
+
+async function openWeeklyProgress() {
+  if (!progressWeekEnd) progressWeekEnd = progressFridayOnOrAfter_(new Date());
+  if (contentCalendar.length) renderWeeklyProgress();
+  else await refreshWeeklyProgress();
+}
+
+async function refreshWeeklyProgress() {
+  const statusEl = document.getElementById('progressStatus');
+  statusEl.textContent = 'Loading tasks from the Content Calendar…';
+  try {
+    const response = await fetch(CALENDAR_APPS_SCRIPT_URL + "?action=list&calendarType=content&t=" + Date.now(), { cache: "no-store" });
+    const result = await response.json();
+    if (result.status === "error") { statusEl.textContent = "Error: " + result.message; return; }
+    contentCalendar = result.entries || [];
+    renderWeeklyProgress();
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "Couldn't load the Content Calendar (" + err.message + ").";
+  }
+}
+
+function progressChangeWeek(delta) {
+  const d = new Date(progressWeekEnd || progressFridayOnOrAfter_(new Date()));
+  d.setDate(d.getDate() + delta * 7);
+  progressWeekEnd = d;
+  renderWeeklyProgress();
+}
+function progressGoThisWeek() {
+  progressWeekEnd = progressFridayOnOrAfter_(new Date());
+  renderWeeklyProgress();
+}
+function progressOpenTask(id) {
+  const entry = contentCalendar.find(e => String(e.id) === String(id));
+  if (entry) openCalViewModal(entry);
+}
+
+function renderWeeklyProgress() {
+  if (!progressWeekEnd) progressWeekEnd = progressFridayOnOrAfter_(new Date());
+  const week = progressWeek_(progressWeekEnd);
+  const isThisWeek = week.end === progressIso_(progressFridayOnOrAfter_(new Date()));
+
+  document.getElementById('progressWeekLabel').innerHTML =
+    `Sat, ${progressShortDate_(week.startDate)} – Fri, ${progressShortDate_(week.endDate)}, ${week.endDate.getFullYear()}` +
+    (isThisWeek ? ' <span class="progress-tag" style="color:var(--green);background:rgba(98,177,52,0.12);">THIS WEEK</span>' : '');
+
+  // Creator filter — rebuilt each render so new "Saved by" names appear
+  const creators = progressCreators_();
+  const select = document.getElementById('progressFilterCreator');
+  const selected = select.value || 'all';
+  select.innerHTML = '<option value="all">All creators</option>' +
+    [...creators].map(([key, name]) => `<option value="${progressEsc_(key)}">${progressEsc_(name)}</option>`).join('');
+  select.value = creators.has(selected) ? selected : 'all';
+  const creatorKey = select.value;
+
+  const s = progressStats_(week, creatorKey);
+  const ratePct = s.rate === null ? null : Math.round(s.rate * 100);
+  document.getElementById('progressStatus').textContent =
+    `As of ${new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })} · source: Content Calendar sheet`;
+
+  document.getElementById('progressKpis').innerHTML = `
+    <div class="kpi-card cyan"><div class="kpi-value">${s.tasks.length}</div><div class="kpi-label">Tasks dated this week</div><div class="kpi-sub">${s.notStarted.length} still at Idea</div></div>
+    <div class="kpi-card purple"><div class="kpi-value">${s.started.length}</div><div class="kpi-label">Started</div><div class="kpi-sub">${s.inProgress.length} in progress</div></div>
+    <div class="kpi-card green"><div class="kpi-value">${s.completed.length}</div><div class="kpi-label">Completed</div><div class="kpi-sub">${s.late.length ? s.late.length + ' finished after their date' : 'Posted or Done'}</div></div>
+    <div class="kpi-card yellow"><div class="kpi-value">${ratePct === null ? '—' : ratePct + '%'}</div><div class="kpi-label">Completion rate</div><div class="kpi-sub">${s.completed.length} of ${s.started.length} started</div></div>`;
+
+  // Per-creator table
+  const rows = [...creators].filter(([key]) => creatorKey === 'all' || key === creatorKey).map(([key, name]) => {
+    const c = progressStats_(week, key);
+    return { key, name, c };
+  }).filter(r => creatorKey !== 'all' || r.c.tasks.length || r.c.overdue.length || ACTIVE_CREATORS.some(n => progressCreatorKey_(n) === r.key));
+  document.getElementById('progressCreatorTable').innerHTML = `
+    <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Started</th><th class="num">Completed</th><th class="num">At Idea</th><th>Completion rate</th><th class="num">Open from earlier weeks</th></tr></thead>
+    <tbody>${rows.length ? rows.map(({ name, c }) => {
+      const pct = c.rate === null ? null : Math.round(c.rate * 100);
+      return `<tr>
+        <td>${progressEsc_(name)}</td>
+        <td class="num">${c.tasks.length}</td>
+        <td class="num">${c.started.length}</td>
+        <td class="num">${c.completed.length}</td>
+        <td class="num">${c.notStarted.length}</td>
+        <td><div style="display:flex;align-items:center;gap:10px;"><div class="progress-bar" style="flex:1;"><span style="width:${pct || 0}%"></span></div><span style="min-width:38px;text-align:right;">${pct === null ? '—' : pct + '%'}</span></div></td>
+        <td class="num" style="color:${c.overdue.length ? '#F87171' : 'var(--text3)'};">${c.overdue.length}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="7" style="color:var(--text3);">No creators with tasks this week.</td></tr>'}</tbody>`;
+
+  // Trend: the selected week and the ones before it
+  const trend = [];
+  for (let i = PROGRESS_TREND_WEEKS - 1; i >= 0; i--) {
+    const fri = new Date(progressWeekEnd);
+    fri.setDate(fri.getDate() - i * 7);
+    const w = progressWeek_(fri);
+    trend.push({ w, c: progressStats_(w, creatorKey), current: i === 0 });
+  }
+  document.getElementById('progressTrend').innerHTML = trend.map(({ w, c, current }) => {
+    const pct = c.rate === null ? null : Math.round(c.rate * 100);
+    return `<div class="progress-trend-row${current ? ' current' : ''}">
+      <span>${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}</span>
+      <div class="progress-bar"><span style="width:${pct || 0}%"></span></div>
+      <span style="text-align:right;">${c.completed.length}/${c.started.length} · ${pct === null ? '—' : pct + '%'}</span>
+    </div>`;
+  }).join('');
+
+  // Task lists
+  const showCreator = creatorKey === 'all';
+  const taskCard = (e, extraTag) => {
+    const d = new Date(e.date + 'T00:00:00');
+    const meta = [d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }), e.platform, e.status];
+    if (showCreator) meta.push(e.savedBy || 'Unassigned');
+    return `<div class="progress-task" style="border-left-color:${calendarStatusColor(e.status)};" onclick="progressOpenTask('${progressEsc_(e.id)}')">
+      <div class="progress-task-title">${progressEsc_(e.title || '(no title)')}${extraTag || ''}</div>
+      <div class="progress-task-meta">${meta.filter(Boolean).map(progressEsc_).join(' · ')}</div>
+    </div>`;
+  };
+  const list = (title, items, emptyText, tagFor) => `<div class="card">
+    <div class="progress-list-title"><span>${title}</span><span style="color:var(--text3);">${items.length}</span></div>
+    ${items.length ? items.map(e => taskCard(e, tagFor ? tagFor(e) : '')).join('') : `<div style="font-size:12px;color:var(--text3);">${emptyText}</div>`}
+  </div>`;
+  const lateIds = new Set(s.late.map(e => e.id));
+  document.getElementById('progressLists').innerHTML =
+    list('Completed', s.completed, 'Nothing completed yet this week.', e => lateIds.has(e.id) ? '<span class="progress-tag late">LATE</span>' : '') +
+    list('In progress', s.inProgress, 'Nothing in progress.') +
+    list('Not started', s.notStarted, 'Every task this week has started.') +
+    (s.overdue.length ? list('Open from earlier weeks', s.overdue, '', () => '<span class="progress-tag overdue">OVERDUE</span>') : '');
 }
 
 function toISODate_(y, m, d) {
