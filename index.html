@@ -844,7 +844,6 @@ html { overflow-x: hidden; }
 .progress-task-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
 .progress-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 2px; margin-left: 4px; }
 .progress-tag.late { color: #FBBF24; background: rgba(251,191,36,0.12); }
-.progress-tag.overdue { color: #F87171; background: rgba(248,113,113,0.12); }
 @media (max-width: 900px) {
   .progress-lists { grid-template-columns: 1fr; }
   .progress-trend-row { grid-template-columns: 110px 1fr 70px; }
@@ -6092,7 +6091,6 @@ const PROGRESS_VISIBLE_CREATORS = { 'Tammy Padal': ['tammy', 'tammy padal'] };
 const PROGRESS_DEFAULT_SAVED_BY = 'Tammy';
 const PROGRESS_TREND_WEEKS = 6;
 let progressWeekEnd = null; // the Friday that closes the selected week
-let progressOverdueOpen = false;
 
 function progressFridayOnOrAfter_(date) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -6147,11 +6145,9 @@ function progressStats_(week, creator, type = 'all') {
     .sort((a, b) => a.date.localeCompare(b.date));
   const started = tasks.filter(isProgressStarted_);
   const completed = tasks.filter(isProgressDone_);
-  const overdue = mine.filter(e => e.date < week.start && !isProgressDone_(e))
-    .sort((a, b) => a.date.localeCompare(b.date));
   const late = completed.filter(e => { const on = progressCompletedOn_(e); return on && on > e.date; });
   return {
-    tasks, started, completed, overdue, late,
+    tasks, started, completed, late,
     inProgress: started.filter(e => !isProgressDone_(e)),
     notStarted: tasks.filter(e => !isProgressStarted_(e)),
     rate: started.length ? completed.length / started.length : null
@@ -6289,7 +6285,7 @@ function renderWeeklyProgress() {
   const rows = creators.filter(name => creatorKey === 'all' || name === creatorKey)
     .map(name => ({ name, c: progressStats_(week, name, typeFilter) }));
   document.getElementById('progressCreatorTable').innerHTML = `
-    <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Started</th><th class="num">Completed</th><th class="num">Not started</th><th>Completion rate</th><th class="num">Open from earlier weeks</th></tr></thead>
+    <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Started</th><th class="num">Completed</th><th class="num">Not started</th><th>Completion rate</th></tr></thead>
     <tbody>${rows.length ? rows.map(({ name, c }) => {
       const pct = c.rate === null ? null : Math.round(c.rate * 100);
       return `<tr>
@@ -6299,9 +6295,8 @@ function renderWeeklyProgress() {
         <td class="num">${c.completed.length}</td>
         <td class="num">${c.notStarted.length}</td>
         <td><div style="display:flex;align-items:center;gap:10px;"><div class="progress-bar" style="flex:1;"><span style="width:${pct || 0}%"></span></div><span style="min-width:38px;text-align:right;">${pct === null ? '—' : pct + '%'}</span></div></td>
-        <td class="num" style="color:${c.overdue.length ? '#F87171' : 'var(--text3)'};">${c.overdue.length}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="7" style="color:var(--text3);">No creators with tasks this week.</td></tr>'}</tbody>`;
+    }).join('') : '<tr><td colspan="6" style="color:var(--text3);">No creators with tasks this week.</td></tr>'}</tbody>`;
 
   // Trend: the selected week and the ones before it
   const trend = [];
@@ -6341,11 +6336,7 @@ function renderWeeklyProgress() {
   listsEl.innerHTML =
     list('notStarted', 'Not started', s.notStarted, 'Every task this week has started.') +
     list('inProgress', 'In progress', s.inProgress, 'Nothing in progress.') +
-    list('completed', 'Completed', s.completed, 'Nothing completed yet this week.', e => lateIds.has(e.id) ? '<span class="progress-tag late">LATE</span>' : '') +
-    (s.overdue.length ? `<details class="card" style="grid-column:1 / -1;"${progressOverdueOpen ? ' open' : ''} ontoggle="progressOverdueOpen = this.open">
-      <summary class="progress-list-title" style="cursor:pointer;margin-bottom:0;"><span>Open from earlier weeks — dated before this week, not yet Posted or Done. Drag one into a list above to update it.</span><span style="color:#F87171;">${s.overdue.length}</span></summary>
-      <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 12px;">${s.overdue.map(e => taskCard(e, '<span class="progress-tag overdue">OVERDUE</span>')).join('')}</div>
-    </details>` : '');
+    list('completed', 'Completed', s.completed, 'Nothing completed yet this week.', e => lateIds.has(e.id) ? '<span class="progress-tag late">LATE</span>' : '');
 
   // Drag a card into another list to change its status
   listsEl.querySelectorAll('.progress-task[data-id]').forEach(card => {
