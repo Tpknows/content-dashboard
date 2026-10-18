@@ -6285,15 +6285,15 @@ function renderWeeklyProgress() {
   const rows = creators.filter(name => creatorKey === 'all' || name === creatorKey)
     .map(name => ({ name, c: progressStats_(week, name, typeFilter) }));
   document.getElementById('progressCreatorTable').innerHTML = `
-    <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Started</th><th class="num">Completed</th><th class="num">Not started</th><th>Completion rate</th></tr></thead>
+    <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Not started</th><th class="num">In progress</th><th class="num">Completed</th><th>Completion rate</th></tr></thead>
     <tbody>${rows.length ? rows.map(({ name, c }) => {
       const pct = c.rate === null ? null : Math.round(c.rate * 100);
       return `<tr>
         <td>${progressEsc_(name)}</td>
         <td class="num">${c.tasks.length}</td>
-        <td class="num">${c.started.length}</td>
-        <td class="num">${c.completed.length}</td>
         <td class="num">${c.notStarted.length}</td>
+        <td class="num">${c.inProgress.length}</td>
+        <td class="num">${c.completed.length}</td>
         <td><div style="display:flex;align-items:center;gap:10px;"><div class="progress-bar" style="flex:1;"><span style="width:${pct || 0}%"></span></div><span style="min-width:38px;text-align:right;">${pct === null ? '—' : pct + '%'}</span></div></td>
       </tr>`;
     }).join('') : '<tr><td colspan="6" style="color:var(--text3);">No creators with tasks this week.</td></tr>'}</tbody>`;
