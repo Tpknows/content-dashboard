@@ -6084,8 +6084,8 @@ function syncCalFormForType(preferredStatus) {
 /* ── WEEKLY PROGRESS ──
    Reads the same Content Calendar entries. A task belongs to the week its
    calendar date falls in; weeks run Monday → Sunday. Content, Tasks and
-   Projects count; Meetings and
-   "Scheduled" entries are left out. */
+   Projects count; Meetings are left out. "Scheduled" entries count as
+   in progress (started, not done) rather than disappearing from the week. */
 const PROGRESS_DONE_STATUSES = ['Posted', 'Done'];
 const PROGRESS_NOT_STARTED_STATUSES = ['Idea', 'To do'];
 // Only these creators show on Weekly Progress for now. Each one lists the
@@ -6124,7 +6124,6 @@ function progressTypeOf_(e) {
 
 function isProgressTask_(e) {
   if (!e || !e.date) return false;
-  if (e.status === 'Scheduled') return false;
   if (progressTypeOf_(e) === 'Meeting') return false;
   return progressCreatorOf_(e) !== null;
 }
