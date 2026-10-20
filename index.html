@@ -824,6 +824,15 @@ html { overflow-x: hidden; }
 .progress-task:hover { border-color: var(--border2); }
 .progress-task[draggable="true"] { cursor: grab; }
 
+/* ── HOOK BANK: first-5-seconds breakdown ── */
+.hook-breakdown { margin-top: 8px; font-size: 11.5px; color: var(--text2); }
+.hook-breakdown > summary { cursor: pointer; font-weight: 700; color: var(--accent-text); font-size: 11px; }
+.hook-breakdown > summary span { font-weight: 400; color: var(--text3); }
+.hook-breakdown-row { display: grid; grid-template-columns: 96px 1fr; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); }
+.hook-breakdown-row:first-of-type { margin-top: 6px; }
+.hook-breakdown-row > span { color: var(--text3); font-weight: 600; }
+.hook-breakdown-row > div { word-break: break-word; overflow-wrap: break-word; line-height: 1.45; }
+
 /* ── POSTED VIDEOS ON CONTENT CALENDAR ── */
 .cal-day-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
 .cal-posted-mark { background: transparent; border: 1px solid rgba(98,177,52,0.3); color: var(--text3); font-size: 9.5px; font-weight: 700; font-family: inherit; line-height: 1; padding: 2px 5px; border-radius: 2px; cursor: pointer; font-feature-settings: "tnum"; }
@@ -3354,10 +3363,30 @@ function openHookBankDetail(idx) {
       </div>
       ${v.hookSpecifics ? `<div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text2);"><span style="font-weight:700;color:var(--accent-text);">Hook specifics:</span> ${v.hookSpecifics}</div>` : `<div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);font-style:italic;">Hook specifics not tagged yet</div>`}
       ${v.hookTypes && v.hookTypes.length > 1 ? `<div style="margin-top:6px;font-size:11px;color:var(--text3);"><span style="font-weight:700;">Hook types:</span> ${v.hookTypes.map(progressEsc_).join(' · ')}</div>` : ''}
+      ${hookBreakdownHTML_(v.breakdown)}
     </div>`;
   }).join('');
 
   modal.style.display = 'flex';
+}
+
+// Collapsible "first 5 seconds" breakdown for one video; empty if none of
+// the breakdown columns are filled in for it.
+function hookBreakdownHTML_(b) {
+  if (!b) return '';
+  const rows = [
+    ['Said', b.said], ['On-screen text', b.onScreenText], ['Visual', b.visual],
+    ['Sound', b.sound], ['Bakit gumana', b.whyItWorked]
+  ].filter(([, val]) => val);
+  const timing = [
+    b.firstWordAt !== '' ? `First word at ${progressEsc_(b.firstWordAt)} s` : '',
+    b.cutsFirst5 !== '' ? `${progressEsc_(b.cutsFirst5)} cut${b.cutsFirst5 === '1' ? '' : 's'} in first 5 s` : ''
+  ].filter(Boolean).join(' · ');
+  if (!rows.length && !timing) return '';
+  return `<details class="hook-breakdown">
+      <summary>Hook breakdown (first 5 s)${timing ? ` · <span>${timing}</span>` : ''}</summary>
+      ${rows.map(([label, val]) => `<div class="hook-breakdown-row"><span>${label}</span><div>${progressEsc_(val)}</div></div>`).join('')}
+    </details>`;
 }
 
 function closeHookBankDetail() {
@@ -4759,8 +4788,19 @@ async function fetchHookBankSheet() {
         dateTimestamp: e.datePosted ? (new Date(e.datePosted).getTime() || 0) : 0,
         views: e.views || 0,
         hookType: (e.hookType || '').trim(),
-        hookTypes: splitHookTypes_(e.hookType),
+        // Hook Tags holds every hook type a video uses; Hook Type is the fallback
+        hookTypes: splitHookTypes_(String(e.hookTags || '').trim() || e.hookType),
         hookSpecifics: (e.hookSpecifics || '').trim(),
+        // First-5-seconds breakdown (UPDATED HOOK BANKS columns)
+        breakdown: {
+          said: String(e.said || '').trim(),
+          onScreenText: String(e.onScreenText || '').trim(),
+          visual: String(e.visual || '').trim(),
+          sound: String(e.sound || '').trim(),
+          whyItWorked: String(e.whyItWorked || '').trim(),
+          firstWordAt: String(e.firstWordAt ?? '').trim(),
+          cutsFirst5: String(e.cutsFirst5 ?? '').trim()
+        },
         hook_rate: e.hookRate || 0,
         hold_rate: e.holdRate || 0,
         winning: !!e.winning,
