@@ -1594,7 +1594,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <div>
         <div style="font-size:16px;font-weight:700;color:var(--text);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Hook Bank</div>
         <div style="font-size:11px;color:var(--text2);margin-top:6px;">Ranked by average Hook Rate for the selected month above — pick "All Year" to see the best hooks across every month</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Hook Bank rule: 40%+ Hook Rate up to September, 30%+ from October onward</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Hook Bank rule: every video with 30%+ Hook Rate, any month — new ones are added automatically every hour</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;">
         <span class="hook-excellent">60%+ Excellent</span>
@@ -1605,17 +1605,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       </div>
     </div>
     <div class="filter-row" style="margin-bottom:16px;">
+      <!-- Options are built from the Hook Type tags in the Hook Bank sheet -->
       <select id="hookBankFilterType" class="filter-select" onchange="renderHookBank()">
         <option value="">All Hook Types</option>
-        <option>Moving Hook</option>
-        <option>Text Hook</option>
-        <option>Visual Hook</option>
-        <option>Sound Hook</option>
-        <option>Question Hook</option>
-        <option>Statement Hook</option>
-        <option>Contrast Hook</option>
-        <option>Story Hook</option>
-        <option>Other</option>
       </select>
     </div>
     <div class="hook-summary" id="hookBankSummary" style="margin-bottom:24px;"></div>
@@ -2194,9 +2186,9 @@ let zernioThumbnails = {};
 // This is now the source of truth for the Hook Bank tab, instead of computing
 // hook-type aggregates from the full Video Log — it's a deliberately smaller,
 // hand-verified "hall of fame" of proven hooks with the exact wording/visual
-// that made each one work. Entry rule: 40%+ Hook Rate up to September 2026,
-// 30%+ from October 2026 onward. The dashboard doesn't filter by rate; the
-// rule is applied when rows are added to the sheet.
+// that made each one work. Reads the "UPDATED HOOK BANKS" tab (set in the
+// proxy), which HookBankSync keeps filled with every 30%+ Hook Rate video,
+// any month, appended hourly. The dashboard itself doesn't filter by rate.
 const HOOK_BANK_SHEET_URL = "https://script.google.com/macros/s/AKfycbw94gk2aZgCE_6TEXDwnTbaAD0l2lx0Iak05qIHLZgmpKY4Ev1bLstii6QfuC5Zc2cO/exec";
 let hookBankSheetData = [];
 const KPI_TARGETS = { views: 3000000, winning: 20, thruplays: 1800000 };
@@ -3181,6 +3173,43 @@ function hookRateTierLabel(r) {
 // whichever month is currently selected elsewhere in the dashboard.
 // ─────────────────────────────────────────────────────────────
 let hookBankRows = [];
+const HOOK_BANK_UNTAGGED = 'Not Tagged';
+
+// One Hook Type cell can hold several tags, e.g. "Text Hook, Visual Hook".
+// Splits on , / ; + | & or new lines, tidies the casing and drops repeats.
+function splitHookTypes_(raw) {
+  const seen = new Set();
+  const out = [];
+  String(raw || '').split(/\s*(?:,|\/|;|\+|\||&|\n)\s*/).forEach(part => {
+    const tag = part.trim().replace(/\s+/g, ' ')
+      .split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    if (tag && !seen.has(tag.toLowerCase())) { seen.add(tag.toLowerCase()); out.push(tag); }
+  });
+  return out;
+}
+
+// Fills the hook-type filter from the tags actually used in the Hook Bank
+// sheet, most-used first, keeping the current pick if it still exists.
+function buildHookBankTypeOptions_() {
+  const sel = document.getElementById('hookBankFilterType');
+  if (!sel) return;
+  const counts = {};
+  let untagged = 0;
+  hookBankSheetData.forEach(v => {
+    if (!v.hookTypes.length) untagged++;
+    v.hookTypes.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
+  });
+  const tags = Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b));
+  const keep = sel.value;
+  sel.innerHTML = '<option value="">All Hook Types</option>' +
+    tags.map(t => `<option value="${progressEsc_(t)}">${progressEsc_(t)} (${counts[t]})</option>`).join('') +
+    (untagged ? `<option value="${HOOK_BANK_UNTAGGED}">${HOOK_BANK_UNTAGGED} (${untagged})</option>` : '');
+  sel.value = (keep && (counts[keep] || (keep === HOOK_BANK_UNTAGGED && untagged))) ? keep : '';
+}
+
+function videoHasHookType_(v, type) {
+  return type === HOOK_BANK_UNTAGGED ? !v.hookTypes.length : v.hookTypes.includes(type);
+}
 
 function renderHookBank(month) {
   const grid = document.getElementById('hookBankGrid');
@@ -3198,7 +3227,7 @@ function renderHookBank(month) {
   // proven hooks rather than every video ever posted.
   const scopedByMonth = month === 'ALL_YEAR' ? hookBankSheetData : hookBankSheetData.filter(v => v.month === month);
   const allVideos = scopedByMonth;
-  const videos = filterType ? allVideos.filter(v => (v.hookType || '').trim() === filterType) : allVideos;
+  const videos = filterType ? allVideos.filter(v => videoHasHookType_(v, filterType)) : allVideos;
   const scopeLabel = month === 'ALL_YEAR' ? 'All Year' : (month.charAt(0) + month.slice(1).toLowerCase());
 
   if (!hookBankSheetData.length) {
@@ -3217,17 +3246,21 @@ function renderHookBank(month) {
     return;
   }
 
+  // A video with several hook types counts toward each of them. When one
+  // type is filtered, only that type's card is shown.
   const byType = {};
   videos.forEach(v => {
-    const type = (v.hookType || '').trim() || 'Not Tagged';
-    if (!byType[type]) byType[type] = { videos:0, totalViews:0, winning:0, hookSum:0, hookCount:0, holdSum:0, holdCount:0, list:[] };
-    const b = byType[type];
-    b.videos++;
-    b.totalViews += v.views || 0;
-    if (v.winning) b.winning++;
-    if (v.hook_rate > 0) { b.hookSum += v.hook_rate; b.hookCount++; }
-    if (v.hold_rate > 0) { b.holdSum += v.hold_rate; b.holdCount++; }
-    b.list.push(v);
+    const tags = v.hookTypes.length ? v.hookTypes : [HOOK_BANK_UNTAGGED];
+    tags.filter(type => !filterType || type === filterType).forEach(type => {
+      if (!byType[type]) byType[type] = { videos:0, totalViews:0, winning:0, hookSum:0, hookCount:0, holdSum:0, holdCount:0, list:[] };
+      const b = byType[type];
+      b.videos++;
+      b.totalViews += v.views || 0;
+      if (v.winning) b.winning++;
+      if (v.hook_rate > 0) { b.hookSum += v.hook_rate; b.hookCount++; }
+      if (v.hold_rate > 0) { b.holdSum += v.hold_rate; b.holdCount++; }
+      b.list.push(v);
+    });
   });
 
   const rows = Object.entries(byType).map(([name, b]) => ({
@@ -3252,7 +3285,8 @@ function renderHookBank(month) {
 
   const best = rows[0];
   const overallAvgHook = Math.round(rows.reduce((s,r) => s + r.avgHook, 0) / rows.length * 10) / 10;
-  const totalWins = rows.reduce((s,r) => s + r.winning, 0);
+  // Count each winning video once, even if it carries several hook types
+  const totalWins = videos.filter(v => v.winning).length;
   document.getElementById('hookBankSummary').innerHTML = `
     <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${rows.length}</div><div class="hook-stat-label">Hook Types Tracked</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#38BDF8">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (${scopeLabel})</div></div>
@@ -3319,6 +3353,7 @@ function openHookBankDetail(idx) {
         ${v.link ? `<a href="${v.link}" target="_blank" rel="noopener noreferrer" class="fb-link" style="flex-shrink:0;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : `<span style="flex-shrink:0;font-size:11px;color:var(--text3);">No link</span>`}
       </div>
       ${v.hookSpecifics ? `<div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text2);"><span style="font-weight:700;color:var(--accent-text);">Hook specifics:</span> ${v.hookSpecifics}</div>` : `<div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);font-style:italic;">Hook specifics not tagged yet</div>`}
+      ${v.hookTypes && v.hookTypes.length > 1 ? `<div style="margin-top:6px;font-size:11px;color:var(--text3);"><span style="font-weight:700;">Hook types:</span> ${v.hookTypes.map(progressEsc_).join(' · ')}</div>` : ''}
     </div>`;
   }).join('');
 
@@ -4724,12 +4759,14 @@ async function fetchHookBankSheet() {
         dateTimestamp: e.datePosted ? (new Date(e.datePosted).getTime() || 0) : 0,
         views: e.views || 0,
         hookType: (e.hookType || '').trim(),
+        hookTypes: splitHookTypes_(e.hookType),
         hookSpecifics: (e.hookSpecifics || '').trim(),
         hook_rate: e.hookRate || 0,
         hold_rate: e.holdRate || 0,
         winning: !!e.winning,
         link: e.link || ''
       }));
+      buildHookBankTypeOptions_();
       renderHookBank();
     }
   } catch (e) { /* proxy not deployed/reachable yet — Hook Bank tab shows its empty state */ }
