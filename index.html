@@ -3362,7 +3362,7 @@ function openHookBankDetail(idx) {
         ${v.link ? `<a href="${v.link}" target="_blank" rel="noopener noreferrer" class="fb-link" style="flex-shrink:0;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : `<span style="flex-shrink:0;font-size:11px;color:var(--text3);">No link</span>`}
       </div>
       ${v.hookSpecifics ? `<div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text2);"><span style="font-weight:700;color:var(--accent-text);">Hook specifics:</span> ${v.hookSpecifics}</div>` : `<div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);font-style:italic;">Hook specifics not tagged yet</div>`}
-      ${v.hookTypes && v.hookTypes.length > 1 ? `<div style="margin-top:6px;font-size:11px;color:var(--text3);"><span style="font-weight:700;">Hook types:</span> ${v.hookTypes.map(progressEsc_).join(' · ')}</div>` : ''}
+      ${v.hookTags && v.hookTags.length > 1 ? `<div style="margin-top:6px;font-size:11px;color:var(--text3);"><span style="font-weight:700;">Hook tags:</span> ${v.hookTags.map(progressEsc_).join(' · ')}</div>` : ''}
       ${hookBreakdownHTML_(v.breakdown)}
     </div>`;
   }).join('');
@@ -4788,8 +4788,10 @@ async function fetchHookBankSheet() {
         dateTimestamp: e.datePosted ? (new Date(e.datePosted).getTime() || 0) : 0,
         views: e.views || 0,
         hookType: (e.hookType || '').trim(),
-        // Hook Tags holds every hook type a video uses; Hook Type is the fallback
-        hookTypes: splitHookTypes_(String(e.hookTags || '').trim() || e.hookType),
+        // Grouping uses Hook Type (one per video) so nothing is counted twice;
+        // Hook Tags is shown in the video popup for reference only
+        hookTypes: splitHookTypes_(e.hookType),
+        hookTags: splitHookTypes_(e.hookTags),
         hookSpecifics: (e.hookSpecifics || '').trim(),
         // First-5-seconds breakdown (UPDATED HOOK BANKS columns)
         breakdown: {
