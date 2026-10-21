@@ -3376,9 +3376,11 @@ function hookBreakdownHTML_(b) {
   if (!b) return '';
   const rows = [
     ['Said', b.said], ['On-screen text', b.onScreenText], ['Visual', b.visual],
-    ['Sound', b.sound], ['Bakit gumana', b.whyItWorked]
+    ['Sound', b.sound], ['Delivery', b.delivery], ['Bakit gumana', b.whyItWorked]
   ].filter(([, val]) => val);
   const timing = [
+    b.tone ? progressEsc_(b.tone) : '',
+    b.energy ? `${progressEsc_(b.energy)} energy` : '',
     b.firstWordAt !== '' ? `First word at ${progressEsc_(b.firstWordAt)} s` : '',
     b.cutsFirst5 !== '' ? `${progressEsc_(b.cutsFirst5)} cut${b.cutsFirst5 === '1' ? '' : 's'} in first 5 s` : ''
   ].filter(Boolean).join(' · ');
@@ -4801,7 +4803,10 @@ async function fetchHookBankSheet() {
           sound: String(e.sound || '').trim(),
           whyItWorked: String(e.whyItWorked || '').trim(),
           firstWordAt: String(e.firstWordAt ?? '').trim(),
-          cutsFirst5: String(e.cutsFirst5 ?? '').trim()
+          cutsFirst5: String(e.cutsFirst5 ?? '').trim(),
+          tone: String(e.tone || '').trim(),
+          energy: String(e.energy || '').trim(),
+          delivery: String(e.delivery || '').trim()
         },
         hook_rate: e.hookRate || 0,
         hold_rate: e.holdRate || 0,
