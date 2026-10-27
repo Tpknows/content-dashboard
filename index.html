@@ -4404,6 +4404,14 @@ function analyzeData(month, d) {
   return { kpi_color, kpi_status, working, not_working: notWorking, actions, dont, top_videos_insight, opportunities, creator_notes, hook_recs: hookRecs, hold_recs: holdRecs, hidden_gems: hiddenGemsAll, wasted_hooks: wastedHooksAll, snapshot };
 }
 
+// Calendar year a report month belongs to: a month later than the current
+// one is last year's (e.g. December reported in January).
+function reportYear_(month) {
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const now = new Date();
+  return MONTHS_ORDER.indexOf(month) > now.getMonth() ? now.getFullYear() - 1 : now.getFullYear();
+}
+
 // Top hooks of the month + hook plan for the next month. Reads the curated
 // Hook Bank sheet first (hand-tagged, 30%+ entry rule); falls back to the
 // Video Log when the sheet has no entries for the month or hasn't loaded.
@@ -4413,7 +4421,7 @@ function buildHookPlan(month, d, ins) {
   const nextMonth = idx >= 0 ? MONTHS_ORDER[(idx + 1) % 12] : '';
   const cap = m => m ? m.charAt(0) + m.slice(1).toLowerCase() : '';
   const monthLabel = cap(month);
-  const nextLabel = nextMonth ? cap(nextMonth) + (idx === 11 ? ' 2027' : '') : 'next month';
+  const nextLabel = nextMonth ? cap(nextMonth) + (idx === 11 ? ' ' + (reportYear_(month) + 1) : '') : 'next month';
   const short = (t, n) => t.length > n ? t.substring(0, n) + '...' : t;
 
   const bankVids = hookBankSheetData.filter(v => v.month === month && v.hook_rate > 0);
@@ -4626,6 +4634,10 @@ function generateClaudePrompt() {
   const month = lastInsightsMonth || 'This Month';
   const s = ins.snapshot || {};
   const monthLabel = month ? (month.charAt(0).toUpperCase() + month.slice(1).toLowerCase()) : 'This Month';
+  const year = reportYear_(month);
+  const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  // A 0 rate means the sheet column was empty, not a real 0%
+  const rateOrNone = v => v > 0 ? v + '%' : 'No data';
 
   const clean = arr => (arr || []).map(x => stripHtmlTags(x)).filter(Boolean);
   const listOrNone = arr => {
@@ -4650,6 +4662,16 @@ function generateClaudePrompt() {
    Creator: ${v.creator || '—'} · Views: ${fmt(v.views)} · Thruplay: ${v.thruplay_rate || 0}%${hookStr}${holdStr} · Pillar: ${v.pillar || '—'}${aiStr}${linkStr}`;
       }).join('\n\n');
 
+  // Summary slide: status, best hook, first plan item
+  const topHook = (ins.top_hooks || [])[0];
+  const firstPlan = clean(ins.hook_plan)[0];
+  const summaryContent = [
+    stripHtmlTags(ins.kpi_status || ''),
+    `Views: ${fmt(s.views || 0)} of ${fmt(s.views_target || 3000000)} target (${s.views_pct || 0}%) · Winning videos: ${s.winning || 0} of ${s.winning_target || 20}`,
+    topHook ? `Top hook: "${topHook.title}" (${topHook.creator || '—'}, ${topHook.hook_type || 'no hook type'}) at ${topHook.hook_rate}% hook rate` : '',
+    firstPlan ? `Main plan for ${ins.next_month || 'next month'}: ${firstPlan}` : ''
+  ].filter(Boolean).map(x => '- ' + x).join('\n');
+
   // Top hooks + hook-type ranking for the Top Hooks slide
   const topHooksContent = (ins.top_hooks || []).length === 0
     ? '- No data available.'
@@ -4661,7 +4683,7 @@ function generateClaudePrompt() {
     ? '- No data available.'
     : ins.hook_types.map(t => `- ${t.name}: ${t.avgHook}% avg hook rate (${t.videos} video${t.videos !== 1 ? 's' : ''}${t.wins ? `, ${t.wins} win${t.wins !== 1 ? 's' : ''}` : ''})`).join('\n');
 
-  // Two framings for Slide 3, picked via the toggle in the modal:
+  // Two framings for Slide 4, picked via the toggle in the modal:
   // "mom" compares against the previous month (can look empty/negative
   // on a slow or still-in-progress month); "working" instead leads with
   // this month's own standalone strengths, which always has something
@@ -4694,13 +4716,14 @@ function generateClaudePrompt() {
 
   function buildPromptText(mode) {
     const { slide3: sl3, slide4: sl4 } = framingByMode[mode] || framingByMode.mom;
-    return `Build a PowerPoint deck (.pptx file I can download) titled "EasyPC Content Performance Report — ${monthLabel} 2026", using the slide outline and data below.
+    return `Build a PowerPoint deck (.pptx file I can download) titled "EasyPC Content Performance Report — ${monthLabel} ${year}", using the slide outline and data below.
+Name the file: "EasyPC Content Performance Report ${monthLabel} ${year} - ${today}.pptx"
 
 RULES
 - Use the numbers, titles and links exactly as written. Do not add, estimate or round any figure, and do not invent videos, creators or results.
-- If a section says "No data available", keep the slide and say that plainly instead of filling it in.
+- If a section or figure says "No data available" or "No data", keep the slide and say that plainly instead of filling it in.
 - Keep the Taglish wording in the Hook Plan slide as written.
-- Every figure comes from the EasyPC Content Dashboard (Video Log and Hook Bank Google Sheets), as of ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Put that source line in small text on the KPI Snapshot slide.
+- Every figure comes from the EasyPC Content Dashboard (Video Log and Hook Bank Google Sheets), as of ${today}. Put that source line in small text on the KPI Snapshot slide.
 
 BRAND & STYLE DIRECTION (EasyPC house style)
 - Modern corporate design, widescreen 16:9.
@@ -4713,19 +4736,23 @@ BRAND & STYLE DIRECTION (EasyPC house style)
 
 SLIDE 1 — COVER (dark background)
 - Title: "EasyPC Content Performance Report"
-- Subtitle: "${monthLabel} 2026"
+- Subtitle: "${monthLabel} ${year}"
 - Status pill/badge showing: "${stripHtmlTags(ins.kpi_status || '')}"
 - Footer text: "Generated by EasyPC Content Dashboard"
 
-SLIDE 2 — KPI SNAPSHOT
-Show 8 metric cards in a row:
+SLIDE 2 — SUMMARY
+Plain-language summary of the month, one short line per bullet, large readable text:
+${summaryContent}
+
+SLIDE 3 — KPI SNAPSHOT
+Show 8 metric cards in 2 rows of 4:
 - Total Views: ${fmt(s.views || 0)}
 - Thruplays: ${fmt(s.thruplays || 0)}
 - Winning Videos: ${s.winning || 0}
 - Videos Submitted: ${s.videos_submitted || 0}
-- Avg Thruplay Rate: ${s.avg_thruplay_rate || 0}%
-- Avg Hook Rate: ${s.avg_hook_rate || 0}%
-- Avg Hold Rate: ${s.avg_hold_rate || 0}%
+- Avg Thruplay Rate: ${rateOrNone(s.avg_thruplay_rate)}
+- Avg Hook Rate: ${rateOrNone(s.avg_hook_rate)}
+- Avg Hold Rate: ${rateOrNone(s.avg_hold_rate)}
 - AI Tagged: ${s.ai_tagged || 0}
 
 Below the cards, show 3 progress bars against targets:
@@ -4733,34 +4760,34 @@ Below the cards, show 3 progress bars against targets:
 - Thruplays: ${fmt(s.thruplays || 0)} / ${fmt(s.thruplays_target || 1800000)} target (${s.thruplays_pct || 0}%)
 - Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
 
-SLIDE 3 — ${sl3.header} (two-column layout)
+SLIDE 4 — ${sl3.header} (two-column layout)
 Left column "${sl3.leftLabel}" ${sl3.note}:
 ${sl3.leftBody}
 
 Right column "${sl3.rightLabel}" ${sl3.note}:
 ${sl3.rightBody}
 
-SLIDE 4 — ${sl4.header} (two-column layout)
+SLIDE 5 — ${sl4.header} (two-column layout)
 Left column "${sl4.leftLabel}" ${sl4.note}:
 ${sl4.leftBody}
 
 Right column "${sl4.rightLabel}" ${sl4.note}:
 ${sl4.rightBody}
 
-SLIDE 5 — HOOK RATE ANALYSIS
-- Headline: Avg hook rate this month is ${s.avg_hook_rate || 0}%.
+SLIDE 6 — HOOK RATE ANALYSIS
+- Headline: Avg hook rate this month: ${rateOrNone(s.avg_hook_rate)}.
 - Include a horizontal scale/legend: Excellent (60%+), Very Strong (50-59%), Good (40-49%), Average (30-39%), Weak (<30%).
 - Recommendations:
 ${listOrNone(ins.hook_recs)}
 
-SLIDE 6 — HOLD RATE ANALYSIS
-- Headline: Avg hold rate this month is ${s.avg_hold_rate || 0}%.
+SLIDE 7 — HOLD RATE ANALYSIS
+- Headline: Avg hold rate this month: ${rateOrNone(s.avg_hold_rate)}.
 - Include the same scale/legend as the hook rate slide.
 - Recommendations:
 ${listOrNone(ins.hold_recs)}
 
-SLIDE 7 — TOP HOOKS THIS MONTH
-Section label: "TOP HOOKS — ${monthLabel} 2026"
+SLIDE 8 — TOP HOOKS THIS MONTH
+Section label: "TOP HOOKS — ${monthLabel} ${year}"
 Source note (small text): ${ins.hook_source || 'Hook Bank / Video Log'}
 Left side: the top hooks as ranked cards (rank, title, creator · hook type, opening line in italics if given, Hook Rate pill, Hold Rate pill, Views, clickable "▶ Watch" link if given):
 ${topHooksContent}
@@ -4768,27 +4795,27 @@ ${topHooksContent}
 Right side: small bar chart "Hook Types by Avg Hook Rate":
 ${hookTypesContent}
 
-SLIDE 8 — HOOK PLAN FOR ${(ins.next_month || 'NEXT MONTH').toUpperCase()}
+SLIDE 9 — HOOK PLAN FOR ${(ins.next_month || 'NEXT MONTH').toUpperCase()}
 Numbered checklist, one item per line, keep the wording:
 ${listOrNone(ins.hook_plan)}
 
-SLIDE 9 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
-Left column "DO THIS MONTH":
+SLIDE 10 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
+Left column "DO NEXT MONTH":
 ${listOrNone(ins.actions)}
 
 Right column "STOP DOING":
 ${listOrNone(ins.dont)}
 
-SLIDE 10 — OPPORTUNITIES & CREATOR NOTES (two-column layout)
+SLIDE 11 — OPPORTUNITIES & CREATOR NOTES (two-column layout)
 Left column "OPPORTUNITIES":
 ${listOrNone(ins.opportunities)}
 
 Right column "CREATOR NOTES":
 ${listOrNone(ins.creator_notes)}
 
-SLIDE 11 — WINNING CONTENT THIS MONTH (light background)
+SLIDE 12 — WINNING CONTENT THIS MONTH (light background)
 ──────────────────────────────────────────────────────
-Section label: "WINNING CONTENT — ${monthLabel} 2026"
+Section label: "WINNING CONTENT — ${monthLabel} ${year}"
 Slide subtitle: "${winVids.length} winning video${winVids.length !== 1 ? 's' : ''} that exceeded performance benchmarks this month"
 
 Layout: Each winning video gets its own card row — ranked by views (highest first).
@@ -4810,9 +4837,9 @@ Design notes for this slide:
   - If more than 5 winning videos, split into two columns
   - This slide should feel like a "hall of fame" — celebratory but professional
 
-SLIDE 12 — CLOSING (dark background)
+SLIDE 13 — CLOSING (dark background)
 - Headline: "Thank You"
-- Subtitle: "${monthLabel} 2026 Content Performance Report"
+- Subtitle: "${monthLabel} ${year} Content Performance Report"
 - Footer: "EasyPC Content Dashboard · Confidential"
 
 TONE
