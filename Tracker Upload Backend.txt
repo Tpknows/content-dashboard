@@ -30,6 +30,12 @@
 
 const TARGET_SPREADSHEET_ID = "1x2snvutnovt0ckK4YdWZN8uxw8TSfhucTfZbgU5SG4E";
 
+// Opening the /exec URL in a browser lands here: a quick check that the
+// deployment is live. Uploads only ever come in through doPost.
+function doGet() {
+  return jsonOut_({ status: "ok", message: "Tracker Upload is ready. Put this /exec URL in uploadUrl in auto-update\\config.json." });
+}
+
 function doPost(e) {
   let body;
   try { body = JSON.parse(e.postData.contents); } catch (err) { return jsonOut_({ status: "error", message: "Bad request body" }); }
