@@ -22,6 +22,19 @@ Lahat ng nangyari ay nasa `logs\update-YYYY-MM-DD.log`. Ang AI tags ay nasa `log
 
 Kapag nilipat ang folder sa OneDrive, hahanapin ito ng script at ia-update ang `dataFolder` sa config.json.
 
+## Kapag lumipat ka ng PC
+
+Nasa OneDrive ang folder na ito, kaya kasama nang lilipat ang scripts, config.json at upload-token.txt. Ang hindi sumasama ay ang auto-update schedule, ang Excel at ang Claude Code login.
+
+1. **Sa lumang PC muna:** patakbuhin ang `Setup-AutoRun.ps1 -Remove`. Kapag sabay na naka-on sa dalawang PC, pwedeng magka-conflict ang files sa OneDrive. Kung wala na ang lumang PC, okay lang na laktawan ito.
+2. **Sa bagong PC:**
+   - Mag-sign in sa OneDrive at hintaying matapos ang sync.
+   - I-install ang desktop Excel.
+   - I-install ang Claude Code, buksan ang terminal, i-type ang `claude` at mag-login.
+3. I-double-click ang `SETUP NEW PC.bat`. Iche-check nito ang lahat, at kapag puro [OK], i-o-on na nito ang auto-update. Kapag may [AYUSIN], gawin ang nakasulat tapos ulitin.
+
+Hindi na kailangang galawin ang Google Sheet o ang Apps Script. Pareho pa rin ang URL at token.
+
 ## Setup ng Google Sheet (isang beses lang)
 
 1. Buksan ang script.google.com, tapos New project. Pangalanan ng "Tracker Upload".
