@@ -1406,25 +1406,25 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
 <div class="main-area">
 
-<div id="manusPromptModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+<div id="claudePromptModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius: 2px;max-width:820px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);">
       <div>
-        <div style="font-size:16px;font-weight:800;color:var(--text);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Manus Presentation Prompt</div>
-        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;">Copy this and paste it into Manus to generate your presentation</div>
+        <div style="font-size:16px;font-weight:800;color:var(--text);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Claude Presentation Prompt</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:3px;">Copy this and paste it into Claude to build your presentation (.pptx)</div>
       </div>
-      <button onclick="closeManusPromptModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+      <button onclick="closeClaudePromptModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
     </div>
     <div style="display:flex;gap:8px;padding:14px 24px 0;">
-      <button id="manusModeMom" onclick="switchManusPromptMode('mom')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid #62B134;border-radius:2px;cursor:pointer;background:#62B134;color:#000;font-family:inherit;">Month-over-Month</button>
-      <button id="manusModeWorking" onclick="switchManusPromptMode('working')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid var(--border2);border-radius:2px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;">What's Working</button>
+      <button id="claudeModeMom" onclick="switchClaudePromptMode('mom')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid #62B134;border-radius:2px;cursor:pointer;background:#62B134;color:#000;font-family:inherit;">Month-over-Month</button>
+      <button id="claudeModeWorking" onclick="switchClaudePromptMode('working')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid var(--border2);border-radius:2px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;">What's Working</button>
     </div>
-    <textarea id="manusPromptText" readonly style="flex:1;min-height:420px;background:#0b0b0b;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
+    <textarea id="claudePromptText" readonly style="flex:1;min-height:420px;background:#0b0b0b;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
-      <span id="manusPromptStatus" style="font-size:11.5px;color:var(--text3);"></span>
+      <span id="claudePromptStatus" style="font-size:11.5px;color:var(--text3);"></span>
       <div style="display:flex;gap:10px;">
-        <button onclick="closeManusPromptModal()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:9px 18px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
-        <button onclick="copyManusPrompt()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:9px 20px;border-radius: 2px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="1"/><rect x="9" y="2" width="6" height="3" rx="1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="13" y2="16"/></svg> Copy Prompt</button>
+        <button onclick="closeClaudePromptModal()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:9px 18px;border-radius: 2px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Close</button>
+        <button onclick="copyClaudePrompt()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:9px 20px;border-radius: 2px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="1"/><rect x="9" y="2" width="6" height="3" rx="1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="13" y2="16"/></svg> Copy Prompt</button>
       </div>
     </div>
   </div>
@@ -1945,8 +1945,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <button onclick="generateInsights()" id="generateBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 24px;border-radius: 2px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;">
           <span id="generateBtnIcon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg></span> Generate Insights
         </button>
-        <button onclick="generateManusPrompt()" id="manusPromptBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 24px;border-radius: 2px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:none;align-items:center;gap:8px;">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Generate Manus Prompt
+        <button onclick="generateClaudePrompt()" id="claudePromptBtn" style="background:transparent;color:#fff;border:2px solid #62B134;padding:11px 24px;border-radius: 2px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;display:none;align-items:center;gap:8px;">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Generate Claude Prompt
         </button>
       </div>
     </div>
@@ -2024,6 +2024,19 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
           <div style="font-size:11px;color:#f472b6;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> Creator Performance Notes</div>
           <div id="insightsCreators" style="font-size:13px;color:var(--text2);line-height:1.7;"></div>
+        </div>
+
+        <!-- Top hooks this month + hook plan for next month -->
+        <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
+          <div style="background:var(--card);border:1px solid rgba(98,177,52,0.25);border-radius:var(--radius);padding:22px;">
+            <div style="font-size:11px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Top Hooks this Month</div>
+            <div id="insightsHookSource" style="font-size:11px;color:var(--text3);margin-bottom:14px;"></div>
+            <div id="insightsTopHooks" style="font-size:12.5px;color:var(--text2);line-height:1.6;"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid rgba(167,139,250,0.2);border-radius:var(--radius);padding:22px;">
+            <div style="font-size:11px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> <span id="insightsHookPlanTitle">Hook Plan for Next Month</span></div>
+            <div id="insightsHookPlan" style="font-size:13px;color:var(--text2);line-height:1.8;"></div>
+          </div>
         </div>
 
         <!-- Hook + Hold Rate side by side -->
@@ -3675,8 +3688,16 @@ async function saveCurrentInsights() {
     hook_recs:        stripArr(ins.hook_recs),
     hold_recs:        stripArr(ins.hold_recs),
 
-    // Manus presentation prompt (if generated before saving) — two framings
-    manus_prompt:         ins.manus_prompt || '',
+    // Top hooks of the month + hook plan for next month
+    top_hooks:        ins.top_hooks || [],
+    hook_plan:        stripArr(ins.hook_plan),
+    hook_plan_month:  ins.next_month || '',
+    hook_source:      ins.hook_source || '',
+
+    // Claude presentation prompt (if generated before saving) — two framings.
+    // Field names keep the old manus_ prefix so earlier saved records and the
+    // Insights sheet columns still line up.
+    manus_prompt:        ins.manus_prompt || '',
     manus_prompt_working: ins.manus_prompt_working || ''
   };
 
@@ -3718,11 +3739,11 @@ async function saveCurrentInsights() {
     btn.style.background = '#A78BFA';
   }, 4000);
 
-  // If the Manus prompt modal is open, reflect that it's now part of the saved record
-  const manusStatusEl = document.getElementById('manusPromptStatus');
-  if (manusStatusEl && ins.manus_prompt) {
-    manusStatusEl.textContent = '✓ Saved with this month\'s record.';
-    manusStatusEl.style.color = '#62B134';
+  // If the Claude prompt modal is open, reflect that it's now part of the saved record
+  const claudeStatusEl = document.getElementById('claudePromptStatus');
+  if (claudeStatusEl && ins.manus_prompt) {
+    claudeStatusEl.textContent = '✓ Saved with this month\'s record.';
+    claudeStatusEl.style.color = '#62B134';
   }
 }
 
@@ -3775,8 +3796,8 @@ function renderInsightRecords() {
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius: 2px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${r.kpi_status}</span>
-          ${r.manus_prompt ? `<button onclick="copyRecordManusPrompt('${r.month}','mom')" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy MoM Prompt</button>` : ''}
-          ${r.manus_prompt_working ? `<button onclick="copyRecordManusPrompt('${r.month}','working')" style="background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy What's Working Prompt</button>` : ''}
+          ${r.manus_prompt ? `<button onclick="copyRecordClaudePrompt('${r.month}','mom')" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy MoM Prompt</button>` : ''}
+          ${r.manus_prompt_working ? `<button onclick="copyRecordClaudePrompt('${r.month}','working')" style="background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy What's Working Prompt</button>` : ''}
           <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(248,113,113,0.1);color:#F87171;border:1px solid rgba(248,113,113,0.2);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Delete</button>
         </div>
       </div>
@@ -3792,6 +3813,18 @@ function renderInsightRecords() {
         <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.15);border-radius: 2px;padding:14px;">
           <div style="font-size:10px;color:#F87171;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/></svg> Lowlights vs Prev Month</div>
           <div style="font-size:12px;color:var(--text2);">${toList(r.mom_lowlights)}</div>
+        </div>
+      </div>` : ''}
+
+      ${(r.top_hooks && r.top_hooks.length) || (r.hook_plan && r.hook_plan.length) ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div style="background:rgba(98,177,52,0.06);border:1px solid rgba(98,177,52,0.15);border-radius: 2px;padding:14px;">
+          <div style="font-size:10px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Top Hooks this Month</div>
+          <div style="font-size:12px;color:var(--text2);">${(r.top_hooks || []).length ? toList(r.top_hooks.map(h => `<strong>${h.hook_rate}%</strong> · ${h.title}${h.creator ? ` (${h.creator})` : ''}${h.hook_type ? ` · ${h.hook_type}` : ''}`)) : '<div>Hindi kasama sa Sheet copy.</div>'}</div>
+        </div>
+        <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.15);border-radius: 2px;padding:14px;">
+          <div style="font-size:10px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Hook Plan for ${r.hook_plan_month || 'Next Month'}</div>
+          <div style="font-size:12px;color:var(--text2);">${toList(r.hook_plan)}</div>
         </div>
       </div>` : ''}
 
@@ -3907,6 +3940,8 @@ async function loadInsightsFromSheet() {
         opportunities:      splitBullets(r['Content Opportunities'] || r.opportunities),
         creator_notes:      splitBullets(r['Creator Performance Notes'] || r.creator_notes),
         hook_recs:          splitBullets(r['Hook Rate Analysis'] || r.hook_recs),
+        hook_plan:          splitBullets(r['Hook Plan'] || r.hook_plan),
+        hook_plan_month:    r['Hook Plan Month'] || r.hook_plan_month || '',
         snapshot: {
           views:               r['Views'] || 0,
           views_target:        r['Views Target'] || 0,
@@ -3934,9 +3969,15 @@ async function loadInsightsFromSheet() {
       };
     });
 
-    // Merge Sheet records into localStorage (Sheet wins for same month)
+    // Merge Sheet records into localStorage (Sheet wins for same month).
+    // Fields the Sheet doesn't carry (top hooks, prompts) are kept from the
+    // local copy instead of being wiped.
     const local = loadInsightRecords();
-    remapped.forEach(r => { if (r.month) local[r.month] = r; });
+    remapped.forEach(r => {
+      if (!r.month) return;
+      if (!r.hook_plan.length) { delete r.hook_plan; delete r.hook_plan_month; }
+      local[r.month] = { ...(local[r.month] || {}), ...r };
+    });
     saveInsightRecords(local);
 
     statusEl.textContent = `✓ Loaded ${sheetRecords.length} insight record${sheetRecords.length !== 1 ? 's' : ''} from Google Sheet.`;
@@ -4070,6 +4111,7 @@ function generateInsights() {
       const mom = buildMoMInsights(month, d, prev, prevMonth);
       ins.mom_highlights = mom.mom_highlights;
       ins.mom_lowlights  = mom.mom_lowlights;
+      Object.assign(ins, buildHookPlan(month, d, ins));
       _currentInsightsData = { month, ins };
       renderInsightsOutput(ins, !!prev);
       document.getElementById('insightsLoading').style.display = 'none';
@@ -4362,12 +4404,101 @@ function analyzeData(month, d) {
   return { kpi_color, kpi_status, working, not_working: notWorking, actions, dont, top_videos_insight, opportunities, creator_notes, hook_recs: hookRecs, hold_recs: holdRecs, hidden_gems: hiddenGemsAll, wasted_hooks: wastedHooksAll, snapshot };
 }
 
+// Top hooks of the month + hook plan for the next month. Reads the curated
+// Hook Bank sheet first (hand-tagged, 30%+ entry rule); falls back to the
+// Video Log when the sheet has no entries for the month or hasn't loaded.
+function buildHookPlan(month, d, ins) {
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const idx = MONTHS_ORDER.indexOf(month);
+  const nextMonth = idx >= 0 ? MONTHS_ORDER[(idx + 1) % 12] : '';
+  const cap = m => m ? m.charAt(0) + m.slice(1).toLowerCase() : '';
+  const monthLabel = cap(month);
+  const nextLabel = nextMonth ? cap(nextMonth) + (idx === 11 ? ' 2027' : '') : 'next month';
+  const short = (t, n) => t.length > n ? t.substring(0, n) + '...' : t;
+
+  const bankVids = hookBankSheetData.filter(v => v.month === month && v.hook_rate > 0);
+  const fromBank = bankVids.length > 0;
+  const pool = fromBank ? bankVids : d.all_videos
+    .filter(v => v.hook_rate > 0)
+    .map(v => ({ ...v, hookTypes: splitHookTypes_(v.hookType), breakdown: {} }));
+  const source = fromBank
+    ? `Hook Bank sheet (${bankVids.length} entries, 30%+ hook rate)`
+    : `Video Log (wala pang Hook Bank entries para sa ${monthLabel})`;
+
+  const top_hooks = [...pool].sort((a, b) => b.hook_rate - a.hook_rate).slice(0, 5).map(v => ({
+    title: v.title,
+    creator: v.creator || '',
+    hook_type: v.hookTypes.join(', '),
+    hook_rate: v.hook_rate,
+    hold_rate: v.hold_rate || 0,
+    views: v.views || 0,
+    winning: !!v.winning,
+    link: v.link || '',
+    opening: (v.breakdown.said || v.breakdown.onScreenText || '').trim()
+  }));
+
+  // Average hook rate per hook type; a video with several types counts toward each
+  const groupTypes = vids => {
+    const by = {};
+    vids.forEach(v => v.hookTypes.forEach(t => {
+      if (!by[t]) by[t] = { name: t, videos: 0, hookSum: 0, wins: 0 };
+      by[t].videos++;
+      by[t].hookSum += v.hook_rate;
+      if (v.winning) by[t].wins++;
+    }));
+    return Object.values(by)
+      .map(t => ({ name: t.name, videos: t.videos, wins: t.wins, avgHook: Math.round(t.hookSum / t.videos * 10) / 10 }))
+      .sort((a, b) => b.avgHook - a.avgHook);
+  };
+  const hook_types = groupTypes(pool);
+
+  const plan = [];
+  const ranked = hook_types.filter(t => t.videos >= 2).length ? hook_types.filter(t => t.videos >= 2) : hook_types;
+  if (ranked[0]) {
+    const t = ranked[0];
+    plan.push(`Gamitin ulit ang <strong>${t.name}</strong> sa mas maraming video sa ${nextLabel}. Ito ang may pinakamataas na avg hook rate ngayong ${monthLabel}: <strong>${t.avgHook}%</strong> sa ${t.videos} video${t.videos !== 1 ? 's' : ''}${t.wins ? `, ${t.wins} win${t.wins !== 1 ? 's' : ''}` : ''}.`);
+  }
+  if (ranked[1]) {
+    const t = ranked[1];
+    plan.push(`Backup na hook: <strong>${t.name}</strong> (${t.avgHook}% avg, ${t.videos} video${t.videos !== 1 ? 's' : ''}). Dito kumuha kapag hindi bagay ang ${ranked[0].name} sa topic.`);
+  }
+  top_hooks.filter(h => h.opening).slice(0, 3).forEach(h => {
+    plan.push(`Gawing template ang opening ng <em>"${short(h.title, 45)}"</em> (${h.creator || 'Unknown'}, ${h.hook_rate}% hook): "${short(h.opening, 90)}". Palitan lang ang topic o product.`);
+  });
+  const gems = ins.hidden_gems || [];
+  if (gems.length) {
+    plan.push(`I-repost ang ${gems.length} hidden gem na may bagong hook. Maganda ang hold pero mahina ang unang 3 seconds. Unahin ang <em>"${short(gems[0].title, 45)}"</em> (${gems[0].hook_rate}% hook, ${gems[0].hold_rate}% hold).`);
+  }
+  const wasted = ins.wasted_hooks || [];
+  if (wasted.length) {
+    plan.push(`Ayusin ang body ng ${wasted.length} video na malakas ang hook pero bumabagsak ang hold, gaya ng <em>"${short(wasted[0].title, 45)}"</em> (${wasted[0].hook_rate}% hook, ${wasted[0].hold_rate}% hold). Huwag nang pahabain ang intro.`);
+  }
+  // Weak hook types come from the full Video Log, since the Hook Bank only keeps 30%+ entries
+  const logTyped = d.all_videos.filter(v => v.hook_rate > 0)
+    .map(v => ({ ...v, hookTypes: splitHookTypes_(v.hookType) }))
+    .filter(v => v.hookTypes.length);
+  groupTypes(logTyped).filter(t => t.videos >= 2 && t.avgHook < 30).slice(-2).forEach(t => {
+    plan.push(`Bawasan muna ang <strong>${t.name}</strong>. ${t.avgHook}% lang ang avg hook rate nito sa ${t.videos} videos. Kung gagamitin ulit, baguhin ang opening.`);
+  });
+  const avgHook = d.avg_hook_rate || 0;
+  if (avgHook > 0) {
+    const tiers = [[30, 'Average'], [40, 'Good'], [50, 'Very Strong'], [60, 'Excellent']];
+    const nextTier = tiers.find(([v]) => v > avgHook);
+    plan.push(nextTier
+      ? `Suggested na target sa ${nextLabel}: <strong>${nextTier[0]}%+ avg hook rate</strong> (${nextTier[1]}). ${avgHook}% tayo ngayong ${monthLabel}. Manager pa rin ang magko-confirm bago gawing KPI.`
+      : `Bantayan na hindi bumaba sa 60% ang avg hook rate sa ${nextLabel}. ${avgHook}% tayo ngayong ${monthLabel}.`);
+  }
+  if (!plan.length) plan.push('Kulang pa ang hook data ngayong buwan. I-fill muna ang Hook Type at Hook Rate sa sheet bago gumawa ng plan.');
+
+  return { top_hooks, hook_types: hook_types.slice(0, 5), hook_plan: plan, hook_source: source, next_month: nextLabel };
+}
+
 function renderInsightsOutput(ins, hasPrev) {
   // Store for PPT export
   lastInsights = ins;
   lastInsightsMonth = document.getElementById('monthSelect') ? document.getElementById('monthSelect').value : '';
-  const manusBtn = document.getElementById('manusPromptBtn');
-  if (manusBtn) manusBtn.style.display = 'flex';
+  const claudeBtn = document.getElementById('claudePromptBtn');
+  if (claudeBtn) claudeBtn.style.display = 'flex';
 
   const bannerColors = { green:'#62B134', yellow:'#FBBF24', red:'#F87171' };
   const bannerBg = { green:'rgba(98,177,52,0.08)', yellow:'rgba(251,191,36,0.08)', red:'rgba(248,113,113,0.08)' };
@@ -4404,6 +4535,31 @@ function renderInsightsOutput(ins, hasPrev) {
   document.getElementById('insightsCreators').innerHTML    = toList(ins.creator_notes || []);
   document.getElementById('insightsHookRate').innerHTML    = toList(ins.hook_recs || []);
   document.getElementById('insightsHoldRate').innerHTML    = toList(ins.hold_recs || []);
+
+  // Top hooks + next-month hook plan
+  document.getElementById('insightsHookSource').textContent = ins.hook_source ? 'Source: ' + ins.hook_source : '';
+  const topHooks = ins.top_hooks || [];
+  const hookTypesHtml = (ins.hook_types || []).length ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;">
+      <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Hook Types by Avg Hook Rate</div>
+      ${ins.hook_types.map(t => `<div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:5px;"><span>${t.name}</span><span style="color:${hookRateTierColor(t.avgHook)};font-weight:700;white-space:nowrap;">${t.avgHook}% <span style="color:var(--text3);font-weight:400;">· ${t.videos} video${t.videos !== 1 ? 's' : ''}${t.wins ? ` · ${t.wins} win${t.wins !== 1 ? 's' : ''}` : ''}</span></span></div>`).join('')}
+    </div>` : '';
+  document.getElementById('insightsTopHooks').innerHTML = topHooks.length ? topHooks.map((h, i) => `
+    <div style="display:flex;gap:10px;margin-bottom:12px;">
+      <span style="flex-shrink:0;color:#62B134;font-weight:800;font-size:13px;width:18px;">${i+1}</span>
+      <div style="min-width:0;flex:1;">
+        <div style="color:var(--text);font-weight:600;line-height:1.4;">${h.title}</div>
+        <div style="font-size:11px;color:var(--text3);margin:3px 0 6px;">${[h.creator, h.hook_type, fmt(h.views) + ' views', h.winning ? 'WIN' : ''].filter(Boolean).join(' · ')}</div>
+        ${h.opening ? `<div style="font-size:11.5px;color:var(--text2);font-style:italic;margin-bottom:6px;">"${h.opening}"</div>` : ''}
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <span style="color:${hookRateTierColor(h.hook_rate)};border:1px solid ${hookRateTierColor(h.hook_rate)}55;padding:2px 8px;border-radius: 2px;font-size:11px;font-weight:700;">Hook ${h.hook_rate}%</span>
+          ${h.hold_rate > 0 ? mutedRateBadge('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>', h.hold_rate) : ''}
+          ${h.link ? `<a href="${h.link}" target="_blank" style="color:#62B134;font-size:11px;font-weight:700;text-decoration:none;">▶ Watch</a>` : ''}
+        </div>
+      </div>
+    </div>`).join('') + hookTypesHtml
+    : '<div>Wala pang hook rate data para sa buwang ito.</div>';
+  document.getElementById('insightsHookPlanTitle').textContent = 'Hook Plan for ' + (ins.next_month || 'Next Month');
+  document.getElementById('insightsHookPlan').innerHTML = toNumbered(ins.hook_plan || []);
 
   // Hidden gems section
   const gemsSection = document.getElementById('insightsHiddenGems');
@@ -4463,7 +4619,7 @@ function stripHtmlTags(str) {
   return (str || '').replace(/<[^>]*>/g, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ').trim();
 }
 
-function generateManusPrompt() {
+function generateClaudePrompt() {
   if (!lastInsights) { alert('Generate insights muna bago gumawa ng prompt.'); return; }
 
   const ins = lastInsights;
@@ -4493,6 +4649,17 @@ function generateManusPrompt() {
         return `${i+1}. "${v.title}"
    Creator: ${v.creator || '—'} · Views: ${fmt(v.views)} · Thruplay: ${v.thruplay_rate || 0}%${hookStr}${holdStr} · Pillar: ${v.pillar || '—'}${aiStr}${linkStr}`;
       }).join('\n\n');
+
+  // Top hooks + hook-type ranking for the Top Hooks slide
+  const topHooksContent = (ins.top_hooks || []).length === 0
+    ? '- No data available.'
+    : ins.top_hooks.map((h, i) => `${i+1}. "${h.title}"
+   Creator: ${h.creator || '—'} · Hook Type: ${h.hook_type || '—'} · Hook Rate: ${h.hook_rate}%${h.hold_rate > 0 ? ` · Hold Rate: ${h.hold_rate}%` : ''} · Views: ${fmt(h.views)}${h.winning ? ' · WINNING' : ''}${h.opening ? `
+   Opening line: "${h.opening}"` : ''}${h.link ? `
+   Link: ${h.link}` : ''}`).join('\n\n');
+  const hookTypesContent = (ins.hook_types || []).length === 0
+    ? '- No data available.'
+    : ins.hook_types.map(t => `- ${t.name}: ${t.avgHook}% avg hook rate (${t.videos} video${t.videos !== 1 ? 's' : ''}${t.wins ? `, ${t.wins} win${t.wins !== 1 ? 's' : ''}` : ''})`).join('\n');
 
   // Two framings for Slide 3, picked via the toggle in the modal:
   // "mom" compares against the previous month (can look empty/negative
@@ -4527,16 +4694,22 @@ function generateManusPrompt() {
 
   function buildPromptText(mode) {
     const { slide3: sl3, slide4: sl4 } = framingByMode[mode] || framingByMode.mom;
-    return `Create a professional, minimalist business presentation titled "EasyPC Content Performance Report — ${monthLabel} 2026".
+    return `Build a PowerPoint deck (.pptx file I can download) titled "EasyPC Content Performance Report — ${monthLabel} 2026", using the slide outline and data below.
 
-BRAND & STYLE DIRECTION
+RULES
+- Use the numbers, titles and links exactly as written. Do not add, estimate or round any figure, and do not invent videos, creators or results.
+- If a section says "No data available", keep the slide and say that plainly instead of filling it in.
+- Keep the Taglish wording in the Hook Plan slide as written.
+- Every figure comes from the EasyPC Content Dashboard (Video Log and Hook Bank Google Sheets), as of ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Put that source line in small text on the KPI Snapshot slide.
+
+BRAND & STYLE DIRECTION (EasyPC house style)
 - Modern corporate design, widescreen 16:9.
-- Cover and closing slides: dark charcoal background (#18181B) with white text.
-- Content slides: white background with dark ink text (#18181B / #3F3F46).
-- Primary accent color: emerald green (#10B981) for positive signals, KPI bars, and highlights.
+- Cover and closing slides: black background (#0b0b0b) with white text.
+- Content slides: white background (#ffffff) with near-black text (#0b0b0b).
+- Accent color: EasyPC green (#62B134) for positive signals, KPI bars and highlights.
 - Use muted red (#DC2626) only for negative/lowlight signals.
-- Company wordmark "EasyPC" styled as "EASY" (white/black) + "PC" (emerald accent).
-- Clean sans-serif font (e.g. Calibri or Inter), generous white space, rounded card elements for data.
+- Company wordmark "EasyPC" styled as "EASY" (white/black) + "PC" (green accent).
+- Font: Open Sans throughout. Generous white space, simple card elements for data.
 
 SLIDE 1 — COVER (dark background)
 - Title: "EasyPC Content Performance Report"
@@ -4586,45 +4759,58 @@ SLIDE 6 — HOLD RATE ANALYSIS
 - Recommendations:
 ${listOrNone(ins.hold_recs)}
 
-SLIDE 7 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
+SLIDE 7 — TOP HOOKS THIS MONTH
+Section label: "TOP HOOKS — ${monthLabel} 2026"
+Source note (small text): ${ins.hook_source || 'Hook Bank / Video Log'}
+Left side: the top hooks as ranked cards (rank, title, creator · hook type, opening line in italics if given, Hook Rate pill, Hold Rate pill, Views, clickable "▶ Watch" link if given):
+${topHooksContent}
+
+Right side: small bar chart "Hook Types by Avg Hook Rate":
+${hookTypesContent}
+
+SLIDE 8 — HOOK PLAN FOR ${(ins.next_month || 'NEXT MONTH').toUpperCase()}
+Numbered checklist, one item per line, keep the wording:
+${listOrNone(ins.hook_plan)}
+
+SLIDE 9 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
 Left column "DO THIS MONTH":
 ${listOrNone(ins.actions)}
 
 Right column "STOP DOING":
 ${listOrNone(ins.dont)}
 
-SLIDE 8 — OPPORTUNITIES & CREATOR NOTES (two-column layout)
+SLIDE 10 — OPPORTUNITIES & CREATOR NOTES (two-column layout)
 Left column "OPPORTUNITIES":
 ${listOrNone(ins.opportunities)}
 
 Right column "CREATOR NOTES":
 ${listOrNone(ins.creator_notes)}
 
-SLIDE 9 — WINNING CONTENT THIS MONTH (light background)
+SLIDE 11 — WINNING CONTENT THIS MONTH (light background)
 ──────────────────────────────────────────────────────
 Section label: "WINNING CONTENT — ${monthLabel} 2026"
 Slide subtitle: "${winVids.length} winning video${winVids.length !== 1 ? 's' : ''} that exceeded performance benchmarks this month"
 
 Layout: Each winning video gets its own card row — ranked by views (highest first).
-Card design: Green left border (#10B981), white card background, rounded corners.
+Card design: Green left border (#62B134), white card background.
 
 For each card, display:
-  - Rank number (bold, large, emerald green)
+  - Rank number (bold, large, EasyPC green)
   - Video title (bold, dark, 14–15px)
   - Creator name · Pillar badge · AI tag (if applicable)
   - Metric pills in a row: Views | Thruplay Rate | Hook Rate | Hold Rate
-  - If a link is provided → add a prominent "▶ Watch Video" button (emerald green, rounded pill) that links directly to the post
+  - If a link is provided → add a prominent "▶ Watch Video" button (EasyPC green pill) that links directly to the post
 
 WINNING VIDEOS DATA — use exactly as written below:
 ${winningSlideContent}
 
 Design notes for this slide:
-  - The "▶ Watch Video" hyperlink must be CLICKABLE in the final presentation (use hyperlink feature in the slide tool)
+  - The "▶ Watch Video" hyperlink must be a CLICKABLE hyperlink in the .pptx
   - Metric pills: small rounded badges, colored per value (green if high, amber if average, red if low)
   - If more than 5 winning videos, split into two columns
   - This slide should feel like a "hall of fame" — celebratory but professional
 
-SLIDE 10 — CLOSING (dark background)
+SLIDE 12 — CLOSING (dark background)
 - Headline: "Thank You"
 - Subtitle: "${monthLabel} 2026 Content Performance Report"
 - Footer: "EasyPC Content Dashboard · Confidential"
@@ -4644,41 +4830,41 @@ Keep all text concise and data-driven, matching the tone of a monthly marketing/
     _currentInsightsData.ins.manus_prompt_working = promptWorking;
   }
 
-  manusPromptVariants = { mom: promptMom, working: promptWorking };
-  switchManusPromptMode('mom');
-  const statusEl = document.getElementById('manusPromptStatus');
+  claudePromptVariants = { mom: promptMom, working: promptWorking };
+  switchClaudePromptMode('mom');
+  const statusEl = document.getElementById('claudePromptStatus');
   if (statusEl) statusEl.textContent = 'Not yet saved — click "Save Analysis" to keep this with your record.';
-  const modal = document.getElementById('manusPromptModal');
+  const modal = document.getElementById('claudePromptModal');
   if (modal) modal.style.display = 'flex';
 }
 
-let manusPromptVariants = { mom: '', working: '' };
-let manusPromptActiveMode = 'mom';
+let claudePromptVariants = { mom: '', working: '' };
+let claudePromptActiveMode = 'mom';
 
-function switchManusPromptMode(mode) {
-  manusPromptActiveMode = mode;
-  const ta = document.getElementById('manusPromptText');
-  if (ta) ta.value = manusPromptVariants[mode] || '';
+function switchClaudePromptMode(mode) {
+  claudePromptActiveMode = mode;
+  const ta = document.getElementById('claudePromptText');
+  if (ta) ta.value = claudePromptVariants[mode] || '';
 
   const activeStyle = 'padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid #62B134;border-radius:2px;cursor:pointer;background:#62B134;color:#000;font-family:inherit;';
   const idleStyle   = 'padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid var(--border2);border-radius:2px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;';
-  const btnMom = document.getElementById('manusModeMom');
-  const btnWorking = document.getElementById('manusModeWorking');
+  const btnMom = document.getElementById('claudeModeMom');
+  const btnWorking = document.getElementById('claudeModeWorking');
   if (btnMom) btnMom.style.cssText = mode === 'mom' ? activeStyle : idleStyle;
   if (btnWorking) btnWorking.style.cssText = mode === 'working' ? activeStyle : idleStyle;
 }
 
-function closeManusPromptModal() {
-  const modal = document.getElementById('manusPromptModal');
+function closeClaudePromptModal() {
+  const modal = document.getElementById('claudePromptModal');
   if (modal) modal.style.display = 'none';
 }
 
-function copyManusPrompt() {
-  const ta = document.getElementById('manusPromptText');
+function copyClaudePrompt() {
+  const ta = document.getElementById('claudePromptText');
   if (!ta) return;
   ta.select();
   ta.setSelectionRange(0, 999999);
-  const statusEl = document.getElementById('manusPromptStatus');
+  const statusEl = document.getElementById('claudePromptStatus');
   navigator.clipboard.writeText(ta.value).then(() => {
     if (statusEl) { statusEl.textContent = '✓ Copied to clipboard!'; statusEl.style.color = '#62B134'; }
   }).catch(() => {
@@ -4691,14 +4877,14 @@ function copyManusPrompt() {
   });
 }
 
-function copyRecordManusPrompt(month, mode) {
+function copyRecordClaudePrompt(month, mode) {
   const records = loadInsightRecords();
   const r = records[month];
   const field = mode === 'working' ? 'manus_prompt_working' : 'manus_prompt';
   const text = r && r[field];
-  if (!text) { alert('Walang saved ' + (mode === 'working' ? "\"What's Working\"" : "Month-over-Month") + ' na Manus prompt para sa buwang ito. I-generate at i-save ulit ang analysis.'); return; }
+  if (!text) { alert('Walang saved ' + (mode === 'working' ? "\"What's Working\"" : "Month-over-Month") + ' na Claude prompt para sa buwang ito. I-generate at i-save ulit ang analysis.'); return; }
   navigator.clipboard.writeText(text).then(() => {
-    alert('✓ Manus prompt copied to clipboard!');
+    alert('✓ Claude prompt copied to clipboard!');
   }).catch(() => {
     try {
       const tmp = document.createElement('textarea');
@@ -4707,7 +4893,7 @@ function copyRecordManusPrompt(month, mode) {
       tmp.select();
       document.execCommand('copy');
       document.body.removeChild(tmp);
-      alert('✓ Manus prompt copied to clipboard!');
+      alert('✓ Claude prompt copied to clipboard!');
     } catch(e) {
       alert('Hindi ma-copy. Subukan mo ulit o i-check ang browser permissions.');
     }
