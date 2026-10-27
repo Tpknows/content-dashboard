@@ -1,0 +1,15 @@
+{
+  "dataFolder": "C:\\Users\\Tammy\\OneDrive - EasyPC\\CONTENT DASHBOARD DATA",
+  "dashboardFile": "DASHBOARD DATA_2026.xlsx",
+  "trackerFile": "EASYPC_Content_Team_Tracker_v2_2026.xlsx",
+  "startDate": "2026-10-01",
+  "excludeCreators": ["X", "MARKETING", "#N/A"],
+  "aiTagging": true,
+  "aiModel": "sonnet",
+  "aiBatchSize": 40,
+  "pillars": ["KNOW", "TRUST", "LIKE", "ASPIRATION"],
+  "categories": ["Educational Tip", "Tech Info", "Product Feature", "Humor", "Campaign", "Social Proof", "Credential", "Pro Insights", "You Asked We Answer", "High End", "Wow Factor Technology", "Day in the Life", "Review", "Mistake Avoidance", "Useful Tools"],
+  "hookTypes": ["Statement Hook", "Question Hook", "Visual Hook", "Story Hook", "Text Hook", "Moving Hook", "Contrast Hook", "Sound Hook"],
+  "uploadUrl": "",
+  "keepBackups": 15
+}

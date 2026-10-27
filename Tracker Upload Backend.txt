@@ -1,0 +1,93 @@
+/**
+ * ============================================================
+ * TRACKER UPLOAD — replaces the manual "upload, replace all data"
+ * ============================================================
+ * auto-update\Update-Dashboard.ps1 sends the saved
+ * EASYPC_Content_Team_Tracker_v2_2026.xlsx here. This script converts
+ * it to a temporary Google Sheet, then copies every tab's contents
+ * (values and formulas, plus number formats) into the same-named tab
+ * of the team's Google Sheet. Tabs keep their IDs, so links, the
+ * dashboard and the Video Log endpoint keep working. Tabs that exist
+ * only in the Google Sheet are never touched. The temporary copy is
+ * deleted after every upload.
+ *
+ * SETUP (run once)
+ * 1. Go to script.google.com → New project. Name it "Tracker Upload".
+ *    (A separate project, so the existing Video Log script is untouched.)
+ * 2. Paste this whole file into Code.gs.
+ * 3. Left sidebar → Services (+) → Drive API → Add.
+ * 4. Project Settings (gear) → Script Properties → add
+ *      UPLOAD_TOKEN = <the text inside auto-update\upload-token.txt>
+ * 5. Run testAccess once from the toolbar and allow the permissions.
+ *    The log should show the Google Sheet's name and tabs.
+ * 6. Deploy → New deployment → Web app
+ *      Execute as: Me    Who has access: Anyone
+ *    Copy the /exec URL into "uploadUrl" in auto-update\config.json.
+ * Only a request carrying the UPLOAD_TOKEN can write; without it the
+ * web app refuses.
+ * ============================================================
+ */
+
+const TARGET_SPREADSHEET_ID = "1x2snvutnovt0ckK4YdWZN8uxw8TSfhucTfZbgU5SG4E";
+
+function doPost(e) {
+  let body;
+  try { body = JSON.parse(e.postData.contents); } catch (err) { return jsonOut_({ status: "error", message: "Bad request body" }); }
+  const token = PropertiesService.getScriptProperties().getProperty("UPLOAD_TOKEN");
+  if (!token || body.token !== token) return jsonOut_({ status: "error", message: "Invalid upload token" });
+  if (!body.data) return jsonOut_({ status: "error", message: "No file data" });
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(60000);
+  let tempId = null;
+  try {
+    const blob = Utilities.newBlob(Utilities.base64Decode(body.data), MimeType.MICROSOFT_EXCEL, body.fileName || "tracker.xlsx");
+    tempId = Drive.Files.create({ name: "TEMP Tracker Upload " + new Date().toISOString(), mimeType: MimeType.GOOGLE_SHEETS }, blob).id;
+    const src = SpreadsheetApp.openById(tempId);
+    const dst = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
+    const done = [], errors = [];
+    src.getSheets().forEach(s => {
+      try { copyTab_(s, dst); done.push(s.getName()); }
+      catch (err) { errors.push(s.getName() + ": " + err.message); }
+    });
+    return jsonOut_({ status: "ok", sheets: done, errors: errors, updatedAt: new Date().toISOString() });
+  } catch (err) {
+    return jsonOut_({ status: "error", message: err.message });
+  } finally {
+    if (tempId) { try { DriveApp.getFileById(tempId).setTrashed(true); } catch (err) {} }
+    lock.releaseLock();
+  }
+}
+
+// Copies one tab's contents into the same-named tab (created if missing).
+// Cells with a formula get the formula, the rest get the value.
+function copyTab_(srcSheet, dst) {
+  const name = srcSheet.getName();
+  const rows = srcSheet.getLastRow(), cols = srcSheet.getLastColumn();
+  let target = dst.getSheetByName(name);
+  if (!target) target = dst.insertSheet(name);
+  target.clearContents();
+  if (rows < 1 || cols < 1) return;
+  if (target.getMaxRows() < rows) target.insertRowsAfter(target.getMaxRows(), rows - target.getMaxRows());
+  if (target.getMaxColumns() < cols) target.insertColumnsAfter(target.getMaxColumns(), cols - target.getMaxColumns());
+
+  const range = srcSheet.getRange(1, 1, rows, cols);
+  const values = range.getValues();
+  const formulas = range.getFormulas();
+  const merged = values.map((row, r) => row.map((v, c) => formulas[r][c] || v));
+  const out = target.getRange(1, 1, rows, cols);
+  out.setValues(merged);
+  out.setNumberFormats(range.getNumberFormats());
+}
+
+// Run once from the editor to grant permissions and check the target sheet
+function testAccess() {
+  const dst = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
+  Logger.log(dst.getName() + " → " + dst.getSheets().map(s => s.getName()).join(", "));
+  Logger.log("Drive API: " + (typeof Drive !== "undefined" ? "ok" : "not added yet (Services → Drive API)"));
+  Logger.log("UPLOAD_TOKEN: " + (PropertiesService.getScriptProperties().getProperty("UPLOAD_TOKEN") ? "set" : "missing"));
+}
+
+function jsonOut_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
