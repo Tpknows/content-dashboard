@@ -1619,7 +1619,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <option value="">All Hook Types</option>
       </select>
     </div>
-    <div class="hook-summary" id="hookBankSummary" style="margin-bottom:24px;"></div>
+    <div class="hook-summary" id="hookBankSummary" style="margin-bottom:10px;"></div>
+    <div id="hookBankAvgNote" style="font-size:11px;color:var(--text3);line-height:1.6;margin-bottom:24px;"></div>
     <div class="hookbank-grid" id="hookBankGrid"></div>
   </div>
   <div id="tab-progress" class="tab-panel">
@@ -3252,6 +3253,7 @@ function videoHasHookType_(v, type) {
 function renderHookBank(month) {
   const grid = document.getElementById('hookBankGrid');
   if (!grid) return;
+  document.getElementById('hookBankAvgNote').innerHTML = '';
   // Falls back to whatever month is currently selected (including
   // 'ALL_YEAR') so this behaves like every other tab — callers that don't
   // pass month explicitly (e.g. the hook-type filter's onchange) still get
@@ -3323,12 +3325,21 @@ function renderHookBank(month) {
 
   const best = rows[0];
   const overallAvgHook = Math.round(rows.reduce((s,r) => s + r.avgHook, 0) / rows.length * 10) / 10;
+  // Monthly avg from the full Video Log, shown beside the Hook Bank avg so
+  // nobody reads the 30%+-only number as the month's overall hook rate
+  const logHook = getVideos(month).filter(v => v.hook_rate > 0);
+  const logAvgHook = logHook.length ? Math.round(logHook.reduce((s,v) => s + v.hook_rate, 0) / logHook.length * 10) / 10 : 0;
+  document.getElementById('hookBankAvgNote').innerHTML =
+    `<strong>Note:</strong> Mas mataas ang avg dito kaysa sa monthly avg hook rate kasi 30%+ videos lang ang laman ng Hook Bank. ` +
+    `Average din ito ng bawat hook type, hindi per video. ` +
+    (logAvgHook ? `Ang monthly avg ng lahat ng videos (Video Log, ${scopeLabel}) ay <strong>${logAvgHook}%</strong> sa ${logHook.length} videos. ` : '') +
+    `Yung monthly avg ang gamitin sa KPI at report. Ang Hook Bank ay pang-compare lang ng hook types.`;
   // Count each winning video once, even if it carries several hook types
   const totalWins = videos.filter(v => v.winning).length;
   document.getElementById('hookBankSummary').innerHTML = `
     <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${rows.length}</div><div class="hook-stat-label">Hook Types Tracked</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#38BDF8">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (${scopeLabel})</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#FB923C">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (all types)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#FB923C">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (30%+ videos lang)</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#FBBF24">${totalWins}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Total Winning Videos</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#A78BFA;font-size:16px;line-height:1.3;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> ${best.name}</div><div class="hook-stat-label">Best Hook Type</div></div>
   `;
