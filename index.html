@@ -2039,6 +2039,22 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           </div>
         </div>
 
+        <!-- Content worth repeating -->
+        <div style="background:var(--card);border:1px solid rgba(98,177,52,0.25);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+          <div style="font-size:11px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="17,2 21,6 17,10"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><polyline points="7,22 3,18 7,14"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg> Content na Pwedeng Ulitin</div>
+          <div id="insightsRepeatSource" style="font-size:11px;color:var(--text3);margin-bottom:16px;"></div>
+          <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div>
+              <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Format na Panalo (Pillar · Hook Type)</div>
+              <div id="insightsRepeatFormats" style="font-size:12.5px;color:var(--text2);line-height:1.6;"></div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Videos na Pwedeng Gawan ng Part 2</div>
+              <div id="insightsRepeatVideos" style="font-size:12.5px;color:var(--text2);line-height:1.6;"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Hook + Hold Rate side by side -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="insight-pair-grid">
           <div style="background:#1a1d2e;border:1px solid #62B13433;border-radius: 2px;padding:22px;">
@@ -3694,6 +3710,9 @@ async function saveCurrentInsights() {
     hook_plan_month:  ins.next_month || '',
     hook_source:      ins.hook_source || '',
 
+    // Content worth repeating (kept locally; the Sheet has no column for it)
+    repeat_content:   repeatContentLines_(ins),
+
     // Claude presentation prompt (if generated before saving) — two framings.
     // Field names keep the old manus_ prefix so earlier saved records and the
     // Insights sheet columns still line up.
@@ -3826,6 +3845,12 @@ function renderInsightRecords() {
           <div style="font-size:10px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Hook Plan for ${r.hook_plan_month || 'Next Month'}</div>
           <div style="font-size:12px;color:var(--text2);">${toList(r.hook_plan)}</div>
         </div>
+      </div>` : ''}
+
+      ${r.repeat_content && r.repeat_content.length ? `
+      <div style="background:rgba(98,177,52,0.06);border:1px solid rgba(98,177,52,0.15);border-radius: 2px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:10px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Content na Pwedeng Ulitin</div>
+        <div style="font-size:12px;color:var(--text2);">${toList(r.repeat_content)}</div>
       </div>` : ''}
 
       <details style="cursor:pointer;">
@@ -4112,6 +4137,7 @@ function generateInsights() {
       ins.mom_highlights = mom.mom_highlights;
       ins.mom_lowlights  = mom.mom_lowlights;
       Object.assign(ins, buildHookPlan(month, d, ins));
+      Object.assign(ins, buildRepeatContent(d));
       _currentInsightsData = { month, ins };
       renderInsightsOutput(ins, !!prev);
       document.getElementById('insightsLoading').style.display = 'none';
@@ -4501,6 +4527,64 @@ function buildHookPlan(month, d, ins) {
   return { top_hooks, hook_types: hook_types.slice(0, 5), hook_plan: plan, hook_source: source, next_month: nextLabel };
 }
 
+// Content worth repeating: Pillar + Hook Type combos that beat the month's
+// average views and produced a win, plus the winning videos that also held
+// 30%+ hook and hold rate (good results from start to end).
+function buildRepeatContent(d) {
+  const vids = d.all_videos || [];
+  const avgViews = vids.length ? vids.reduce((s, v) => s + v.views, 0) / vids.length : 0;
+  const avg = (arr, key) => {
+    const vals = arr.map(v => v[key]).filter(x => x > 0);
+    return vals.length ? Math.round(vals.reduce((s, x) => s + x, 0) / vals.length * 10) / 10 : 0;
+  };
+
+  const by = {};
+  vids.forEach(v => {
+    const hook = splitHookTypes_(v.hookType)[0] || '';
+    if (!v.pillar || !hook) return;
+    const key = v.pillar + ' · ' + hook;
+    (by[key] = by[key] || []).push(v);
+  });
+  const repeat_formats = Object.entries(by)
+    .map(([name, list]) => {
+      const best = [...list].sort((a, b) => b.views - a.views)[0];
+      return {
+        name,
+        videos: list.length,
+        wins: list.filter(v => v.winning).length,
+        avgViews: Math.round(list.reduce((s, v) => s + v.views, 0) / list.length),
+        avgHook: avg(list, 'hook_rate'),
+        avgHold: avg(list, 'hold_rate'),
+        example: { title: best.title, creator: best.creator || '', views: best.views, link: best.link || '' }
+      };
+    })
+    .filter(f => f.videos >= 2 && f.wins >= 1 && f.avgViews >= avgViews)
+    .sort((a, b) => b.wins - a.wins || b.avgViews - a.avgViews)
+    .slice(0, 3)
+    .map(f => ({ ...f, vsAvg: avgViews ? Math.round(f.avgViews / avgViews * 10) / 10 : 0 }));
+
+  const repeat_videos = vids
+    .filter(v => v.winning && v.hook_rate >= 30 && v.hold_rate >= 30)
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5)
+    .map(v => ({
+      title: v.title, creator: v.creator || '', pillar: v.pillar || '',
+      hook_type: splitHookTypes_(v.hookType).join(', '),
+      views: v.views, hook_rate: v.hook_rate, hold_rate: v.hold_rate, link: v.link || ''
+    }));
+
+  return { repeat_formats, repeat_videos, repeat_avg_views: Math.round(avgViews) };
+}
+
+// Plain-text lines of the repeat-content section, for saved records
+function repeatContentLines_(ins) {
+  const short = (t, n) => t.length > n ? t.substring(0, n) + '...' : t;
+  return [
+    ...(ins.repeat_formats || []).map(f => `${f.name}: ${f.videos} videos, ${f.wins} win${f.wins !== 1 ? 's' : ''}, avg ${fmt(f.avgViews)} views (${f.vsAvg}x ng month avg)`),
+    ...(ins.repeat_videos || []).map(v => `Ulitin: "${short(v.title, 60)}" (${v.creator || '—'}, ${fmt(v.views)} views, ${v.hook_rate}% hook, ${v.hold_rate}% hold)`)
+  ];
+}
+
 function renderInsightsOutput(ins, hasPrev) {
   // Store for PPT export
   lastInsights = ins;
@@ -4568,6 +4652,34 @@ function renderInsightsOutput(ins, hasPrev) {
     : '<div>Wala pang hook rate data para sa buwang ito.</div>';
   document.getElementById('insightsHookPlanTitle').textContent = 'Hook Plan for ' + (ins.next_month || 'Next Month');
   document.getElementById('insightsHookPlan').innerHTML = toNumbered(ins.hook_plan || []);
+
+  // Content worth repeating
+  document.getElementById('insightsRepeatSource').textContent =
+    `Source: Video Log. Kasama dito ang format na may 2+ videos, may win, at lagpas sa month avg na ${fmt(ins.repeat_avg_views || 0)} views; at ang winning videos na 30%+ ang hook at hold.`;
+  const watchLink = link => link ? `<a href="${link}" target="_blank" style="color:#62B134;font-size:11px;font-weight:700;text-decoration:none;">▶ Watch</a>` : '';
+  const formats = ins.repeat_formats || [];
+  document.getElementById('insightsRepeatFormats').innerHTML = formats.length ? formats.map((f, i) => `
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <span style="flex-shrink:0;color:#62B134;font-weight:800;font-size:13px;width:18px;">${i+1}</span>
+      <div style="min-width:0;flex:1;">
+        <div style="color:var(--text);font-weight:600;">${f.name}</div>
+        <div style="font-size:11px;color:var(--text3);margin:3px 0 6px;">${f.videos} videos · ${f.wins} win${f.wins !== 1 ? 's' : ''} · avg ${fmt(f.avgViews)} views (${f.vsAvg}x ng avg)${f.avgHook ? ` · ${f.avgHook}% hook` : ''}${f.avgHold ? ` · ${f.avgHold}% hold` : ''}</div>
+        <div style="font-size:11.5px;color:var(--text2);">Halimbawa: <em>"${f.example.title.length > 60 ? f.example.title.substring(0, 60) + '...' : f.example.title}"</em> ${watchLink(f.example.link)}</div>
+      </div>
+    </div>`).join('')
+    : '<div>Wala pang format na pasok ngayong buwan. Kailangan ng 2+ videos na may Pillar at Hook Type, may win, at lagpas sa avg views.</div>';
+  const repeatVids = ins.repeat_videos || [];
+  document.getElementById('insightsRepeatVideos').innerHTML = repeatVids.length ? repeatVids.map(v => `
+    <div style="margin-bottom:12px;">
+      <div style="color:var(--text);font-weight:600;line-height:1.4;">${v.title.length > 80 ? v.title.substring(0, 80) + '...' : v.title}</div>
+      <div style="font-size:11px;color:var(--text3);margin:3px 0 6px;">${[v.creator, v.pillar, v.hook_type, fmt(v.views) + ' views'].filter(Boolean).join(' · ')}</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <span style="color:${hookRateTierColor(v.hook_rate)};border:1px solid ${hookRateTierColor(v.hook_rate)}55;padding:2px 8px;border-radius: 2px;font-size:11px;font-weight:700;">Hook ${v.hook_rate}%</span>
+        ${mutedRateBadge('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>', v.hold_rate)}
+        ${watchLink(v.link)}
+      </div>
+    </div>`).join('')
+    : '<div>Walang winning video ngayong buwan na 30%+ pareho ang hook at hold.</div>';
 
   // Hidden gems section
   const gemsSection = document.getElementById('insightsHiddenGems');
