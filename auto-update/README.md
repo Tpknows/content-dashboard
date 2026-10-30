@@ -18,7 +18,9 @@ Lahat ng nangyari ay nasa `logs\update-YYYY-MM-DD.log`. Ang AI tags ay nasa `log
 ## Paano patakbuhin
 
 - **Manual:** double-click ang `UPDATE DASHBOARD.bat`. Isara muna ang tracker sa Excel.
-- **Automatic:** patakbuhin minsan ang `Setup-AutoRun.ps1`. Every 15 minutes, chine-check nito kung na-save ang DASHBOARD DATA. Kapag oo at sarado ang dalawang file, tatakbo na siya mag-isa. Pang-off: `Setup-AutoRun.ps1 -Remove`.
+- **Automatic:** patakbuhin minsan ang `Setup-AutoRun.ps1`. Tuwing 8 AM, 1 PM at 5 PM, Monday to Friday, chine-check nito kung may bagong save sa DASHBOARD DATA. Kapag meron at sarado ang dalawang file, tatakbo na siya mag-isa. Kapag walang binago, wala siyang gagawin. Walang takbo tuwing Sabado at Linggo. Pang-off: `Setup-AutoRun.ps1 -Remove`.
+  - Kapag bukas pa ang DASHBOARD DATA o ang tracker sa oras na yan, lalaktawan muna niya at sa susunod na oras na lang. Kaya isara na ang files bago mag-8, 1 o 5.
+  - Kapag patay ang PC sa oras na yan, tatakbo siya pagbukas at pag-login mo.
 
 Kapag nilipat ang folder sa OneDrive, hahanapin ito ng script at ia-update ang `dataFolder` sa config.json.
 

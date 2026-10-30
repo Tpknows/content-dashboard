@@ -1,7 +1,7 @@
 <#
   Run once on a new PC (right-click > Run with PowerShell, or from the
   "SETUP NEW PC.bat"). It checks everything the auto-update needs, then
-  turns on the 15-minute auto-update on this PC.
+  turns on the auto-update (8 AM, 1 PM, 5 PM, weekdays) on this PC.
 
   The auto-update folder lives in OneDrive, so config.json, upload-token.txt
   and the scripts move with it. What does NOT move: the scheduled task,
