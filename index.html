@@ -4348,7 +4348,7 @@ function analyzeData(month, d) {
     const bothVids = d.all_videos.filter(v => v.hook_rate > 0 && v.hold_rate > 0);
     if (bothVids.length >= 3) {
       // Hidden gems: weak hook but strong hold — great content, bad opening
-      const hiddenGems = bothVids.filter(v => v.hook_rate < 35 && v.hold_rate >= 45)
+      const hiddenGems = bothVids.filter(v => v.hook_rate < 30 && v.hold_rate >= 45)
         .sort((a,b) => b.hold_rate - a.hold_rate);
       if (hiddenGems.length > 0) {
         const gem = hiddenGems[0];
@@ -4371,7 +4371,7 @@ function analyzeData(month, d) {
 
   // HIDDEN GEMS SUMMARY (for dedicated section)
   const bothVidsAll = d.all_videos.filter(v => v.hook_rate > 0 && v.hold_rate > 0);
-  const hiddenGemsAll = bothVidsAll.filter(v => v.hook_rate < 35 && v.hold_rate >= 45).sort((a,b) => b.hold_rate - a.hold_rate);
+  const hiddenGemsAll = bothVidsAll.filter(v => v.hook_rate < 30 && v.hold_rate >= 45).sort((a,b) => b.hold_rate - a.hold_rate);
   const wastedHooksAll = bothVidsAll.filter(v => v.hook_rate >= 50 && v.hold_rate < 30).sort((a,b) => a.hold_rate - b.hold_rate);
 
   // KPI Snapshot — raw numbers for Sheet saving
