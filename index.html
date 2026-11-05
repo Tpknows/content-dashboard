@@ -814,6 +814,9 @@ html { overflow-x: hidden; }
 .progress-table th { text-align: left; font-size: 10.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); padding: 8px 10px; border-bottom: 1px solid var(--border2); }
 .progress-table td { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text); font-feature-settings: "tnum"; }
 .progress-table th.num, .progress-table td.num { text-align: right; }
+.progress-table.compact { font-size: 12px; }
+.progress-table.compact td { padding: 5px 10px; white-space: nowrap; }
+.progress-table.compact th { padding: 6px 10px; }
 .progress-bar { height: 6px; background: var(--surface2); border-radius: 2px; overflow: hidden; min-width: 80px; }
 .progress-bar > span { display: block; height: 100%; background: var(--green); }
 .progress-trend-row { display: grid; grid-template-columns: 150px 1fr 90px; gap: 12px; align-items: center; padding: 6px 0; font-size: 12px; color: var(--text2); }
@@ -1646,6 +1649,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <option>Task</option>
           <option>Project</option>
         </select>
+        <select id="progressFilterSubCategory" onchange="renderWeeklyProgress()" class="filter-select" aria-label="Sub-category">
+          <option value="all">All sub-categories</option>
+        </select>
         <select id="progressFilterCreator" onchange="renderWeeklyProgress()" class="filter-select">
           <option value="all">All creators</option>
         </select>
@@ -1653,6 +1659,11 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     </div>
     <div id="progressStatus" style="font-size:12px;color:var(--text3);margin-bottom:14px;"></div>
     <div class="kpi-grid" id="progressKpis"></div>
+    <details class="card" style="margin-bottom:24px;">
+      <summary style="cursor:pointer;font-size:14px;font-weight:700;color:var(--text);">Per sub-category <span style="font-size:11.5px;font-weight:400;color:var(--text3);">· click para ipakita o itago</span></summary>
+      <div id="progressSubCategoryNote" style="font-size:11.5px;color:var(--text3);margin:10px 0 14px;"></div>
+      <div style="overflow-x:auto;"><table class="progress-table compact" id="progressSubCategoryTable"></table></div>
+    </details>
     <div class="card" style="margin-bottom:24px;">
       <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Per creator</div>
       <div style="font-size:11.5px;color:var(--text3);margin-bottom:14px;">Completion rate = completed ÷ started. Creator is the name in the task's "Saved by" field.</div>
@@ -1706,6 +1717,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <option>Idea</option>
           <option>Scripting</option>
           <option>Filming/Design</option>
+          <option>Editing</option>
           <option>Ready to post</option>
           <option>Posted</option>
           <option>Done</option>
@@ -1718,6 +1730,9 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           <option>Project</option>
           <option>Meeting</option>
           <option>Other Task</option>
+        </select>
+        <select id="calendarFilterSubCategory" onchange="renderContentCalendar()" class="filter-select" aria-label="Sub-category">
+          <option value="all">All sub-categories</option>
         </select>
         <select id="calendarFilterSavedBy" onchange="renderContentCalendar()" class="filter-select">
           <option value="all">Everyone</option>
@@ -1739,6 +1754,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16a6 6 0 1 1 6 0c-.6 1-1 1.5-1 3h-4c0-1.5-.4-2-1-3z"/><line x1="10" y1="21" x2="14" y2="21"/></svg> Idea</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(251,191,36,0.08);color:#FBBF24;border:1px solid rgba(251,191,36,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Scripting</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(167,139,250,0.08);color:#A78BFA;border:1px solid rgba(167,139,250,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="1"/><rect x="3" y="5" width="18" height="4"/><line x1="6" y1="5" x2="8" y2="9"/><line x1="11" y1="5" x2="13" y2="9"/><line x1="16" y1="5" x2="18" y2="9"/></svg> Filming/Design</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(251,146,60,0.08);color:#FB923C;border:1px solid rgba(251,146,60,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg> Editing</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(56,189,248,0.08);color:#38BDF8;border:1px solid rgba(56,189,248,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/><path d="M9 17l-3 4M15 17l3 4"/></svg> Ready to post</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(98,177,52,0.08);color:#62B134;border:1px solid rgba(98,177,52,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Posted</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(98,177,52,0.08);color:#62B134;border:1px solid rgba(98,177,52,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Done</span>
@@ -2231,6 +2247,40 @@ let zernioThumbnails = {};
 const HOOK_BANK_SHEET_URL = "https://script.google.com/macros/s/AKfycbw94gk2aZgCE_6TEXDwnTbaAD0l2lx0Iak05qIHLZgmpKY4Ev1bLstii6QfuC5Zc2cO/exec";
 let hookBankSheetData = [];
 const KPI_TARGETS = { views: 3000000, winning: 20, thruplays: 1800000 };
+
+// Content Calendar pillar + sub-category dropdowns. Edit names and monthly
+// targets here only. Any sub-category can go under any pillar; "group" is just
+// the dropdown heading and "source" is a label (not used in any math).
+const CAL_PILLARS = ['KNOW', 'LIKE', 'TRUST'];
+const SUB_CATEGORIES = [
+  { name: 'Customer and community',                    group: 'Customer Interaction', target: 10, source: 'Curated' },
+  { name: 'Service & Technicals',                      group: 'Customer Interaction', target: 10, source: 'Curated' },
+  { name: 'Expert Explainer (base reliable source)',   group: 'Authority',            target: 5,  source: 'Shoot' },
+  { name: 'POV Builds',                                group: 'Authority',            target: 15, source: 'Curated' },
+  { name: 'How-to/Fixes',                              group: 'Knowledge',            target: 10, source: 'Shoot' },
+  { name: 'Best Local Store Content',                  group: 'Local Store Contents', target: 10, source: 'CL' }
+];
+const SUB_CATEGORY_UNASSIGNED = 'Unassigned'; // rows saved before sub-categories existed
+function subCategoryOf_(e) {
+  return SUB_CATEGORIES.some(c => c.name === e.subCategory) ? e.subCategory : SUB_CATEGORY_UNASSIGNED;
+}
+// <option>s grouped by heading; firstLabel is the empty / "all" choice
+function subCategoryOptionsHtml_(firstValue, firstLabel, withUnassigned) {
+  const groups = [...new Set(SUB_CATEGORIES.map(c => c.group))];
+  return `<option value="${firstValue}">${firstLabel}</option>` +
+    groups.map(g => `<optgroup label="${g}">${SUB_CATEGORIES.filter(c => c.group === g)
+      .map(c => `<option value="${c.name}">${c.name}</option>`).join('')}</optgroup>`).join('') +
+    (withUnassigned ? `<option value="${SUB_CATEGORY_UNASSIGNED}">${SUB_CATEGORY_UNASSIGNED}</option>` : '');
+}
+// Fills a filter dropdown once, keeping whatever was picked
+function fillSubCategoryFilter_(id) {
+  const sel = document.getElementById(id);
+  if (sel && sel.options.length <= 1) sel.innerHTML = subCategoryOptionsHtml_('all', 'All sub-categories', true);
+  return sel ? sel.value : 'all';
+}
+function subCategoryTag_(e) {
+  return e.subCategory ? `<span class="cal-entry-chip" style="background:rgba(98,177,52,0.12);color:#62B134;">${progressEsc_(e.subCategory)}</span>` : '';
+}
 
 // Creator-level views (Creator Breakdown, Creator Comparison chart) only
 // count videos tagged to an active creator. Update this list if the roster
@@ -4267,7 +4317,6 @@ function analyzeData(month, d) {
   if (aiVids.length > 0 && aiWinRate > 0) opportunities.push(`AI content shows ${aiWinRate}% win rate — there's room to produce more AI-integrated videos.`);
   if (highRate.length > 0) opportunities.push(`${highRate.length} videos with 15%+ thruplay rate — analyze their hooks and replicate for more submissions.`);
   opportunities.push(`Repurpose winning content into different formats (shorter cuts, different hooks) to multiply output without extra production effort.`);
-  if (winVids.length > 0) opportunities.push(`Boost winning videos with paid promotion to maximize their reach before month end.`);
 
   // CREATOR NOTES
   const creator_notes = [];
@@ -5256,6 +5305,9 @@ function msalOnAuthenticated(account) {
 const GRAPH_CAL_SCOPES = ['Calendars.Read'];
 const TEAMS_OPT_IN_KEY = 'easypc_teams_cal_on';
 const TEAMS_REFRESH_MS = 5 * 60 * 1000;
+// shortcut: Teams overlay paused because its token refresh redirected the page
+// while people were logging entries; set to true to bring the feature back
+const TEAMS_CALENDAR_ENABLED = false;
 let teamsMeetings = [];
 let teamsRedirectError_ = null;
 let _teamsLoading = false;
@@ -5323,6 +5375,11 @@ async function getGraphToken_() {
 }
 
 function initTeamsCalendar_() {
+  if (!TEAMS_CALENDAR_ENABLED) {
+    const btn = document.getElementById('teamsConnectBtn');
+    if (btn) btn.style.display = 'none';
+    return;
+  }
   if (teamsRedirectError_) {
     const e = teamsRedirectError_;
     teamsRedirectError_ = null;
@@ -5359,7 +5416,7 @@ async function connectTeamsCalendar() {
 }
 
 async function loadTeamsMeetings() {
-  if (!teamsOptedIn() || _teamsLoading || !msalInstance.getAllAccounts().length) return;
+  if (!TEAMS_CALENDAR_ENABLED || !teamsOptedIn() || _teamsLoading || !msalInstance.getAllAccounts().length) return;
   _teamsLoading = true;
   setTeamsStatus('loading', 'Loading Teams meetings…');
   try {
@@ -6314,6 +6371,15 @@ function openCalendarForm(entry, presetDate) {
   document.getElementById('calFieldScheduleType').value = entry ? normScheduleType_(entry.scheduleType) : 'Content';
   syncCalFormForType(entry ? entry.status : 'Idea');
   document.getElementById('calFieldHookType').value = entry ? (entry.hookType || '') : '';
+  const pillarSel = document.getElementById('calFieldPillar');
+  const subSel = document.getElementById('calFieldSubCategory');
+  if (!pillarSel.options.length) {
+    pillarSel.innerHTML = '<option value="">— None —</option>' + CAL_PILLARS.map(p => `<option>${p}</option>`).join('');
+    subSel.innerHTML = subCategoryOptionsHtml_('', '— None —', false);
+  }
+  pillarSel.value = entry && CAL_PILLARS.includes(entry.pillar) ? entry.pillar : '';
+  subSel.value = entry ? (entry.subCategory || '') : '';
+  if (subSel.selectedIndex < 0) subSel.value = ''; // name no longer in SUB_CATEGORIES
   document.getElementById('calFieldTitle').value = entry ? entry.title : '';
   document.getElementById('calFieldTitleCount').textContent = document.getElementById('calFieldTitle').value.length + '/80';
   document.getElementById('calFieldSavedBy').value = entry ? (entry.savedBy || '') : lastSavedByName;
@@ -6371,6 +6437,8 @@ async function submitCalendarEntry() {
     status: document.getElementById('calFieldStatus').value,
     scheduleType: document.getElementById('calFieldScheduleType').value,
     hookType: document.getElementById('calFieldHookType').value,
+    pillar: document.getElementById('calFieldPillar').value,
+    subCategory: document.getElementById('calFieldSubCategory').value,
     title: title,
     savedBy: document.getElementById('calFieldSavedBy').value.trim(),
     notes: document.getElementById('calFieldNotes').value.trim(),
@@ -6460,6 +6528,7 @@ function calendarStatusColor(status) {
     'Idea': '#71717A',
     'Scripting': '#FBBF24',
     'Filming/Design': '#A78BFA',
+    'Editing': '#FB923C',
     'Ready to post': '#38BDF8',
     'Posted': '#62B134',
     'Done': '#62B134',
@@ -6490,7 +6559,7 @@ function normScheduleType_(type) { return CALENDAR_SCHEDULE_TYPES.includes(type)
 // and don't need platform / content type / hook type.
 const WORK_ITEM_TYPES = ['Task', 'Project'];
 const WORK_ITEM_STATUSES = ['To do', 'In progress', 'Done'];
-const CONTENT_STATUSES = ['Idea', 'Scripting', 'Filming/Design', 'Ready to post', 'Posted', 'Done', 'Scheduled'];
+const CONTENT_STATUSES = ['Idea', 'Scripting', 'Filming/Design', 'Editing', 'Ready to post', 'Posted', 'Done', 'Scheduled'];
 
 function syncCalFormForType(preferredStatus) {
   const isWorkItem = WORK_ITEM_TYPES.includes(document.getElementById('calFieldScheduleType').value);
@@ -6562,10 +6631,11 @@ function progressCompletedOn_(e) {
   return isNaN(d) ? '' : progressIso_(d);
 }
 
-function progressStats_(week, creator, type = 'all') {
+function progressStats_(week, creator, type = 'all', sub = 'all') {
   const mine = contentCalendar.filter(e => isProgressTask_(e) &&
     (creator === 'all' || progressCreatorOf_(e) === creator) &&
-    (type === 'all' || progressTypeOf_(e) === type));
+    (type === 'all' || progressTypeOf_(e) === type) &&
+    (sub === 'all' || subCategoryOf_(e) === sub));
   const tasks = mine.filter(e => e.date >= week.start && e.date <= week.end)
     .sort((a, b) => a.date.localeCompare(b.date));
   const started = tasks.filter(isProgressStarted_);
@@ -6675,7 +6745,7 @@ function renderProgressTrend() {
   const end = document.getElementById('progressTrendWeek').value;
   if (!end) return;
   const w = progressWeek_(new Date(end + 'T00:00:00'));
-  const c = progressStats_(w, document.getElementById('progressFilterCreator').value || 'all', document.getElementById('progressFilterType').value);
+  const c = progressStats_(w, document.getElementById('progressFilterCreator').value || 'all', document.getElementById('progressFilterType').value, document.getElementById('progressFilterSubCategory').value);
   const pct = c.rate === null ? null : Math.round(c.rate * 100);
   document.getElementById('progressTrend').innerHTML = `<div class="progress-trend-row current">
       <span>${progressShortDate_(w.startDate)} – ${progressShortDate_(w.endDate)}</span>
@@ -6715,8 +6785,9 @@ function renderWeeklyProgress() {
   select.style.display = creators.length > 1 ? '' : 'none';
   const creatorKey = select.value;
   const typeFilter = document.getElementById('progressFilterType').value;
+  const subFilter = fillSubCategoryFilter_('progressFilterSubCategory');
 
-  const s = progressStats_(week, creatorKey, typeFilter);
+  const s = progressStats_(week, creatorKey, typeFilter, subFilter);
   const ratePct = s.rate === null ? null : Math.round(s.rate * 100);
   document.getElementById('progressStatus').textContent =
     `As of ${new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })} · source: Content Calendar sheet`;
@@ -6729,7 +6800,7 @@ function renderWeeklyProgress() {
 
   // Per-creator table
   const rows = creators.filter(name => creatorKey === 'all' || name === creatorKey)
-    .map(name => ({ name, c: progressStats_(week, name, typeFilter) }));
+    .map(name => ({ name, c: progressStats_(week, name, typeFilter, subFilter) }));
   document.getElementById('progressCreatorTable').innerHTML = `
     <thead><tr><th>Creator</th><th class="num">Dated</th><th class="num">Not started</th><th class="num">In progress</th><th class="num">Completed</th><th>Completion rate</th></tr></thead>
     <tbody>${rows.length ? rows.map(({ name, c }) => {
@@ -6743,6 +6814,45 @@ function renderWeeklyProgress() {
         <td><div style="display:flex;align-items:center;gap:10px;"><div class="progress-bar" style="flex:1;"><span style="width:${pct || 0}%"></span></div><span style="min-width:38px;text-align:right;">${pct === null ? '—' : pct + '%'}</span></div></td>
       </tr>`;
     }).join('') : '<tr><td colspan="6" style="color:var(--text3);">No creators with tasks this week.</td></tr>'}</tbody>`;
+
+  // Per sub-category: planned vs done this week, then done vs the monthly
+  // target for the month the week's Friday falls in, with last month beside it
+  const fri = new Date(week.startDate);
+  fri.setDate(fri.getDate() + 4);
+  const monthRange = d => ({ start: toISODate_(d.getFullYear(), d.getMonth(), 1), end: toISODate_(d.getFullYear(), d.getMonth(), new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()) });
+  const thisMonth = monthRange(fri);
+  const lastMonthDate = new Date(fri.getFullYear(), fri.getMonth() - 1, 1);
+  const lastMonth = monthRange(lastMonthDate);
+  const monthLabel = d => d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const subRows = [...SUB_CATEGORIES, { name: SUB_CATEGORY_UNASSIGNED, target: null, source: '' }]
+    .filter(c => subFilter === 'all' || c.name === subFilter)
+    .map(c => {
+      const wk = progressStats_(week, creatorKey, typeFilter, c.name);
+      return { ...c, planned: wk.tasks.length, weekDone: wk.completed.length,
+        monthDone: progressStats_(thisMonth, creatorKey, typeFilter, c.name).completed.length,
+        prevDone: progressStats_(lastMonth, creatorKey, typeFilter, c.name).completed.length };
+    });
+  const sum = key => subRows.filter(r => r.target).reduce((t, r) => t + r[key], 0); // Unassigned has no target, so it stays out
+  const momCell = (now, prev) => {
+    const diff = now - prev;
+    return `${prev} <span style="color:${diff > 0 ? '#62B134' : diff < 0 ? '#F87171' : 'var(--text3)'};font-weight:700;">(${diff > 0 ? '+' : ''}${diff})</span>`;
+  };
+  const subRowHtml = (r, isTotal) => {
+    const pct = r.target ? Math.round(r.monthDone / r.target * 100) : null;
+    return `<tr${isTotal ? ' style="font-weight:700;"' : ''}>
+      <td>${progressEsc_(r.name)}</td>
+      <td style="color:var(--text3);">${progressEsc_(r.source || '')}</td>
+      <td class="num">${r.weekDone} / ${r.planned}</td>
+      <td class="num">${r.target ? `${r.monthDone} / ${r.target} <span style="color:${pct >= 100 ? '#62B134' : 'var(--text3)'};">(${pct}%)</span>` : `${r.monthDone} <span style="color:var(--text3);">· walang target</span>`}</td>
+      <td class="num">${momCell(r.monthDone, r.prevDone)}</td>
+    </tr>`;
+  };
+  document.getElementById('progressSubCategoryNote').textContent =
+    `This week = done / planned. ${monthLabel(fri)} = Posted o Done laban sa monthly target. Last month = ${monthLabel(lastMonthDate)}, (+/-) kumpara ngayong buwan.`;
+  document.getElementById('progressSubCategoryTable').innerHTML = `
+    <thead><tr><th>Sub-category</th><th>Source</th><th class="num">This week</th><th class="num">${monthLabel(fri)}</th><th class="num">Last month</th></tr></thead>
+    <tbody>${subRows.map(r => subRowHtml(r)).join('')}
+    ${subFilter === 'all' ? subRowHtml({ name: 'Total (may sub-category)', source: '', planned: sum('planned'), weekDone: sum('weekDone'), monthDone: sum('monthDone'), prevDone: sum('prevDone'), target: sum('target') }, true) : ''}</tbody>`;
 
   // Week dropdown drives the whole tab (same as the ‹ › arrows). Lists this
   // week and the ones before it, newest first, reaching back far enough to
@@ -6772,7 +6882,7 @@ function renderWeeklyProgress() {
     if (showCreator) meta.push(progressCreatorOf_(e));
     return `<div class="progress-task" draggable="true" data-id="${progressEsc_(e.id)}" title="Click to open · drag to another list to change status" style="border-left-color:${calendarStatusColor(e.status)};" onclick="progressOpenTask('${progressEsc_(e.id)}')">
       <div class="progress-task-title">${scheduleTypeMeta(type).icon} ${progressEsc_(e.title || '(no title)')}${extraTag || ''}</div>
-      <div class="progress-task-meta">${meta.filter(Boolean).map(progressEsc_).join(' · ')}</div>
+      <div class="progress-task-meta">${meta.filter(Boolean).map(progressEsc_).join(' · ')} ${subCategoryTag_(e)}</div>
     </div>`;
   };
   const list = (group, title, items, emptyText, tagFor) => `<div class="card progress-drop" data-progress-drop="${group}">
@@ -6842,6 +6952,7 @@ function renderContentCalendar() {
   const statusFilter = document.getElementById('calendarFilterStatus').value;
   const scheduleTypeFilter = document.getElementById('calendarFilterScheduleType').value;
   const savedByFilter = document.getElementById('calendarFilterSavedBy').value;
+  const subFilter = fillSubCategoryFilter_('calendarFilterSubCategory');
 
   const savedBySelect = document.getElementById('calendarFilterSavedBy');
   const names = Array.from(new Set(contentCalendar.map(e => (e.savedBy || '').trim()).filter(Boolean))).sort();
@@ -6853,6 +6964,7 @@ function renderContentCalendar() {
     if (statusFilter !== 'all' && e.status !== statusFilter) return false;
     if (scheduleTypeFilter !== 'all' && normScheduleType_(e.scheduleType) !== scheduleTypeFilter) return false;
     if (savedByFilter !== 'all' && (e.savedBy || '') !== savedByFilter) return false;
+    if (subFilter !== 'all' && subCategoryOf_(e) !== subFilter) return false;
     return true;
   });
 
@@ -6864,7 +6976,7 @@ function renderContentCalendar() {
 
   // Teams meetings have no platform/status/saved-by, so they only show when
   // those filters are off (and the Type filter allows Meetings).
-  const showTeams = platformFilter === 'all' && statusFilter === 'all' && savedByFilter === 'all'
+  const showTeams = platformFilter === 'all' && statusFilter === 'all' && savedByFilter === 'all' && subFilter === 'all'
     && (scheduleTypeFilter === 'all' || scheduleTypeFilter === 'Meeting');
   const teamsByDate = {};
   if (showTeams) {
@@ -6968,6 +7080,7 @@ function renderContentCalendar() {
         <div class="cal-entry-title"><span title="${normScheduleType_(entry.scheduleType)}">${typeMeta.icon}</span> ${entry.title || '(no title)'}</div>
         <div class="cal-entry-meta">
           <span class="cal-entry-chip" style="background:${pillColor}26;color:${pillColor};">${entry.status}</span>
+          ${subCategoryTag_(entry)}
           ${metaBits ? `<span class="cal-entry-by">${metaBits}</span>` : ''}
         </div>`;
       card.appendChild(leftDiv);
@@ -7618,6 +7731,7 @@ function openCalDayPopup(dateStr, entries) {
           <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:6px;">${entry.title || '(no title)'}</div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <span class="cal-entry-chip" style="background:${pillColor}26;color:${pillColor};">${entry.status}</span>
+            ${subCategoryTag_(entry)}
             ${entry.savedBy ? `<span style="font-size:11px;color:var(--text3);">${entry.savedBy}</span>` : ''}
             ${entry.platform ? `<span style="font-size:11px;color:var(--text3);">· ${entry.platform}</span>` : ''}
           </div>
@@ -7705,6 +7819,8 @@ function openCalViewModal(entry) {
   document.getElementById('calViewBadges').innerHTML = `
     <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius: 2px;background:${color}22;color:${color};border:1px solid ${color}44;">${entry.status}</span>
     ${entry.platform ? `<span style="font-size:11px;padding:3px 10px;border-radius: 2px;background:var(--surface);color:var(--text2);border:1px solid var(--border2);">${entry.platform}</span>` : ''}
+    ${entry.pillar ? `<span style="font-size:11px;padding:3px 10px;border-radius: 2px;background:var(--surface);color:var(--text2);border:1px solid var(--border2);">${progressEsc_(entry.pillar)}</span>` : ''}
+    ${entry.subCategory ? `<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius: 2px;background:rgba(98,177,52,0.12);color:#62B134;border:1px solid rgba(98,177,52,0.3);">${progressEsc_(entry.subCategory)}</span>` : ''}
   `;
   document.getElementById('calViewDate').textContent = entry.date || '—';
   const viewTypeMeta = scheduleTypeMeta(entry.scheduleType);
@@ -8168,6 +8284,7 @@ function addViralTopicToCalendar(title) {
             <option>Idea</option>
             <option>Scripting</option>
             <option>Filming/Design</option>
+            <option>Editing</option>
             <option>Ready to post</option>
             <option>Posted</option>
             <option>Done</option>
@@ -8188,6 +8305,14 @@ function addViralTopicToCalendar(title) {
             <option>Story Hook</option>
             <option>Other</option>
           </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Pillar <span style="font-weight:400;">(optional)</span></label>
+          <select id="calFieldPillar" class="filter-select" style="width:100%;"></select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px;">Sub-category <span style="font-weight:400;">(optional)</span></label>
+          <select id="calFieldSubCategory" class="filter-select" style="width:100%;"></select>
         </div>
       </div>
       <div style="margin-bottom:14px;">
