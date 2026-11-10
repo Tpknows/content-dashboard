@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "content-dashboard",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "const h=require('http'),f=require('fs'),p=require('path');const d='C:/Users/Creatives/OneDrive - EasyPC/AI/CONTENT DASHBOARD';h.createServer((q,r)=>{const u=decodeURIComponent(q.url.split('?')[0]);const fp=p.join(d,u==='/'?'index.html':u);f.readFile(fp,(e,b)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'Content-Type':fp.endsWith('.html')?'text/html; charset=utf-8':'application/octet-stream'});r.end(b)})}).listen(5870)"],
+      "port": 5870
+    },
+    {
+      "name": "post-scheduler-dashboard",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5850", "--directory", "C:/Users/TP/Downloads/AI/POST SCHEDULER"],
+      "port": 5850
+    },
+    {
+      "name": "script-library",
+      "runtimeExecutable": "py",
+      "runtimeArgs": ["-m", "http.server", "5861", "--directory", "C:/Users/Tammy/OneDrive - EasyPC/AI/SCRIPT LIBRARY"],
+      "port": 5861
+    }
+  ]
+}
