@@ -2239,6 +2239,15 @@ const CREATIVE_CALENDAR_APPS_SCRIPT_URL = CALENDAR_APPS_SCRIPT_URL;
 // back to the YouTube-or-placeholder thumbnail it already had.
 const ZERNIO_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz07WcsSmUj5oP46U113V-U9uv1SepkKjlGzIEd3B5FqlZhwDX5iYpGn-HLHt3rPi1R/exec";
 let zernioThumbnails = {};
+// Live views per post link from the same Zernio proxy: { link: { v, at } }.
+// The Video Log only changes when DASHBOARD DATA is updated, so this shows
+// how far the real numbers have moved since then.
+let zernioLiveViews = {};
+let zernioLiveAt = '';
+function liveViewsOf_(v) {
+  const x = v && v.link && zernioLiveViews[v.link];
+  return x && typeof x.v === 'number' ? x.v : null;
+}
 // Hook Bank — separate curated Google Sheet (uploaded from the Hook Rate
 // export, then manually tagged with Hook Type / Hook Specifics per video).
 // This is now the source of truth for the Hook Bank tab, instead of computing
@@ -3151,6 +3160,25 @@ function populateCreatorFilter(videos) {
     creators.map(c => `<option value="${c}"${c === current ? ' selected' : ''}>${c}</option>`).join('');
 }
 
+function liveDeltaHTML_(diff) {
+  if (!diff) return '';
+  const up = diff > 0;
+  return `<span style="color:${up ? 'var(--green)' : 'var(--red)'}">${up ? '+' : '−'}${fmt(Math.abs(diff))}</span>`;
+}
+// Summary-bar tile: Video Log total, with each video's views swapped for its
+// Zernio live count where Zernio has one. Hidden until Zernio returns any.
+function liveViewsSummaryHTML_(vids, recordedTotal) {
+  let matched = 0, diff = 0;
+  vids.forEach(v => { const live = liveViewsOf_(v); if (live !== null) { matched++; diff += live - (v.views || 0); } });
+  if (!matched) return '';
+  const at = zernioLiveAt ? new Date(zernioLiveAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+  return `<div class="msb-item" title="Galing sa Zernio${at ? ', as of ' + at : ''}. ${matched} of ${vids.length} videos ang may live count; yung iba, dashboard views pa rin ang gamit.">
+    <div class="msb-val" style="color:#38BDF8">${fmt(recordedTotal + diff)}</div>
+    <div class="msb-label">Live Views ${liveDeltaHTML_(diff)}</div>
+    <div class="msb-label" style="margin-top:2px;">Zernio${at ? ' · ' + at : ''} · ${matched}/${vids.length} videos</div>
+  </div>`;
+}
+
 function renderMonthlyResults() {
   const month = document.getElementById('monthSelect').value;
   const d = DATA[month];
@@ -3172,6 +3200,7 @@ function renderMonthlyResults() {
     <div class="msb-item"><div class="msb-val" style="color:#FBBF24">${d.kpi_submitted}</div><div class="msb-label">Videos Submitted</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#f472b6">${d.ai}</div><div class="msb-label">AI Tagged</div></div>
     <div class="msb-item"><div class="msb-val"><span class="status-badge status-${status}">${statusLabel}</span></div><div class="msb-label">KPI Status</div></div>
+    ${liveViewsSummaryHTML_(d.all_videos || [], d.views)}
   `;
 
   populateCreatorFilter(d.all_videos);
@@ -3206,7 +3235,9 @@ function renderMonthlyResults() {
     const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '—';
     const dateDisplay = v.dateTimestamp ? (() => { const d = new Date(v.dateTimestamp); return (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0') + '/' + d.getFullYear(); })() : v.datePosted;
     const dateHTML = dateDisplay ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;">${dateDisplay}</span>` : '<span style="color:var(--text3);font-size:11px;">—</span>';
-    rows += `<tr><td style="color:var(--text2);font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div></td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}</td><td style="color:#A78BFA">${fmt(v.thruplays)}</td><td>${getHookBadgeCompact(v.hook_rate)}</td><td>${getHoldBadgeCompact(v.hold_rate)}</td><td style="color:var(--text2)">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
+    const live = liveViewsOf_(v);
+    const liveHTML = live === null ? '' : `<div style="font-size:10.5px;font-weight:600;color:var(--text3);white-space:nowrap;" title="Live views from Zernio">Live: ${fmt(live)} ${liveDeltaHTML_(live - (v.views || 0))}</div>`;
+    rows += `<tr><td style="color:var(--text2);font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div></td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}${liveHTML}</td><td style="color:#A78BFA">${fmt(v.thruplays)}</td><td>${getHookBadgeCompact(v.hook_rate)}</td><td>${getHoldBadgeCompact(v.hold_rate)}</td><td style="color:var(--text2)">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
   });
   document.getElementById('monthlyTableBody').innerHTML = rows || '<tr><td colspan="12" style="text-align:center;color:#444;padding:30px">No videos match your filter</td></tr>';
 }
@@ -5152,10 +5183,13 @@ async function fetchZernioThumbnails() {
     const data = await res.json();
     if (data.status === 'ok' && data.thumbnails) {
       Object.assign(zernioThumbnails, data.thumbnails);
+      if (data.liveViews) Object.assign(zernioLiveViews, data.liveViews);
+      if (data.fetchedAt) zernioLiveAt = data.fetchedAt;
       // Re-render whichever video-card tabs already have data, so real
       // thumbnails replace placeholders in place without a manual refresh.
       if (Object.keys(DATA).length) {
         renderTop10(month); renderAI(month); renderHook(month); renderHold(month);
+        renderMonthlyResults();
       }
     }
   } catch (e) { /* proxy not deployed/reachable yet — keep existing fallbacks */ }
