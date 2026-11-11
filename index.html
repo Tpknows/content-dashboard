@@ -3105,7 +3105,7 @@ function renderAI(month) {
     const viewsLine = p.live === null
       ? `${fmt(recorded)} views · Dashboard only`
       : `${fmt(p.live)} views${recorded !== null ? ' ' + liveDeltaHTML_(p.live - recorded) : ''}`;
-    const badges = [cap(p.platform), p.story ? 'Story' : '', p.log ? p.log.creator : ''].filter(Boolean)
+    const badges = [cap(p.platform), p.log ? p.log.creator : ''].filter(Boolean)
       .map(b => `<span class="top10-creator">${esc(b)}</span>`).join(' ');
     return `
       <div class="top10-item ${rankClass}" ${safeLink ? `onclick="window.open('${esc(safeLink)}','_blank')"` : ''}>
@@ -3162,8 +3162,8 @@ function liveDeltaHTML_(diff) {
 function zernioAtLabel_() {
   return zernioLiveAt ? new Date(zernioLiveAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
 }
-// Every post Zernio has for the month (all platforms, Video Log or not) plus
-// Video Log videos Zernio doesn't have, so the month total counts everything.
+// Every video post Zernio has for the month (all platforms, Video Log or not;
+// no stories, images or text posts) plus Video Log videos Zernio doesn't have.
 // Month is judged in PH time from Zernio's publishedAt.
 function liveMonthPosts_(month, logVideos) {
   const ph = iso => new Date(iso).toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'long', year: 'numeric' }).toUpperCase();
@@ -3174,13 +3174,15 @@ function liveMonthPosts_(month, logVideos) {
     const log = byLink[url];
     // no publishedAt (older proxy version): keep it only if it's this month's Video Log video
     if (x.d ? ph(x.d) !== month + ' 2026' : !log) return;
-    posts.push({ link: url, live: x.v, platform: x.p || postedPlatform_(url), story: url.includes('/stories/'),
+    // video content only: Video Log videos always count; otherwise Zernio must say video and it can't be a story
+    if (!log && (x.m !== 'video' || url.includes('/stories/'))) return;
+    posts.push({ link: url, live: x.v, platform: x.p || postedPlatform_(url),
       date: x.d, title: (log && log.title) || x.t || '', log });
   });
   const seen = new Set(posts.map(p => p.link));
   logVideos.forEach(v => {
     if (v.link && seen.has(v.link)) return;
-    posts.push({ link: v.link || '', live: null, platform: postedPlatform_(v.link), story: false,
+    posts.push({ link: v.link || '', live: null, platform: postedPlatform_(v.link),
       date: v.dateTimestamp ? new Date(v.dateTimestamp).toISOString() : '', title: v.title || '', log: v });
   });
   return posts;
@@ -3194,7 +3196,7 @@ function liveViewsSummaryHTML_(month, vids, recordedTotal) {
   if (!posts.some(p => p.live !== null)) return '';
   const total = posts.reduce((s, p) => s + postViews_(p), 0);
   const at = zernioAtLabel_();
-  return `<div class="msb-item" title="Lahat ng posts ngayong buwan, kasama ang wala sa Video Log. Galing sa Zernio${at ? ', as of ' + at : ''}.">
+  return `<div class="msb-item" title="Lahat ng video posts ngayong buwan (walang stories), kasama ang wala sa Video Log. Galing sa Zernio${at ? ', as of ' + at : ''}.">
     <div class="msb-val" style="color:#38BDF8">${fmt(total)}</div>
     <div class="msb-label">Live Views ${liveDeltaHTML_(total - recordedTotal)}</div>
     <div class="msb-label" style="margin-top:2px;">${posts.length} posts · Zernio${at ? ' · ' + at : ''}</div>
