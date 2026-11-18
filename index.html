@@ -5578,6 +5578,57 @@ function buildTeamsPill_(ev) {
 
 setInterval(() => { loadTeamsMeetings(); }, TEAMS_REFRESH_MS);
 
+// ── Posts published by the Post Scheduler (tp-post-scheduler.pages.dev) ─
+// Read-only key: the worker only lets it list posted posts.
+const SCHEDULER_WORKER_URL = 'https://post-scheduler.tammy-padal.workers.dev';
+const SCHEDULER_READ_TOKEN = 'j3d3M9fEKXM6Yrc43JrV___9OuoqyNYT';
+let schedulerPosts = [];
+
+async function loadSchedulerPosts() {
+  try {
+    const res = await fetch(SCHEDULER_WORKER_URL + '/posts', { headers: { Authorization: 'Bearer ' + SCHEDULER_READ_TOKEN }, cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const { posts } = await res.json();
+    schedulerPosts = (posts || []).map(p => {
+      const d = new Date(p.scheduled_time * 1000);
+      return {
+        _sched: true,
+        date: toISODate_(d.getFullYear(), d.getMonth(), d.getDate()),
+        time: d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        title: (p.caption || '').split('\n')[0].trim() || '(no caption)',
+        platform: p.platform,
+        account: p.account_name || '',
+        url: /^https?:\/\//i.test(p.platform_post_url || '') ? p.platform_post_url : '',
+      };
+    });
+    renderContentCalendar();
+  } catch (err) {
+    console.warn('Post Scheduler posts not loaded:', err.message);
+  }
+}
+
+function buildSchedulerPill_(p) {
+  const color = '#62B134';
+  const card = document.createElement('div');
+  card.className = 'cal-entry-pill';
+  card.style.cssText = `background:${color}16;border-left:3px solid ${color};cursor:${p.url ? 'pointer' : 'default'};`;
+  card.title = `${p.title} · ${p.platform}${p.account ? ' · ' + p.account : ''} · posted ${p.time} via Post Scheduler`;
+  const title = document.createElement('div');
+  title.className = 'cal-entry-title';
+  title.textContent = '📤 ' + p.title;
+  const meta = document.createElement('div');
+  meta.className = 'cal-entry-meta';
+  const chip = document.createElement('span');
+  chip.className = 'cal-entry-chip';
+  chip.style.cssText = `background:${color}26;color:${color};`;
+  chip.textContent = `${p.time} · ${p.platform}`;
+  meta.appendChild(chip);
+  card.appendChild(title);
+  card.appendChild(meta);
+  card.onclick = (e) => { e.stopPropagation(); if (p.url) window.open(p.url, '_blank', 'noopener'); };
+  return card;
+}
+
 // ─────────────────────────────────────────────────────────────
 // HIDDEN ADMIN PANEL — tap the header logo 6x to reveal a log of
 // sign-ins. Synced to the "Login Log" tab on the Content Calendar
@@ -6588,6 +6639,7 @@ async function loadContentCalendar() {
     statusEl.textContent = `${contentCalendar.length} scheduled entries.`;
     renderContentCalendar();
     loadTeamsMeetings();
+    loadSchedulerPosts();
   } catch (err) {
     console.error(err);
     statusEl.textContent = "May error sa pag-load. (" + err.message + ")";
@@ -7057,6 +7109,12 @@ function renderContentCalendar() {
     });
   }
 
+  // Scheduler posts are all "Posted", so they hide only under filters they can't match.
+  const schedByDate = {};
+  if (platformFilter === 'all' && (statusFilter === 'all' || statusFilter === 'Posted') && savedByFilter === 'all' && subFilter === 'all' && scheduleTypeFilter === 'all') {
+    schedulerPosts.forEach(p => { (schedByDate[p.date] = schedByDate[p.date] || []).push(p); });
+  }
+
   const year = calendarViewDate.getFullYear();
   const month = calendarViewDate.getMonth();
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -7123,10 +7181,11 @@ function renderContentCalendar() {
 
     const entriesWrap = document.createElement('div');
     entriesWrap.className = 'cal-entries';
-    const dayEntries = [...(teamsByDate[dateStr] || []), ...(byDate[dateStr] || [])];
+    const dayEntries = [...(teamsByDate[dateStr] || []), ...(byDate[dateStr] || []), ...(schedByDate[dateStr] || [])];
     const MAX_VISIBLE = 3;
     dayEntries.slice(0, MAX_VISIBLE).forEach(entry => {
       if (entry._teams) { entriesWrap.appendChild(buildTeamsPill_(entry)); return; }
+      if (entry._sched) { entriesWrap.appendChild(buildSchedulerPill_(entry)); return; }
       const color     = calendarStatusColor(entry.status);
       const isDone    = entry.status === 'Posted' || entry.status === 'Done';
       const hasLink   = entry.link && entry.link.trim();
@@ -7782,6 +7841,7 @@ function openCalDayPopup(dateStr, entries) {
   list.innerHTML = '';
   entries.forEach(entry => {
     if (entry._teams) { list.appendChild(buildTeamsPill_(entry)); return; }
+    if (entry._sched) { list.appendChild(buildSchedulerPill_(entry)); return; }
     const color = calendarStatusColor(entry.status);
     const isDone = entry.status === 'Posted' || entry.status === 'Done';
     const card = document.createElement('div');
