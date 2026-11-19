@@ -3926,7 +3926,6 @@ function renderInsightRecords() {
           { label:'Avg Thruplay %', val: (s.avg_thruplay_rate||0)+'%', pct: null,       color:'#f472b6' },
           { label:'Avg Hook Rate',  val: (s.avg_hook_rate||0)+'%',     pct: null,       color: s.avg_hook_rate>=60?'#62B134':s.avg_hook_rate>=50?'#38BDF8':s.avg_hook_rate>=40?'#A78BFA':s.avg_hook_rate>=30?'#FBBF24':'#F87171' },
           { label:'Avg Hold Rate',  val: (s.avg_hold_rate||0)+'%',     pct: null,       color: s.avg_hold_rate>=60?'#62B134':s.avg_hold_rate>=50?'#38BDF8':s.avg_hold_rate>=40?'#A78BFA':s.avg_hold_rate>=30?'#FBBF24':'#F87171' },
-          { label:'AI Tagged',      val: s.ai_tagged,            pct: null,             color:'#FBBF24' },
           { label:'Win Rate',       val: (s.win_rate_pct||0)+'%',pct: null,             color:'#62B134' },
         ].map(st => `<div style="background:var(--surface);border:1px solid var(--border);border-radius: 2px;padding:10px 14px;text-align:center;min-width:90px;">
           <div style="font-size:17px;font-weight:700;color:${st.color}">${st.val}</div>
@@ -4186,7 +4185,6 @@ function buildMoMInsights(month, d, prev, prevMonth) {
   const sPaceDiff   = paceDiff(d.kpi_submitted, prev.kpi_submitted); // % pace, used while in progress
   const rDiff  = pctDiff(d.avg_rate, prev.avg_rate);
   const hDiff  = (d.avg_hook_rate && prev.avg_hook_rate) ? pctDiff(d.avg_hook_rate, prev.avg_hook_rate) : null;
-  const aiDiff = d.ai - (prev.ai || 0);
 
   if (vDiff !== null) {
     (vDiff >= 0 ? highlights : lowlights).push(`Views ${vDiff >= 0 ? 'up' : 'down'} <strong>${Math.abs(vDiff)}%</strong> vs ${prevLabel()}${paceNote} (${fmt(d.views)} vs ${fmt(prev.views)} total).`);
@@ -4207,9 +4205,6 @@ function buildMoMInsights(month, d, prev, prevMonth) {
   }
   if (hDiff !== null) {
     (hDiff >= 0 ? highlights : lowlights).push(`Avg hook rate ${hDiff >= 0 ? 'improved' : 'dropped'} <strong>${Math.abs(hDiff)}%</strong> vs ${prevLabel()} (${d.avg_hook_rate}% vs ${prev.avg_hook_rate}%).`);
-  }
-  if (aiDiff !== 0) {
-    (aiDiff > 0 ? highlights : lowlights).push(`AI-tagged content ${aiDiff > 0 ? 'increased by' : 'decreased by'} <strong>${Math.abs(aiDiff)}</strong> video${Math.abs(aiDiff) !== 1 ? 's' : ''} vs ${prevLabel()}.`);
   }
 
   if (highlights.length === 0) {
@@ -4335,7 +4330,6 @@ function analyzeData(month, d) {
   if (winVids.length > 0) working.push(`${winVids.length} winning video${winVids.length>1?'s':''} produced — ${winRate}% win rate across all submissions.`);
   if (bestPillar.count > 0) working.push(`<strong>${bestPillar.name}</strong> pillar is your strongest with avg ${fmt(bestPillar.avg)} views per video (${bestPillar.count} videos).`);
   if (highRate.length > 0) working.push(`${highRate.length} video${highRate.length>1?'s':''} achieved 15%+ thruplay rate — strong retention on these pieces.`);
-  if (aiVids.length > 0 && aiWinRate > winRate) working.push(`AI-tagged videos have a higher win rate (${aiWinRate}%) vs overall (${winRate}%) — AI integration is paying off.`);
   if (topCreator) working.push(`<strong>${topCreator[0]}</strong> is the top creator this month with ${fmt(topCreator[1].views)} views from ${topCreator[1].videos} videos.`);
   if (working.length === 0) working.push('Data is still building — keep submitting quality content consistently.');
 
@@ -4354,7 +4348,6 @@ function analyzeData(month, d) {
   if (winGap > 0) actions.push(`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.3"/><circle cx="12" cy="12" r="0.9" fill="currentColor" stroke="none"/></svg> Need ${winGap} more winning videos — replicate the format of "${topVideo ? topVideo.title.substring(0,40)+'...' : 'your top video'}" which got ${topVideo ? fmt(topVideo.views) : 0} views.`);
   if (viewsGap > 0) actions.push(`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,17 10,10 14,13 20,5"/><polyline points="14,5 20,5 20,11"/></svg> To close the ${fmt(viewsGap)} views gap, focus on <strong>${bestPillar.name}</strong> content — it's your highest-performing pillar.`);
   if (d.avg_rate < 10) actions.push(`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Improve hooks in the first 3 seconds — ${lowRate.length} videos have under 5% thruplay rate. Test pattern-interrupt openings.`);
-  if (aiVids.length < d.videos * 0.3) actions.push(`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Only ${d.ai} AI-tagged videos (${Math.round(d.ai/d.videos*100)}% of submissions) — increase AI integration, it correlates with better performance.`);
   actions.push(`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Double down on content from <strong>${topCreator ? topCreator[0] : 'your top creator'}</strong> — increase their output this month.`);
   if (winVids.length > 0) actions.push(`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="1"/><rect x="9" y="2" width="6" height="3" rx="1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="13" y2="16"/></svg> Study the winning videos' hook types and pillar — replicate those exact formats with new topics.`);
   actions.push(`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> Submit content earlier in the month to allow more time for views to accumulate before month-end reporting.`);
@@ -4381,7 +4374,6 @@ function analyzeData(month, d) {
   // OPPORTUNITIES
   const opportunities = [];
   if (bestPillar.count < 10) opportunities.push(`Scale up <strong>${bestPillar.name}</strong> content — only ${bestPillar.count} videos this month but highest avg views at ${fmt(bestPillar.avg)}.`);
-  if (aiVids.length > 0 && aiWinRate > 0) opportunities.push(`AI content shows ${aiWinRate}% win rate — there's room to produce more AI-integrated videos.`);
   if (highRate.length > 0) opportunities.push(`${highRate.length} videos with 15%+ thruplay rate — analyze their hooks and replicate for more submissions.`);
   opportunities.push(`Repurpose winning content into different formats (shorter cuts, different hooks) to multiply output without extra production effort.`);
 
@@ -4870,6 +4862,32 @@ function generateClaudePrompt() {
   if (!lastInsights) { alert('Generate insights muna bago gumawa ng prompt.'); return; }
 
   const ins = lastInsights;
+// Why a winning video worked, from Video Log numbers only. Hook and hold come
+// first; when neither beats the month average, look at thruplay, views, and
+// whether the same Pillar + Hook Type also won last month.
+function winReason_(v, monthVids, prevVids, prevName) {
+  const avgOf = (arr, k) => { const xs = arr.map(x => x[k]).filter(x => x > 0); return xs.length ? Math.round(xs.reduce((s, x) => s + x, 0) / xs.length * 10) / 10 : 0; };
+  const avgHook = avgOf(monthVids, 'hook_rate'), avgHold = avgOf(monthVids, 'hold_rate');
+  const avgRate = avgOf(monthVids, 'thruplay_rate'), avgViews = avgOf(monthVids, 'views');
+  const out = [];
+  if (v.hook_rate >= 30 && v.hook_rate >= avgHook) out.push(`Malakas ang hook: ${v.hook_rate}% vs ${avgHook}% avg ng buwan`);
+  if (v.hold_rate >= 30 && v.hold_rate >= avgHold) out.push(`Nag-stay ang viewers: ${v.hold_rate}% hold vs ${avgHold}% avg`);
+  if (out.length) return out.join('. ') + '.';
+
+  out.push(v.hook_rate > 0 || v.hold_rate > 0 ? 'Hindi hook o hold ang dahilan' : 'Walang hook/hold data');
+  if (v.thruplay_rate > avgRate && avgRate > 0) out.push(`mataas ang thruplay (${v.thruplay_rate}% vs ${avgRate}% avg), tinapos ng tao ang video`);
+  if (avgViews > 0 && v.views >= avgViews * 1.5) out.push(`${Math.round(v.views / avgViews * 10) / 10}x ng avg views ang reach`);
+  const hook = splitHookTypes_(v.hookType)[0] || '';
+  if (v.pillar && hook && prevName && (prevVids || []).some(p => p.winning && p.pillar === v.pillar && splitHookTypes_(p.hookType)[0] === hook)) {
+    out.push(`parehong format (${v.pillar} · ${hook}) na nanalo rin noong ${prevName}`);
+  } else if (v.pillar) {
+    const pw = monthVids.filter(x => x.winning && x.pillar === v.pillar).length;
+    if (pw >= 2) out.push(`malakas ang ${v.pillar} pillar ngayong buwan (${pw} wins)`);
+  }
+  if (out.length === 1) out.push('wala sa data ang dahilan, i-review ang topic, product at kung na-boost');
+  return out.join('; ') + '.';
+}
+
   const month = lastInsightsMonth || 'This Month';
   const s = ins.snapshot || {};
   const monthLabel = month ? (month.charAt(0).toUpperCase() + month.slice(1).toLowerCase()) : 'This Month';
@@ -4894,11 +4912,17 @@ function generateClaudePrompt() {
     ? '- No winning videos recorded for this month yet.'
     : winVids.map((v, i) => {
         const hookStr  = v.hook_rate  > 0 ? ` · Hook Rate: ${v.hook_rate}%`  : '';
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const withData = MONTHS_ORDER.filter(m => DATA[m] && DATA[m].videos > 0);
+  const prevMonthKey = withData[withData.indexOf(month) - 1];
+  const prevVids = prevMonthKey ? (DATA[prevMonthKey].all_videos || []) : [];
+  const prevName = prevMonthKey ? prevMonthKey.charAt(0) + prevMonthKey.slice(1).toLowerCase() : '';
+
         const holdStr  = v.hold_rate  > 0 ? ` · Hold Rate: ${v.hold_rate}%`  : '';
         const linkStr  = v.link       ? ` · Link: ${v.link}` : '';
-        const aiStr    = v.ai         ? ' · AI' : '';
         return `${i+1}. "${v.title}"
-   Creator: ${v.creator || '—'} · Views: ${fmt(v.views)} · Thruplay: ${v.thruplay_rate || 0}%${hookStr}${holdStr} · Pillar: ${v.pillar || '—'}${aiStr}${linkStr}`;
+   Creator: ${v.creator || '—'} · Views: ${fmt(v.views)} · Thruplay: ${v.thruplay_rate || 0}%${hookStr}${holdStr} · Pillar: ${v.pillar || '—'}${linkStr}
+   Why it worked: ${winReason_(v, monthData.all_videos || [], prevVids, prevName)}`;
       }).join('\n\n');
 
   // Summary slide: status, best hook, first plan item
@@ -4992,7 +5016,7 @@ Show 8 metric cards in 2 rows of 4:
 - Avg Thruplay Rate: ${rateOrNone(s.avg_thruplay_rate)}
 - Avg Hook Rate: ${rateOrNone(s.avg_hook_rate)}
 - Avg Hold Rate: ${rateOrNone(s.avg_hold_rate)}
-- AI Tagged: ${s.ai_tagged || 0}
+- Win Rate: ${s.win_rate_pct || 0}%
 
 Below the cards, show 3 progress bars against targets:
 - Views: ${fmt(s.views || 0)} / ${fmt(s.views_target || 3000000)} target (${s.views_pct || 0}%)
@@ -5063,12 +5087,13 @@ Card design: Green left border (#62B134), white card background.
 For each card, display:
   - Rank number (bold, large, EasyPC green)
   - Video title (bold, dark, 14–15px)
-  - Creator name · Pillar badge · AI tag (if applicable)
+  - Creator name · Pillar badge
   - Metric pills in a row: Views | Thruplay Rate | Hook Rate | Hold Rate
   - If a link is provided → add a prominent "▶ Watch Video" button (EasyPC green pill) that links directly to the post
 
 WINNING VIDEOS DATA — use exactly as written below:
 ${winningSlideContent}
+  - "Why it worked" line under the pills (small text, keep the wording exactly as given in the data)
 
 Design notes for this slide:
   - The "▶ Watch Video" hyperlink must be a CLICKABLE hyperlink in the .pptx
