@@ -4858,10 +4858,6 @@ function stripHtmlTags(str) {
   return (str || '').replace(/<[^>]*>/g, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ').trim();
 }
 
-function generateClaudePrompt() {
-  if (!lastInsights) { alert('Generate insights muna bago gumawa ng prompt.'); return; }
-
-  const ins = lastInsights;
 // Why a winning video worked, from Video Log numbers only. Hook and hold come
 // first; when neither beats the month average, look at thruplay, views, and
 // whether the same Pillar + Hook Type also won last month.
@@ -4870,24 +4866,28 @@ function winReason_(v, monthVids, prevVids, prevName) {
   const avgHook = avgOf(monthVids, 'hook_rate'), avgHold = avgOf(monthVids, 'hold_rate');
   const avgRate = avgOf(monthVids, 'thruplay_rate'), avgViews = avgOf(monthVids, 'views');
   const out = [];
-  if (v.hook_rate >= 30 && v.hook_rate >= avgHook) out.push(`Malakas ang hook: ${v.hook_rate}% vs ${avgHook}% avg ng buwan`);
-  if (v.hold_rate >= 30 && v.hold_rate >= avgHold) out.push(`Nag-stay ang viewers: ${v.hold_rate}% hold vs ${avgHold}% avg`);
-  if (out.length) return out.join('. ') + '.';
+  if (v.hook_rate >= 30 && v.hook_rate >= avgHook) out.push(`Malakas ang hook, ${v.hook_rate}% kumpara sa ${avgHook}% na average this month.`);
+  if (v.hold_rate >= 30 && v.hold_rate >= avgHold) out.push(`Hindi agad nag-scroll ang viewers, ${v.hold_rate}% ang hold kumpara sa ${avgHold}% na average.`);
+  if (out.length) return out.join(' ');
 
-  out.push(v.hook_rate > 0 || v.hold_rate > 0 ? 'Hindi hook o hold ang dahilan' : 'Walang hook/hold data');
-  if (v.thruplay_rate > avgRate && avgRate > 0) out.push(`mataas ang thruplay (${v.thruplay_rate}% vs ${avgRate}% avg), tinapos ng tao ang video`);
-  if (avgViews > 0 && v.views >= avgViews * 1.5) out.push(`${Math.round(v.views / avgViews * 10) / 10}x ng avg views ang reach`);
+  out.push(v.hook_rate > 0 || v.hold_rate > 0 ? 'Hindi sa hook o hold nanalo ito.' : 'Walang hook at hold data ang video na ito.');
+  if (v.thruplay_rate > avgRate && avgRate > 0) out.push(`Mataas ang thruplay (${v.thruplay_rate}% vs ${avgRate}% na average), kaya marami talaga ang tumapos sa video.`);
+  if (avgViews > 0 && v.views >= avgViews * 1.5) out.push(`Umabot ng ${Math.round(v.views / avgViews * 10) / 10}x ng average views.`);
   const hook = splitHookTypes_(v.hookType)[0] || '';
   if (v.pillar && hook && prevName && (prevVids || []).some(p => p.winning && p.pillar === v.pillar && splitHookTypes_(p.hookType)[0] === hook)) {
-    out.push(`parehong format (${v.pillar} · ${hook}) na nanalo rin noong ${prevName}`);
+    out.push(`Same format din (${v.pillar} · ${hook}) ang nanalo noong ${prevName}.`);
   } else if (v.pillar) {
     const pw = monthVids.filter(x => x.winning && x.pillar === v.pillar).length;
-    if (pw >= 2) out.push(`malakas ang ${v.pillar} pillar ngayong buwan (${pw} wins)`);
+    if (pw >= 2) out.push(`Malakas ang ${v.pillar} content this month, ${pw} wins na.`);
   }
-  if (out.length === 1) out.push('wala sa data ang dahilan, i-review ang topic, product at kung na-boost');
-  return out.join('; ') + '.';
+  if (out.length === 1) out.push('Walang malinaw na dahilan sa numbers. Silipin ang topic, product, at kung na-boost ito.');
+  return out.join(' ');
 }
 
+function generateClaudePrompt() {
+  if (!lastInsights) { alert('Generate insights muna bago gumawa ng prompt.'); return; }
+
+  const ins = lastInsights;
   const month = lastInsightsMonth || 'This Month';
   const s = ins.snapshot || {};
   const monthLabel = month ? (month.charAt(0).toUpperCase() + month.slice(1).toLowerCase()) : 'This Month';
@@ -4908,16 +4908,16 @@ function winReason_(v, monthVids, prevVids, prevName) {
     .filter(v => v.winning)
     .sort((a, b) => b.views - a.views);
 
-  const winningSlideContent = winVids.length === 0
-    ? '- No winning videos recorded for this month yet.'
-    : winVids.map((v, i) => {
-        const hookStr  = v.hook_rate  > 0 ? ` · Hook Rate: ${v.hook_rate}%`  : '';
   const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   const withData = MONTHS_ORDER.filter(m => DATA[m] && DATA[m].videos > 0);
   const prevMonthKey = withData[withData.indexOf(month) - 1];
   const prevVids = prevMonthKey ? (DATA[prevMonthKey].all_videos || []) : [];
   const prevName = prevMonthKey ? prevMonthKey.charAt(0) + prevMonthKey.slice(1).toLowerCase() : '';
 
+  const winningSlideContent = winVids.length === 0
+    ? '- No winning videos recorded for this month yet.'
+    : winVids.map((v, i) => {
+        const hookStr  = v.hook_rate  > 0 ? ` · Hook Rate: ${v.hook_rate}%`  : '';
         const holdStr  = v.hold_rate  > 0 ? ` · Hold Rate: ${v.hold_rate}%`  : '';
         const linkStr  = v.link       ? ` · Link: ${v.link}` : '';
         return `${i+1}. "${v.title}"
@@ -4972,6 +4972,9 @@ function winReason_(v, monthVids, prevVids, prevName) {
   // flips the priority — useful when the comparison has nothing
   // positive to say (e.g. a slow or still-in-progress month) but the
   // month still has real strengths worth leading with.
+  // Highlights slide only when something went up vs last month; otherwise drop it
+  const hasHighlights = clean(ins.mom_highlights).length > 0;
+  momBlock.note = '(only results that went up vs previous month)';
   const framingByMode = {
     mom:     { slide3: momBlock,     slide4: workingBlock },
     working: { slide3: workingBlock, slide4: momBlock }
@@ -4985,7 +4988,7 @@ Name the file: "EasyPC Content Performance Report ${monthLabel} ${year} - ${toda
 RULES
 - Use the numbers, titles and links exactly as written. Do not add, estimate or round any figure, and do not invent videos, creators or results.
 - If a section or figure says "No data available" or "No data", keep the slide and say that plainly instead of filling it in.
-- Keep the Taglish wording in the Hook Plan slide as written.
+- Keep the Taglish wording in the Hook Plan slide and the "Why it worked" lines as written.
 - Every figure comes from the EasyPC Content Dashboard (Video Log and Hook Bank Google Sheets), as of ${today}. Put that source line in small text on the KPI Snapshot slide.
 
 BRAND & STYLE DIRECTION (EasyPC house style)
@@ -5023,21 +5026,14 @@ Below the cards, show 3 progress bars against targets:
 - Thruplays: ${fmt(s.thruplays || 0)} / ${fmt(s.thruplays_target || 1800000)} target (${s.thruplays_pct || 0}%)
 - Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
 
-SLIDE 4 — ${sl3.header} (two-column layout)
-Left column "${sl3.leftLabel}" ${sl3.note}:
-${sl3.leftBody}
+${[sl3, sl4].filter(b => b !== momBlock || hasHighlights).map(b => `SLIDE 4 — ${b.header} (two-column layout)
+Left column "${b.leftLabel}" ${b.note}:
+${b.leftBody}
 
-Right column "${sl3.rightLabel}" ${sl3.note}:
-${sl3.rightBody}
+Right column "${b.rightLabel}" ${b.note}:
+${b.rightBody}
 
-SLIDE 5 — ${sl4.header} (two-column layout)
-Left column "${sl4.leftLabel}" ${sl4.note}:
-${sl4.leftBody}
-
-Right column "${sl4.rightLabel}" ${sl4.note}:
-${sl4.rightBody}
-
-SLIDE 6 — HOOK RATE ANALYSIS
+`).join('')}SLIDE 6 — HOOK RATE ANALYSIS
 - Headline: Avg hook rate this month: ${rateOrNone(s.avg_hook_rate)}.
 - Include a horizontal scale/legend: Excellent (60%+), Very Strong (50-59%), Good (40-49%), Average (30-39%), Weak (<30%).
 - Recommendations:
@@ -5089,11 +5085,11 @@ For each card, display:
   - Video title (bold, dark, 14–15px)
   - Creator name · Pillar badge
   - Metric pills in a row: Views | Thruplay Rate | Hook Rate | Hold Rate
+  - "WHY IT WORKED" box under the pills: small green label "WHY IT WORKED", then the reason from the data in normal text. Keep the Taglish wording exactly as written; do not translate, shorten or add reasons.
   - If a link is provided → add a prominent "▶ Watch Video" button (EasyPC green pill) that links directly to the post
 
 WINNING VIDEOS DATA — use exactly as written below:
 ${winningSlideContent}
-  - "Why it worked" line under the pills (small text, keep the wording exactly as given in the data)
 
 Design notes for this slide:
   - The "▶ Watch Video" hyperlink must be a CLICKABLE hyperlink in the .pptx
@@ -5107,7 +5103,9 @@ SLIDE 13 — CLOSING (dark background)
 - Footer: "EasyPC Content Dashboard · Confidential"
 
 TONE
-Keep all text concise and data-driven, matching the tone of a monthly marketing/content performance report for a Philippine computer retail brand.`;
+Keep all text concise and data-driven, matching the tone of a monthly marketing/content performance report for a Philippine computer retail brand.`
+      // Renumber slides, since the highlights slide may be left out
+      .replace(/^SLIDE \d+ —/gm, (() => { let n = 0; return () => `SLIDE ${++n} —`; })());
   }
 
   const promptMom = buildPromptText('mom');
