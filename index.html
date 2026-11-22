@@ -2393,7 +2393,7 @@ function parseSheetData(raw) {
       if(rate>0) m._rates.push(rate);
       if(pillar==='KNOW') m.know++; else if(pillar==='LIKE') m.like++; else if(pillar==='TRUST') m.trust++;
       if(!m.creators[creator]) m.creators[creator]={videos:0,views:0,thruplays:0,winning:0}; m.creators[creator].videos++; m.creators[creator].views+=views; m.creators[creator].thruplays+=thruplays; if(winning) m.creators[creator].winning++;
-      m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
+      m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp,subCategory:String(v.subCategory||v['SUB-CATEGORY']||'').trim()});
     }
   } else if (raw.videoLog && Array.isArray(raw.videoLog)) {
     // Legacy: 2D array from sheet
@@ -2436,7 +2436,7 @@ function parseSheetData(raw) {
       if(rate>0)m._rates.push(rate);
       if(pillar==='KNOW')m.know++;else if(pillar==='LIKE')m.like++;else if(pillar==='TRUST')m.trust++;
       if(!m.creators[creator])m.creators[creator]={videos:0,views:0,thruplays:0,winning:0};m.creators[creator].videos++;m.creators[creator].views+=views;m.creators[creator].thruplays+=thruplays;if(winning)m.creators[creator].winning++;
-      m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp});
+      m.all_videos.push({title,creator,views,thruplays,thruplay_rate:rate,winning,ai,authentic,pillar,link,hookType,hook_rate,hold_rate,datePosted,dateTimestamp,subCategory:(colIdx('SUB-CATEGORY')>=0?String(row[colIdx('SUB-CATEGORY')]||''):'').trim()});
     }
   } else { return {}; }
 
@@ -3269,7 +3269,7 @@ function renderMonthlyResults() {
     const dateHTML = dateDisplay ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;">${dateDisplay}</span>` : '<span style="color:var(--text3);font-size:11px;">—</span>';
     const live = liveViewsOf_(v);
     const liveHTML = live === null ? '' : `<div style="font-size:10.5px;font-weight:600;color:var(--text3);white-space:nowrap;" title="Live views from Zernio">Live: ${fmt(live)} ${liveDeltaHTML_(live - (v.views || 0))}</div>`;
-    rows += `<tr><td style="color:var(--text2);font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div></td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}${liveHTML}</td><td style="color:#A78BFA">${fmt(v.thruplays)}</td><td>${getHookBadgeCompact(v.hook_rate)}</td><td>${getHoldBadgeCompact(v.hold_rate)}</td><td style="color:var(--text2)">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
+    rows += `<tr><td style="color:var(--text2);font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div>${videoTagSelectHtml_(v.link, v.title)}</td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}${liveHTML}</td><td style="color:#A78BFA">${fmt(v.thruplays)}</td><td>${getHookBadgeCompact(v.hook_rate)}</td><td>${getHoldBadgeCompact(v.hold_rate)}</td><td style="color:var(--text2)">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
   });
   document.getElementById('monthlyTableBody').innerHTML = rows || '<tr><td colspan="12" style="text-align:center;color:#444;padding:30px">No videos match your filter</td></tr>';
 }
@@ -3747,6 +3747,7 @@ function switchTab(tab, el) {
   if (tab === 'hold') renderHold(month);
   if (tab === 'hookbank') renderHookBank(month);
   if (tab === 'monthly') renderMonthlyResults();
+  if (tab === 'monthly' || tab === 'insights') loadVideoTags();
   if (tab === 'insights') { /* snapshot removed */ }
   if (tab === 'news') {
     if (!newsLoaded) {
@@ -4925,6 +4926,16 @@ function generateClaudePrompt() {
    Why it worked: ${winReason_(v, monthData.all_videos || [], prevVids, prevName)}`;
       }).join('\n\n');
 
+  // Per sub-category slide, from the manual tags (left out when nothing is tagged)
+  const monthVidsAll = monthData.all_videos || [];
+  const tagged = monthVidsAll.map(v => ({ ...v, sub: videoSubCategory_(v) })).filter(v => v.sub);
+  const avgPos = (arr, k) => { const xs = arr.map(x => x[k]).filter(x => x > 0); return xs.length ? Math.round(xs.reduce((a, x) => a + x, 0) / xs.length * 10) / 10 + '%' : 'No data'; };
+  const subCatContent = tagged.length === 0 ? '' : SUB_CATEGORIES
+    .map(c => ({ c, list: tagged.filter(v => v.sub === c.name) }))
+    .filter(x => x.list.length)
+    .map(({ c, list }) => `- ${c.name}: ${list.length} of ${c.target} target posted · Views: ${fmt(list.reduce((a, v) => a + v.views, 0))} (avg ${fmt(Math.round(list.reduce((a, v) => a + v.views, 0) / list.length))}) · Wins: ${list.filter(v => v.winning).length} · Avg Hook: ${avgPos(list, 'hook_rate')} · Avg Hold: ${avgPos(list, 'hold_rate')}`)
+    .join('\n') + `\n- Not yet tagged: ${monthVidsAll.length - tagged.length} of ${monthVidsAll.length} videos`;
+
   // Summary slide: status, best hook, first plan item
   const topHook = (ins.top_hooks || [])[0];
   const firstPlan = clean(ins.hook_plan)[0];
@@ -5072,7 +5083,11 @@ ${listOrNone(ins.opportunities)}
 Right column "CREATOR NOTES":
 ${listOrNone(ins.creator_notes)}
 
-SLIDE 12 — WINNING CONTENT THIS MONTH (light background)
+${subCatContent ? `SLIDE 12 — RESULTS PER SUB-CATEGORY
+Table, one row per sub-category, columns: Sub-category | Posted vs Target | Views | Avg Views | Wins | Avg Hook | Avg Hold. Highlight the row with the most wins in EasyPC green. Put the "Not yet tagged" line as a small note under the table. Source line in small text: "Sub-categories are tagged manually in the dashboard."
+${subCatContent}
+
+` : ''}SLIDE 12 — WINNING CONTENT THIS MONTH (light background)
 ──────────────────────────────────────────────────────
 Section label: "WINNING CONTENT — ${monthLabel} ${year}"
 Slide subtitle: "${winVids.length} winning video${winVids.length !== 1 ? 's' : ''} that exceeded performance benchmarks this month"
@@ -5649,7 +5664,73 @@ function buildSchedulerPill_(p) {
   card.appendChild(title);
   card.appendChild(meta);
   card.onclick = (e) => { e.stopPropagation(); if (p.url) window.open(p.url, '_blank', 'noopener'); };
+  const tagSel = videoTagSelectHtml_(p.url, p.title);
+  if (tagSel) card.insertAdjacentHTML('beforeend', `<div style="margin-top:4px;">${tagSel}</div>`);
   return card;
+}
+
+// ── Manual sub-category tags for posted videos ─────────────────────────
+// Picked in the Calendar (Post Scheduler posts) or in Monthly Results, saved in
+// the "Video Tags" tab of the Calendar Google Sheet keyed by the post ID in the
+// link. The auto-update copies them into the tracker's SUB-CATEGORY column.
+let videoTags = {};          // post ID -> sub-category
+let videoTagsReady = false;  // false until the Calendar Apps Script has the Video Tags tab
+function postIdOf_(link) { const m = String(link || '').match(/\d{8,}/g); return m ? m[m.length - 1] : ''; }
+function videoSubCategory_(v) { return videoTags[postIdOf_(v.link)] || v.subCategory || ''; }
+
+function videoTagSelectHtml_(link, title) {
+  const id = postIdOf_(link);
+  if (!id) return '';
+  const cur = videoTags[id] || '';
+  return `<select class="filter-select" style="font-size:10.5px;padding:2px 6px;max-width:100%;${cur ? 'color:#62B134;' : ''}" title="Sub-category"
+    onclick="event.stopPropagation()" onchange="saveVideoTag_(this.dataset.link, this.dataset.title, this.value)"
+    data-link="${progressEsc_(link)}" data-title="${progressEsc_(title)}">
+    <option value="">Sub-category…</option>
+    ${SUB_CATEGORIES.map(c => `<option value="${progressEsc_(c.name)}"${c.name === cur ? ' selected' : ''}>${progressEsc_(c.name)}</option>`).join('')}
+  </select>`;
+}
+
+function rerenderTaggedViews_() {
+  try { renderMonthlyResults(); } catch (e) {}
+  try { renderContentCalendar(); } catch (e) {}
+}
+
+async function loadVideoTags() {
+  try {
+    const res = await fetch(CALENDAR_APPS_SCRIPT_URL + '?action=list&calendarType=videotags&t=' + Date.now(), { cache: 'no-store' });
+    const { entries = [] } = await res.json();
+    // An old backend answers with Content Calendar rows (they have "platform")
+    videoTagsReady = !entries.some(e => 'platform' in e);
+    videoTags = {};
+    if (videoTagsReady) entries.forEach(e => { if (e.id && e.subCategory) videoTags[String(e.id)] = e.subCategory; });
+    rerenderTaggedViews_();
+  } catch (err) {
+    console.warn('Video tags not loaded:', err.message);
+  }
+}
+
+async function saveVideoTag_(link, title, sub) {
+  const id = postIdOf_(link);
+  if (!id) return;
+  if (!videoTagsReady) {
+    alert('Hindi pa masa-save ang sub-category. Kailangan munang i-paste ang bagong "Content Calendar.txt" sa Calendar Apps Script at i-deploy ulit.');
+    rerenderTaggedViews_();
+    return;
+  }
+  const prev = videoTags[id];
+  if (sub) videoTags[id] = sub; else delete videoTags[id];
+  try {
+    const body = sub
+      ? { action: 'update', calendarType: 'videotags', entry: { id, link, title: String(title || '').slice(0, 120), subCategory: sub, taggedBy: (document.getElementById('msalUserName') || {}).textContent || '' } }
+      : { action: 'delete', calendarType: 'videotags', id };
+    const res = await fetch(CALENDAR_APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    const out = await res.json();
+    if (out.status !== 'ok') throw new Error(out.message || 'unknown error');
+  } catch (err) {
+    if (prev) videoTags[id] = prev; else delete videoTags[id];
+    alert('Hindi na-save ang sub-category: ' + err.message);
+  }
+  rerenderTaggedViews_();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -6663,6 +6744,7 @@ async function loadContentCalendar() {
     renderContentCalendar();
     loadTeamsMeetings();
     loadSchedulerPosts();
+    loadVideoTags();
   } catch (err) {
     console.error(err);
     statusEl.textContent = "May error sa pag-load. (" + err.message + ")";

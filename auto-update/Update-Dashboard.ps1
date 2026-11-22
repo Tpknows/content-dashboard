@@ -332,6 +332,37 @@ try {
 
   function Sheet-Row([int]$i) { return $FIRST + $i - 1 }
 
+  # ---- 7b. SUB-CATEGORY: manual tags from the dashboard (Calendar / Monthly Results),
+  # saved in the "Video Tags" tab of the Calendar Google Sheet, matched by the post ID in VIDEO LINK
+  if ($Config.videoTagsUrl) {
+    try {
+      $resp = Invoke-RestMethod -Uri ($Config.videoTagsUrl + '?action=list&calendarType=videotags') -TimeoutSec 60
+      # An old backend answers with Content Calendar rows (they have "platform"); ignore those
+      $tags = @{}
+      foreach ($e in @($resp.entries)) { if ($e.id -and $e.subCategory -and -not ($e.PSObject.Properties.Name -contains 'platform')) { $tags["$($e.id)"] = "$($e.subCategory)" } }
+      if (-not $th.ContainsKey('SUB-CATEGORY')) {
+        $sc = $lastCol + 1
+        $ws.Cells($HDR, $lastCol).Copy($ws.Cells($HDR, $sc)) | Out-Null
+        Set-XlProp $ws $HDR $sc 'Value2' 'SUB-CATEGORY'
+        $th['SUB-CATEGORY'] = $sc; $lastCol = $sc
+        Log 'Ginawa ang SUB-CATEGORY column sa VIDEO LOG.'
+      }
+      $sc = $th['SUB-CATEGORY']; $setCount = 0
+      foreach ($i in ($rowRec.Keys | Sort-Object)) {
+        $m = [regex]::Matches((Clean $cols['VIDEO LINK'][$i, 1]), '\d{8,}')
+        if (-not $m.Count) { continue }
+        $id = $m[$m.Count - 1].Value
+        if (-not $tags.ContainsKey($id)) { continue }
+        $r = Sheet-Row $i
+        if ((Clean $ws.Cells($r, $sc).Value2) -ne $tags[$id]) { Set-XlProp $ws $r $sc 'Value2' $tags[$id]; $setCount++ }
+      }
+      $trackWb.Save()
+      Log ('SUB-CATEGORY: ' + $tags.Count + ' tags sa dashboard, ' + $setCount + ' cells ang na-update.')
+    } catch {
+      Log ('SUB-CATEGORY: hindi nakuha ang tags (' + $_.Exception.Message + '). Tuloy pa rin ang update.')
+    }
+  }
+
 
   # ---- 8. AI tags
   if (-not $NoAI -and $Config.aiTagging -and $todo.Count) {
