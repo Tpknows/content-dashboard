@@ -10,7 +10,7 @@
   "pillars": ["KNOW", "TRUST", "LIKE", "ASPIRATION"],
   "categories": ["Educational Tip", "Tech Info", "Product Feature", "Humor", "Campaign", "Social Proof", "Credential", "Pro Insights", "You Asked We Answer", "High End", "Wow Factor Technology", "Day in the Life", "Review", "Mistake Avoidance", "Useful Tools"],
   "hookTypes": ["Statement Hook", "Question Hook", "Visual Hook", "Story Hook", "Text Hook", "Moving Hook", "Contrast Hook", "Sound Hook"],
-  "uploadUrl": "",
+  "uploadUrl": "https://script.google.com/macros/s/AKfycbyYnEOW9HCFmScs86xnbIt9eF84JkLdn5edlAEWHkT0AtdmyfBuPixELmkuMRqU5BED_w/exec",
   "keepBackups": 15,
   "videoTagsUrl": "https://script.google.com/macros/s/AKfycbx3R07juun2SwRgi0TMwJBN0NpjTkrTrjt1omfDek1WE0Du0wr6ljIbWmt9meXDbG0-/exec"
 }

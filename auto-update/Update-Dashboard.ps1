@@ -13,6 +13,8 @@
     4. saves the tracker (a backup copy is kept first)
     5. pushes the tracker to the Google Sheet through the Tracker Upload
        Apps Script (only when uploadUrl is set in config.json)
+    6. syncs the Hook Bank and fills blank HOOK SPECIFICS by watching each
+       new reel (hook-breakdown\tools\auto-hook-bank.mjs)
 
   Usage
     UPDATE DASHBOARD.bat                      normal run
@@ -82,9 +84,17 @@ if ($IfChanged) {
   $last = $null
   if (Test-Path $StatePath) { $last = ([IO.File]::ReadAllText($StatePath, $Utf8) | ConvertFrom-Json).dashboardWriteTime }
   $now = (Get-Item -LiteralPath $DashPath).LastWriteTimeUtc.ToString('o')
-  if ($last -eq $now) { exit 0 }
+  if ($last -eq $now) {
+    # No new data, but Hook Bank tags left unfinished last time are retried, at most once an hour
+    $hookDir = Join-Path $Here '..\..\hook-breakdown'
+    $pending = Get-Item -LiteralPath (Join-Path $hookDir 'breakdowns\_sheet\auto-hook-bank.pending') -ErrorAction SilentlyContinue
+    if ($pending -and $pending.LastWriteTime -lt (Get-Date).AddHours(-1)) {
+      Start-Process -FilePath 'node.exe' -ArgumentList 'tools\auto-hook-bank.mjs' -WorkingDirectory (Resolve-Path $hookDir).Path -WindowStyle Hidden -Wait | Out-Null
+    }
+    exit 0
+  }
   if (Test-Open $DashPath) { exit 0 }   # still being edited; next run will pick it up
-  if (Test-Open $TrackPath) { Log 'Skipped: bukas ang tracker sa Excel.'; exit 0 }
+  if (Test-Open $TrackPath) { exit 0 }   # silent: checked every 5 minutes, runs once it is closed
 }
 
 if (Test-Open $TrackPath) { throw 'Bukas ang tracker sa Excel. Isara mo muna, tapos ulitin.' }
@@ -189,11 +199,17 @@ try {
     $t[$k] = Need-Col $th $k 'VIDEO LOG'
   }
   $lastCol = ($th.Values | Measure-Object -Maximum).Maximum
-  $xlUp = -4162
+  # Last row with a date, title or link. Reads values directly because End(xlUp)
+  # skips rows hidden by a filter, which made every run re-add the same videos.
   $last = $FIRST - 1
-  foreach ($k in 'DATE POSTED', 'VIDEO TITLE', 'VIDEO LINK') {
-    $lr = $ws.Cells($ws.Rows.Count, $t[$k]).End($xlUp).Row
-    if ($lr -gt $last) { $last = $lr }
+  $usedEnd = $ws.UsedRange.Row + $ws.UsedRange.Rows.Count - 1
+  if ($usedEnd -ge $FIRST) {
+    foreach ($k in 'DATE POSTED', 'VIDEO TITLE', 'VIDEO LINK') {
+      $cv = Get-Block $ws.Range($ws.Cells($FIRST, $t[$k]), $ws.Cells($usedEnd, $t[$k]))
+      for ($i = $cv.GetLength(0); $i -ge 1; $i--) {
+        if ((Clean $cv[$i, 1]).Trim()) { if ($FIRST + $i - 1 -gt $last) { $last = $FIRST + $i - 1 }; break }
+      }
+    }
   }
   $n = $last - $FIRST + 1
   $tv = Get-Block $ws.Range($ws.Cells($FIRST, 1), $ws.Cells($last, $lastCol))
@@ -323,6 +339,7 @@ try {
       # New row: borrow the first data row's formatting (no clipboard used)
       $ws.Rows($FIRST).Copy($ws.Rows($r)) | Out-Null
       $ws.Rows($r).ClearContents() | Out-Null
+      $ws.Rows($r).Hidden = $false   # row 5 may be hidden by a filter; new rows must stay visible
     }
     foreach ($k in $written) { Set-XlProp $ws $r $t[$k] 'Value2' $cols[$k][$i, 1] }
     foreach ($col in $tmpl.Keys) { Set-XlProp $ws $r $col 'FormulaR1C1' $tmpl[$col] }
@@ -493,4 +510,17 @@ if (-not $NoUpload -and $Config.uploadUrl) {
 
 $state = @{ dashboardWriteTime = (Get-Item -LiteralPath $DashPath).LastWriteTimeUtc.ToString('o'); lastRun = (Get-Date).ToString('o') }
 [IO.File]::WriteAllText($StatePath, ($state | ConvertTo-Json), $Utf8)
+
+# ---------------------------------------------------------------- 9. Hook Bank specifics
+# Syncs the Hook Bank, then watches every reel with a blank HOOK SPECIFICS and fills it
+# (hook-breakdown\tools\auto-hook-bank.mjs). Runs after the state is saved, so a failure
+# here never makes the update above run again.
+if (-not $NoUpload -and $Config.uploadUrl) {
+  Log 'Hook Bank: sync at fill ng HOOK SPECIFICS (log: hook-breakdown\breakdowns\_sheet\auto-hook-bank.log) ...'
+  try {
+    $hookDir = (Resolve-Path (Join-Path $Here '..\..\hook-breakdown')).Path
+    $p = Start-Process -FilePath 'node.exe' -ArgumentList 'tools\auto-hook-bank.mjs' -WorkingDirectory $hookDir -WindowStyle Hidden -Wait -PassThru
+    Log ('Hook Bank: ' + $(if ($p.ExitCode -eq 0) { 'tapos' } else { 'may error, tingnan ang auto-hook-bank.log' }))
+  } catch { Log ('Hook Bank error: ' + $_) }
+}
 Log '==== Tapos.'

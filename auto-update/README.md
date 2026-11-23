@@ -12,15 +12,16 @@
    - Caption lang ang nababasa ng AI, hindi ang video. Kaya ang HOOK TEXT ay galing sa caption, at hula lang ang HOOK TYPE na Visual, Moving o Sound.
 4. May backup muna bago mag-save (`backups\`, huling 15 lang ang tinatago).
 5. Pinu-push ang tracker sa Google Sheet (kapag naka-setup na, tingnan sa baba).
+6. Sini-sync agad ang Hook Bank, tapos pinapanood ang bawat reel na blangko pa ang HOOK SPECIFICS at pinupunan ito, pati Said, Visual, Sound, Bakit Gumana at Tone. Blangkong cells lang ang ginagalaw. Pumapasok din ito sa hook library. Ilang minuto ito bawat reel. Ang log ay nasa `hook-breakdown\breakdowns\_sheet\auto-hook-bank.log`. Para gumana, kailangang naka-paste sa Apps Script ng Hook Bank ang buong `Hook Bank Script (all-in-one).txt` (Part 3 ang bago), at may Script Property na `UPLOAD_TOKEN`.
 
 Lahat ng nangyari ay nasa `logs\update-YYYY-MM-DD.log`. Ang AI tags ay nasa `logs\ai-tags.csv`.
 
 ## Paano patakbuhin
 
 - **Manual:** double-click ang `UPDATE DASHBOARD.bat`. Isara muna ang tracker sa Excel.
-- **Automatic:** patakbuhin minsan ang `Setup-AutoRun.ps1`. Tuwing 8 AM, 1 PM at 5 PM, Monday to Friday, chine-check nito kung may bagong save sa DASHBOARD DATA. Kapag meron at sarado ang dalawang file, tatakbo na siya mag-isa. Kapag walang binago, wala siyang gagawin. Walang takbo tuwing Sabado at Linggo. Pang-off: `Setup-AutoRun.ps1 -Remove`.
-  - Kapag bukas pa ang DASHBOARD DATA o ang tracker sa oras na yan, lalaktawan muna niya at sa susunod na oras na lang. Kaya isara na ang files bago mag-8, 1 o 5.
-  - Kapag patay ang PC sa oras na yan, tatakbo siya pagbukas at pag-login mo.
+- **Automatic:** patakbuhin minsan ang `Setup-AutoRun.ps1`. Kada 5 minuto, araw-araw, chine-check nito kung may bagong save sa DASHBOARD DATA. Kapag meron at sarado ang dalawang file, tatakbo na siya mag-isa. Kapag walang binago, hihinto agad siya. Pang-off: `Setup-AutoRun.ps1 -Remove`.
+  - Kapag bukas pa ang DASHBOARD DATA o ang tracker, maghihintay muna siya. Tatakbo siya sa loob ng 5 minuto pagkasara mo ng files.
+  - Kapag patay ang PC, tatakbo siya pagbukas at pag-login mo.
 
 Kapag nilipat ang folder sa OneDrive, hahanapin ito ng script at ia-update ang `dataFolder` sa config.json.
 
