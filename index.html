@@ -1427,10 +1427,6 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       </div>
       <button onclick="closeClaudePromptModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
     </div>
-    <div style="display:flex;gap:8px;padding:14px 24px 0;">
-      <button id="claudeModeMom" onclick="switchClaudePromptMode('mom')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid #62B134;border-radius:2px;cursor:pointer;background:#62B134;color:#000;font-family:inherit;">Month-over-Month</button>
-      <button id="claudeModeWorking" onclick="switchClaudePromptMode('working')" style="padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid var(--border2);border-radius:2px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;">What's Working</button>
-    </div>
     <textarea id="claudePromptText" readonly style="flex:1;min-height:420px;background:#0b0b0b;color:#ddd;border:none;padding:20px 24px;font-family:'SF Mono',Consolas,monospace;font-size:12.5px;line-height:1.65;resize:none;outline:none;"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap;">
       <span id="claudePromptStatus" style="font-size:11.5px;color:var(--text3);"></span>
@@ -2229,6 +2225,10 @@ function setIconHTML(el, iconHtml, text) {
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlDlrch4raEz4foQM-TycNyU-AI93vDzcSza9gsb_unt2x6xHrX-5T5X38IzRMVkMB/exec";
 // Separate backend for Weekly Topics History — does NOT touch the KPI dashboard sheet above.
 const TOPICS_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDKK0JCkwES-4wkly2nTubSFxfhSBhCAtv3M36WRhU6j11eejSfxB25-wCWoWH_Gm5A/exec";
+// Script Library Relay — standalone Apps Script, see "Script Library Relay Backend.txt".
+// Sends a Tech News topic to the Script Library's live Sheet as a new Draft row.
+// Placeholder until deployed — replace with the /exec URL the deployment gives you.
+const SCRIPT_LIBRARY_RELAY_URL = "";
 // AI Insights — dedicated sheet: 1BY0JEB1GkytqlxMPHOvcsQ_mRjO9X3jJt1N1DeHsgCQ
 // Actions: POST { action:"save", ...record } | GET ?action=list
 const INSIGHTS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDKK0JCkwES-4wkly2nTubSFxfhSBhCAtv3M36WRhU6j11eejSfxB25-wCWoWH_Gm5A/exec";
@@ -3943,7 +3943,7 @@ function renderInsightRecords() {
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius: 2px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${r.kpi_status}</span>
-          ${r.manus_prompt ? `<button onclick="copyRecordClaudePrompt('${r.month}','mom')" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy MoM Prompt</button>` : ''}
+          ${r.manus_prompt ? `<button onclick="copyRecordClaudePrompt('${r.month}','mom')" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy Claude Prompt</button>` : ''}
           ${r.manus_prompt_working ? `<button onclick="copyRecordClaudePrompt('${r.month}','working')" style="background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy What's Working Prompt</button>` : ''}
           <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(248,113,113,0.1);color:#F87171;border:1px solid rgba(248,113,113,0.2);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Delete</button>
         </div>
@@ -4328,7 +4328,7 @@ function analyzeData(month, d) {
   // WHAT'S WORKING
   const working = [];
   if (viewsPct >= 70) working.push(`Views are at ${viewsPct}% of target (${fmt(d.views)}) — solid reach this month.`);
-  if (winVids.length > 0) working.push(`${winVids.length} winning video${winVids.length>1?'s':''} produced — ${winRate}% win rate across all submissions.`);
+  if (winVids.length > 0) working.push(`${winVids.length} winning video${winVids.length>1?'s':''} produced — ${winRate}% win rate across Video Log videos.`);
   if (bestPillar.count > 0) working.push(`<strong>${bestPillar.name}</strong> pillar is your strongest with avg ${fmt(bestPillar.avg)} views per video (${bestPillar.count} videos).`);
   if (highRate.length > 0) working.push(`${highRate.length} video${highRate.length>1?'s':''} achieved 15%+ thruplay rate — strong retention on these pieces.`);
   if (topCreator) working.push(`<strong>${topCreator[0]}</strong> is the top creator this month with ${fmt(topCreator[1].views)} views from ${topCreator[1].videos} videos.`);
@@ -4576,10 +4576,18 @@ function buildHookPlan(month, d, ins) {
     .filter(v => v.hook_rate > 0)
     .map(v => ({ ...v, hookTypes: splitHookTypes_(v.hookType), breakdown: {} }));
   const source = fromBank
-    ? `Hook Bank sheet (${bankVids.length} entries, 30%+ hook rate)`
+    ? `Hook Bank sheet (${bankVids.length} entries, 30%+ hook rate); views, hook and hold rates from the Video Log`
     : `Video Log (wala pang Hook Bank entries para sa ${monthLabel})`;
 
-  const top_hooks = [...pool].sort((a, b) => b.hook_rate - a.hook_rate).slice(0, 5).map(v => ({
+  // Hook Bank numbers are a snapshot from when the hook was logged; the Video Log keeps updating,
+  // so use its views and rates for the same post so every slide shows one figure per video
+  const logByLink = new Map(d.all_videos.filter(v => v.link).map(v => [v.link.trim(), v]));
+  const withLogStats = v => {
+    const l = fromBank && v.link ? logByLink.get(v.link.trim()) : null;
+    return l ? { ...v, views: l.views, hook_rate: l.hook_rate || v.hook_rate, hold_rate: l.hold_rate || v.hold_rate, winning: l.winning } : v;
+  };
+
+  const top_hooks = pool.map(withLogStats).sort((a, b) => b.hook_rate - a.hook_rate).slice(0, 5).map(v => ({
     title: v.title,
     creator: v.creator || '',
     hook_type: v.hookTypes.join(', '),
@@ -4631,7 +4639,9 @@ function buildHookPlan(month, d, ins) {
   const logTyped = d.all_videos.filter(v => v.hook_rate > 0)
     .map(v => ({ ...v, hookTypes: splitHookTypes_(v.hookType) }))
     .filter(v => v.hookTypes.length);
-  groupTypes(logTyped).filter(t => t.videos >= 2 && t.avgHook < 30).slice(-2).forEach(t => {
+  // Skip types recommended above, so the plan never says use and cut the same hook
+  const recommended = ranked.slice(0, 2).map(t => t.name);
+  groupTypes(logTyped).filter(t => t.videos >= 2 && t.avgHook < 30 && !recommended.includes(t.name)).slice(-2).forEach(t => {
     plan.push(`Bawasan muna ang <strong>${t.name}</strong>. ${t.avgHook}% lang ang avg hook rate nito sa ${t.videos} videos. Kung gagamitin ulit, baguhin ang opening.`);
   });
   const avgHook = d.avg_hook_rate || 0;
@@ -4915,13 +4925,21 @@ function generateClaudePrompt() {
   const prevVids = prevMonthKey ? (DATA[prevMonthKey].all_videos || []) : [];
   const prevName = prevMonthKey ? prevMonthKey.charAt(0) + prevMonthKey.slice(1).toLowerCase() : '';
 
+  // Multi-line post captions don't fit a card: give the deck the first line (max 120 chars) to show
+  const shortTitleLine = t => {
+    const full = (t || '').trim();
+    const first = full.split('\n')[0].trim();
+    if (first === full && full.length <= 160) return '';
+    return `\n   Short title: "${first.length > 120 ? first.substring(0, 117) + '...' : first}"`;
+  };
+
   const winningSlideContent = winVids.length === 0
     ? '- No winning videos recorded for this month yet.'
     : winVids.map((v, i) => {
         const hookStr  = v.hook_rate  > 0 ? ` · Hook Rate: ${v.hook_rate}%`  : '';
         const holdStr  = v.hold_rate  > 0 ? ` · Hold Rate: ${v.hold_rate}%`  : '';
         const linkStr  = v.link       ? ` · Link: ${v.link}` : '';
-        return `${i+1}. "${v.title}"
+        return `${i+1}. "${v.title}"${shortTitleLine(v.title)}
    Creator: ${v.creator || '—'} · Views: ${fmt(v.views)} · Thruplay: ${v.thruplay_rate || 0}%${hookStr}${holdStr} · Pillar: ${v.pillar || '—'}${linkStr}
    Why it worked: ${winReason_(v, monthData.all_videos || [], prevVids, prevName)}`;
       }).join('\n\n');
@@ -4949,7 +4967,7 @@ function generateClaudePrompt() {
   // Top hooks + hook-type ranking for the Top Hooks slide
   const topHooksContent = (ins.top_hooks || []).length === 0
     ? '- No data available.'
-    : ins.top_hooks.map((h, i) => `${i+1}. "${h.title}"
+    : ins.top_hooks.map((h, i) => `${i+1}. "${h.title}"${shortTitleLine(h.title)}
    Creator: ${h.creator || '—'} · Hook Type: ${h.hook_type || '—'} · Hook Rate: ${h.hook_rate}%${h.hold_rate > 0 ? ` · Hold Rate: ${h.hold_rate}%` : ''} · Views: ${fmt(h.views)}${h.winning ? ' · WINNING' : ''}${h.opening ? `
    Opening line: "${h.opening}"` : ''}${h.link ? `
    Link: ${h.link}` : ''}`).join('\n\n');
@@ -4957,50 +4975,22 @@ function generateClaudePrompt() {
     ? '- No data available.'
     : ins.hook_types.map(t => `- ${t.name}: ${t.avgHook}% avg hook rate (${t.videos} video${t.videos !== 1 ? 's' : ''}${t.wins ? `, ${t.wins} win${t.wins !== 1 ? 's' : ''}` : ''})`).join('\n');
 
-  // Two framings for Slide 4, picked via the toggle in the modal:
-  // "mom" compares against the previous month (can look empty/negative
-  // on a slow or still-in-progress month); "working" instead leads with
-  // this month's own standalone strengths, which always has something
-  // to say regardless of how the month compares to the last one.
-  const momBlock = {
-    header: 'MONTH-OVER-MONTH PERFORMANCE',
-    leftLabel: 'HIGHLIGHTS',
-    leftBody: listOrNone(ins.mom_highlights),
-    rightLabel: 'LOWLIGHTS',
-    rightBody: listOrNone(ins.mom_lowlights),
-    note: '(vs previous month)'
-  };
-  const workingBlock = {
-    header: "WHAT'S WORKING THIS MONTH",
-    leftLabel: "WHAT'S WORKING",
-    leftBody: listOrNone(ins.working),
-    rightLabel: "WHAT'S NOT WORKING",
-    rightBody: listOrNone(ins.not_working),
-    note: '(standalone — not a comparison to last month)'
-  };
-  // "mom" mode leads with the previous-month comparison, then this
-  // month's standalone strengths as backup context. "working" mode
-  // flips the priority — useful when the comparison has nothing
-  // positive to say (e.g. a slow or still-in-progress month) but the
-  // month still has real strengths worth leading with.
-  // Highlights slide only when something went up vs last month; otherwise drop it
-  const hasHighlights = clean(ins.mom_highlights).length > 0;
-  momBlock.note = '(only results that went up vs previous month)';
-  const framingByMode = {
-    mom:     { slide3: momBlock,     slide4: workingBlock },
-    working: { slide3: workingBlock, slide4: momBlock }
-  };
+  // Videos Submitted counts Campaign Ads too; win rate and per-video stats use the Video Log only
+  const logVideos = s.total_videos || 0;
+  const adsCount = (s.videos_submitted || 0) - logVideos;
+  const submittedLine = adsCount > 0 ? `${s.videos_submitted} (${logVideos} Video Log + ${adsCount} Campaign Ads)` : `${s.videos_submitted || 0}`;
 
-  function buildPromptText(mode) {
-    const { slide3: sl3, slide4: sl4 } = framingByMode[mode] || framingByMode.mom;
-    return `Build a PowerPoint deck (.pptx file I can download) titled "EasyPC Content Performance Report — ${monthLabel} ${year}", using the slide outline and data below.
-Name the file: "EasyPC Content Performance Report ${monthLabel} ${year} - ${today}.pptx"
+  const promptText = `Build a PowerPoint deck (.pptx file I can download) titled "EasyPC Content Performance Report — ${monthLabel} ${year}", using the slide outline and data below.
+Name the file: "EasyPC Content Performance Report ${monthLabel} ${year} - ${today}.pptx". If a file with this name already exists, replace it with this version.
 
 RULES
 - Use the numbers, titles and links exactly as written. Do not add, estimate or round any figure, and do not invent videos, creators or results.
 - If a section or figure says "No data available" or "No data", keep the slide and say that plainly instead of filling it in.
 - Keep the Taglish wording in the Hook Plan slide and the "Why it worked" lines as written.
 - Every figure comes from the EasyPC Content Dashboard (Video Log and Hook Bank Google Sheets), as of ${today}. Put that source line in small text on the KPI Snapshot slide.
+- Video counts: "Videos Submitted" includes Campaign Ads. Win rate, averages and per-video figures cover Video Log videos only (${logVideos} this month).
+- When a video has a "Short title", show the short title on the slide and put the full title in that slide's speaker notes.
+- Pill colors: Hook Rate and Hold Rate green 40%+, amber 30–39.9%, red under 30%. Thruplay Rate green 15%+, amber 5–14.9%, red under 5%. Views pill neutral gray.
 
 BRAND & STYLE DIRECTION (EasyPC house style)
 - Modern corporate design, widescreen 16:9.
@@ -5026,25 +5016,25 @@ Show 8 metric cards in 2 rows of 4:
 - Total Views: ${fmt(s.views || 0)}
 - Thruplays: ${fmt(s.thruplays || 0)}
 - Winning Videos: ${s.winning || 0}
-- Videos Submitted: ${s.videos_submitted || 0}
+- Videos Submitted: ${submittedLine}
 - Avg Thruplay Rate: ${rateOrNone(s.avg_thruplay_rate)}
 - Avg Hook Rate: ${rateOrNone(s.avg_hook_rate)}
 - Avg Hold Rate: ${rateOrNone(s.avg_hold_rate)}
-- Win Rate: ${s.win_rate_pct || 0}%
+- Win Rate: ${s.win_rate_pct || 0}% (${s.winning || 0} wins of ${logVideos} Video Log videos)
 
 Below the cards, show 3 progress bars against targets:
 - Views: ${fmt(s.views || 0)} / ${fmt(s.views_target || 3000000)} target (${s.views_pct || 0}%)
 - Thruplays: ${fmt(s.thruplays || 0)} / ${fmt(s.thruplays_target || 1800000)} target (${s.thruplays_pct || 0}%)
 - Winning Videos: ${s.winning || 0} / ${s.winning_target || 20} target (${s.winning_pct || 0}%)
 
-${[sl3, sl4].filter(b => b !== momBlock || hasHighlights).map(b => `SLIDE 4 — ${b.header} (two-column layout)
-Left column "${b.leftLabel}" ${b.note}:
-${b.leftBody}
+SLIDE 4 — WHAT'S WORKING THIS MONTH (two-column layout)
+Left column "WHAT'S WORKING":
+${listOrNone(ins.working)}
 
-Right column "${b.rightLabel}" ${b.note}:
-${b.rightBody}
+Right column "WHAT'S NOT WORKING":
+${listOrNone(ins.not_working)}
 
-`).join('')}SLIDE 6 — HOOK RATE ANALYSIS
+SLIDE 5 — HOOK RATE ANALYSIS
 - Headline: Avg hook rate this month: ${rateOrNone(s.avg_hook_rate)}.
 - Include a horizontal scale/legend: Excellent (60%+), Very Strong (50-59%), Good (40-49%), Average (30-39%), Weak (<30%).
 - Recommendations:
@@ -5108,7 +5098,7 @@ ${winningSlideContent}
 
 Design notes for this slide:
   - The "▶ Watch Video" hyperlink must be a CLICKABLE hyperlink in the .pptx
-  - Metric pills: small rounded badges, colored per value (green if high, amber if average, red if low)
+  - Metric pills: small rounded badges, colored by the pill color rules above
   - If more than 5 winning videos, split into two columns
   - This slide should feel like a "hall of fame" — celebratory but professional
 
@@ -5119,43 +5109,23 @@ SLIDE 13 — CLOSING (dark background)
 
 TONE
 Keep all text concise and data-driven, matching the tone of a monthly marketing/content performance report for a Philippine computer retail brand.`
-      // Renumber slides, since the highlights slide may be left out
-      .replace(/^SLIDE \d+ —/gm, (() => { let n = 0; return () => `SLIDE ${++n} —`; })());
-  }
-
-  const promptMom = buildPromptText('mom');
-  const promptWorking = buildPromptText('working');
+    // Renumber slides, since the sub-category slide may be left out
+    .replace(/^SLIDE \d+ —/gm, (() => { let n = 0; return () => `SLIDE ${++n} —`; })());
 
   // Persist onto the in-memory insight object so it rides along with Save Analysis
-  lastInsights.manus_prompt = promptMom;
-  lastInsights.manus_prompt_working = promptWorking;
+  lastInsights.manus_prompt = promptText;
+  lastInsights.manus_prompt_working = '';
   if (_currentInsightsData && _currentInsightsData.ins) {
-    _currentInsightsData.ins.manus_prompt = promptMom;
-    _currentInsightsData.ins.manus_prompt_working = promptWorking;
+    _currentInsightsData.ins.manus_prompt = promptText;
+    _currentInsightsData.ins.manus_prompt_working = '';
   }
 
-  claudePromptVariants = { mom: promptMom, working: promptWorking };
-  switchClaudePromptMode('mom');
+  const ta = document.getElementById('claudePromptText');
+  if (ta) ta.value = promptText;
   const statusEl = document.getElementById('claudePromptStatus');
   if (statusEl) statusEl.textContent = 'Not yet saved — click "Save Analysis" to keep this with your record.';
   const modal = document.getElementById('claudePromptModal');
   if (modal) modal.style.display = 'flex';
-}
-
-let claudePromptVariants = { mom: '', working: '' };
-let claudePromptActiveMode = 'mom';
-
-function switchClaudePromptMode(mode) {
-  claudePromptActiveMode = mode;
-  const ta = document.getElementById('claudePromptText');
-  if (ta) ta.value = claudePromptVariants[mode] || '';
-
-  const activeStyle = 'padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid #62B134;border-radius:2px;cursor:pointer;background:#62B134;color:#000;font-family:inherit;';
-  const idleStyle   = 'padding:7px 16px;font-size:11.5px;font-weight:700;border:2px solid var(--border2);border-radius:2px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;';
-  const btnMom = document.getElementById('claudeModeMom');
-  const btnWorking = document.getElementById('claudeModeWorking');
-  if (btnMom) btnMom.style.cssText = mode === 'mom' ? activeStyle : idleStyle;
-  if (btnWorking) btnWorking.style.cssText = mode === 'working' ? activeStyle : idleStyle;
 }
 
 function closeClaudePromptModal() {
@@ -5186,7 +5156,7 @@ function copyRecordClaudePrompt(month, mode) {
   const r = records[month];
   const field = mode === 'working' ? 'manus_prompt_working' : 'manus_prompt';
   const text = r && r[field];
-  if (!text) { alert('Walang saved ' + (mode === 'working' ? "\"What's Working\"" : "Month-over-Month") + ' na Claude prompt para sa buwang ito. I-generate at i-save ulit ang analysis.'); return; }
+  if (!text) { alert('Walang saved na Claude prompt para sa buwang ito. I-generate at i-save ulit ang analysis.'); return; }
   navigator.clipboard.writeText(text).then(() => {
     alert('✓ Claude prompt copied to clipboard!');
   }).catch(() => {
@@ -6372,6 +6342,7 @@ function renderWeeklyTopics() {
           <a href="${topic.link}" target="_blank" rel="noopener noreferrer" class="fb-link" style="flex:1;text-align:center;background:var(--surface);border-radius: 2px;padding:7px 0;">View article</a>
           <button onclick="saveTopicToHistory('${topic.id}')" style="flex:1;background:transparent;color:#fff;border:2px solid #62B134;border-radius: 2px;padding:7px 0;font-size:11.5px;font-weight:600;cursor:pointer;">Save to history</button>
         </div>
+        <button onclick="sendTopicToScriptLibrary('${topic.id}', this)" style="width:100%;margin-top:6px;background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.3);border-radius: 2px;padding:7px 0;font-size:11.5px;font-weight:600;cursor:pointer;">Add to Script Library</button>
       </div>
     `;
     grid.appendChild(card);
@@ -6403,6 +6374,47 @@ async function saveTopicToHistory(topicId) {
   } catch (err) {
     console.error(err);
     alert("May error sa pag-save. Subukan ulit. (" + err.message + ")");
+  }
+}
+
+async function sendTopicToScriptLibrary(topicId, btn) {
+  const topic = weeklyTopics.find(t => t.id === topicId);
+  if (!topic) return;
+
+  if (!SCRIPT_LIBRARY_RELAY_URL) {
+    alert("Hindi pa naka-set up ang Script Library relay. Tingnan ang 'Script Library Relay Backend.txt' para sa setup steps.");
+    return;
+  }
+
+  const originalText = btn.textContent;
+  btn.textContent = "Sinesend...";
+  btn.disabled = true;
+
+  try {
+    const response = await fetch(SCRIPT_LIBRARY_RELAY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ topic: topic.title, angle: topic.angle, source: topic.source, link: topic.link })
+    });
+    const result = await response.json();
+
+    if (result.error) {
+      alert("May error: " + result.error);
+      btn.textContent = originalText;
+      btn.disabled = false;
+      return;
+    }
+    if (result.skipped && result.skipped.length > 0) {
+      alert("Nasa Script Library na ito dati.");
+    } else {
+      alert("Naidagdag sa Script Library bilang bagong Draft!");
+    }
+    btn.textContent = "Nadagdag na";
+  } catch (err) {
+    console.error(err);
+    alert("May error sa pag-send. Subukan ulit. (" + err.message + ")");
+    btn.textContent = originalText;
+    btn.disabled = false;
   }
 }
 
