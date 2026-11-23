@@ -4994,7 +4994,7 @@ RULES
 
 BRAND & STYLE DIRECTION (EasyPC house style)
 - Modern corporate design, widescreen 16:9.
-- Cover and closing slides: black background (#0b0b0b) with white text.
+- Cover slide: black background (#0b0b0b) with white text.
 - Content slides: white background (#ffffff) with near-black text (#0b0b0b).
 - Accent color: EasyPC green (#62B134) for positive signals, KPI bars and highlights.
 - Use muted red (#DC2626) only for negative/lowlight signals.
@@ -5034,16 +5034,12 @@ ${listOrNone(ins.working)}
 Right column "WHAT'S NOT WORKING":
 ${listOrNone(ins.not_working)}
 
-SLIDE 5 — HOOK RATE ANALYSIS
-- Headline: Avg hook rate this month: ${rateOrNone(s.avg_hook_rate)}.
-- Include a horizontal scale/legend: Excellent (60%+), Very Strong (50-59%), Good (40-49%), Average (30-39%), Weak (<30%).
-- Recommendations:
+SLIDE 5 — HOOK & HOLD RATE ANALYSIS (two-column layout)
+- One horizontal scale/legend across the top, used for both rates: Excellent (60%+), Very Strong (50-59%), Good (40-49%), Average (30-39%), Weak (<30%). Mark where the month's avg hook rate and avg hold rate fall on it.
+Left column "HOOK RATE" — headline: Avg hook rate this month: ${rateOrNone(s.avg_hook_rate)}. Then:
 ${listOrNone(ins.hook_recs)}
 
-SLIDE 7 — HOLD RATE ANALYSIS
-- Headline: Avg hold rate this month: ${rateOrNone(s.avg_hold_rate)}.
-- Include the same scale/legend as the hook rate slide.
-- Recommendations:
+Right column "HOLD RATE" — headline: Avg hold rate this month: ${rateOrNone(s.avg_hold_rate)}. Then:
 ${listOrNone(ins.hold_recs)}
 
 SLIDE 8 — TOP HOOKS THIS MONTH
@@ -5058,20 +5054,6 @@ ${hookTypesContent}
 SLIDE 9 — HOOK PLAN FOR ${(ins.next_month || 'NEXT MONTH').toUpperCase()}
 Numbered checklist, one item per line, keep the wording:
 ${listOrNone(ins.hook_plan)}
-
-SLIDE 10 — ACTION ITEMS & RECOMMENDATIONS (two-column layout)
-Left column "DO NEXT MONTH":
-${listOrNone(ins.actions)}
-
-Right column "STOP DOING":
-${listOrNone(ins.dont)}
-
-SLIDE 11 — OPPORTUNITIES & CREATOR NOTES (two-column layout)
-Left column "OPPORTUNITIES":
-${listOrNone(ins.opportunities)}
-
-Right column "CREATOR NOTES":
-${listOrNone(ins.creator_notes)}
 
 ${subCatContent ? `SLIDE 12 — RESULTS PER SUB-CATEGORY
 Table, one row per sub-category, columns: Sub-category | Posted vs Target | Views | Avg Views | Wins | Avg Hook | Avg Hold. Highlight the row with the most wins in EasyPC green. Put the "Not yet tagged" line as a small note under the table. Source line in small text: "Sub-categories are tagged manually in the dashboard."
@@ -5101,11 +5083,21 @@ Design notes for this slide:
   - Metric pills: small rounded badges, colored by the pill color rules above
   - If more than 5 winning videos, split into two columns
   - This slide should feel like a "hall of fame" — celebratory but professional
+  - This is the last slide. No closing or Thank You slide after it.
 
-SLIDE 13 — CLOSING (dark background)
-- Headline: "Thank You"
-- Subtitle: "${monthLabel} ${year} Content Performance Report"
-- Footer: "EasyPC Content Dashboard · Confidential"
+PRESENTER GUIDE — speaker notes only, never on a slide
+Put this in the speaker notes of the Winning Content slide, under the heading "PRESENTER GUIDE — NEXT STEPS", as plain text with the four headings below:
+DO NEXT MONTH:
+${listOrNone(ins.actions)}
+
+STOP DOING:
+${listOrNone(ins.dont)}
+
+OPPORTUNITIES:
+${listOrNone(ins.opportunities)}
+
+CREATOR NOTES:
+${listOrNone(ins.creator_notes)}
 
 TONE
 Keep all text concise and data-driven, matching the tone of a monthly marketing/content performance report for a Philippine computer retail brand.`
