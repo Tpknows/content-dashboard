@@ -4948,11 +4948,17 @@ function generateClaudePrompt() {
   const monthVidsAll = monthData.all_videos || [];
   const tagged = monthVidsAll.map(v => ({ ...v, sub: videoSubCategory_(v) })).filter(v => v.sub);
   const avgPos = (arr, k) => { const xs = arr.map(x => x[k]).filter(x => x > 0); return xs.length ? Math.round(xs.reduce((a, x) => a + x, 0) / xs.length * 10) / 10 + '%' : 'No data'; };
+  const sumViews = arr => arr.reduce((a, v) => a + v.views, 0);
+  const pctOf = (n, d) => d > 0 ? Math.round(n / d * 1000) / 10 + '%' : '0%';
+  const monthViews = sumViews(monthVidsAll);
+  const subTargetTotal = SUB_CATEGORIES.reduce((a, c) => a + c.target, 0);
+  const untagged = monthVidsAll.filter(v => !videoSubCategory_(v));
+  // every sub-category is listed, even at 0 posted, so the gap to target shows
   const subCatContent = tagged.length === 0 ? '' : SUB_CATEGORIES
     .map(c => ({ c, list: tagged.filter(v => v.sub === c.name) }))
-    .filter(x => x.list.length)
-    .map(({ c, list }) => `- ${c.name}: ${list.length} of ${c.target} target posted · Views: ${fmt(list.reduce((a, v) => a + v.views, 0))} (avg ${fmt(Math.round(list.reduce((a, v) => a + v.views, 0) / list.length))}) · Wins: ${list.filter(v => v.winning).length} · Avg Hook: ${avgPos(list, 'hook_rate')} · Avg Hold: ${avgPos(list, 'hold_rate')}`)
-    .join('\n') + `\n- Not yet tagged: ${monthVidsAll.length - tagged.length} of ${monthVidsAll.length} videos`;
+    .map(({ c, list }) => `- ${c.name}: ${list.length} of ${c.target} target posted (${pctOf(list.length, c.target)}) · Views: ${fmt(sumViews(list))} (${pctOf(sumViews(list), monthViews)} of the month's views)${list.length ? ` (avg ${fmt(Math.round(sumViews(list) / list.length))})` : ''} · Wins: ${list.filter(v => v.winning).length} · Avg Hook: ${avgPos(list, 'hook_rate')} · Avg Hold: ${avgPos(list, 'hold_rate')}`)
+    .join('\n') + `\n- TOTAL: ${tagged.length} of ${subTargetTotal} target posted (${pctOf(tagged.length, subTargetTotal)}) · Views of tagged videos: ${fmt(sumViews(tagged))} (${pctOf(sumViews(tagged), monthViews)} of the month's views) · Month views: ${fmt(s.views || 0)} of ${fmt(s.views_target || 3000000)} target (${s.views_pct || 0}%)`
+    + `\n- Not yet tagged: ${untagged.length} of ${monthVidsAll.length} videos · Views: ${fmt(sumViews(untagged))} (${pctOf(sumViews(untagged), monthViews)} of the month's views)`;
 
   // Summary slide: status, best hook, first plan item
   const topHook = (ins.top_hooks || [])[0];
@@ -5056,7 +5062,7 @@ Numbered checklist, one item per line, keep the wording:
 ${listOrNone(ins.hook_plan)}
 
 ${subCatContent ? `SLIDE 12 — RESULTS PER SUB-CATEGORY
-Table, one row per sub-category, columns: Sub-category | Posted vs Target | Views | Avg Views | Wins | Avg Hook | Avg Hold. Highlight the row with the most wins in EasyPC green. Put the "Not yet tagged" line as a small note under the table. Source line in small text: "Sub-categories are tagged manually in the dashboard."
+Table, one row per sub-category, columns: Sub-category | Posted vs Target | Views | Share of Views | Avg Views | Wins | Avg Hook | Avg Hold. Add the TOTAL line as the last row in bold. Highlight the row with the most wins in EasyPC green. Put the "Not yet tagged" line and the month views vs target from the TOTAL line as small notes under the table. Source line in small text: "Sub-categories are tagged manually in the dashboard."
 ${subCatContent}
 
 ` : ''}SLIDE 12 — WINNING CONTENT THIS MONTH (light background)
