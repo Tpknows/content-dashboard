@@ -3776,7 +3776,7 @@ function renderInsightRecords() {
   const bbg = { green:'rgba(98,177,52,0.08)', yellow:'rgba(139,139,148,0.08)', red:'rgba(248,113,113,0.08)' };
   const toList = arr => (arr||[]).map(x=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;margin-top:2px;color:var(--text2)">•</span><span>${x}</span></div>`).join('');
 
-  list.innerHTML = sorted.reverse().map(r => {
+  const cardOf = r => {
     const color = bc[r.kpi_color] || '#8B8B94';
     const bg    = bbg[r.kpi_color] || 'rgba(139,139,148,0.06)';
     const dt    = r.savedAt ? (() => { const d=new Date(r.savedAt); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const h=d.getHours()%12||12; return `${mo[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${h}:${d.getMinutes().toString().padStart(2,'0')} ${d.getHours()<12?'AM':'PM'}`; })() : '';
@@ -3906,7 +3906,19 @@ function renderInsightRecords() {
         </div>
       </details>
     </div>`;
-  }).join('');
+  };
+
+  // One card per month: the latest save shows, older saves of the same month fold away under it
+  const groups = [];
+  sorted.reverse().forEach(r => {
+    const g = groups.find(x => x.base === baseOf(r));
+    if (g) g.older.push(r); else groups.push({ base: baseOf(r), latest: r, older: [] });
+  });
+  list.innerHTML = groups.map(g => cardOf(g.latest) + (g.older.length ? `
+    <details style="margin:-8px 0 20px;">
+      <summary style="cursor:pointer;font-size:12px;color:var(--text3);padding:8px 2px;">Mas lumang versions ng ${g.base.charAt(0) + g.base.slice(1).toLowerCase()} (${g.older.length})</summary>
+      <div style="margin-top:10px;">${g.older.map(cardOf).join('')}</div>
+    </details>` : '')).join('');
 }
 
 function deleteInsightRecord(month) {
