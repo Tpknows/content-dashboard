@@ -2719,7 +2719,7 @@ function updateDashboard() {
   const cell = (label, value, dlt, sub, bad) => `<div class="stat-cell"><div class="stat-label">${label}</div><div class="stat-value">${value}${dlt}</div><div class="stat-sub${bad ? ' bad' : ''}">${sub}</div></div>`;
   document.getElementById('kpiGrid').innerHTML =
     cell('Views', fmt(d.views), delta(d.views, prev?.views, true), `${viewsPct}% of ${fmt(KPI_TARGETS.views)}`, viewsPct < expectedPct) +
-    cell('Thruplays', fmt(d.thruplays), delta(d.thruplays, prev?.thruplays, true), `${thruPct}% of ${fmt(KPI_TARGETS.thruplays)} · ${d.avg_rate}% rate`, thruPct < expectedPct) +
+    cell('Thruplays', fmt(d.thruplays), delta(d.thruplays, prev?.thruplays, true), `${thruPct}% of ${fmt(KPI_TARGETS.thruplays)}`, thruPct < expectedPct) +
     cell('Winning videos', d.winning, delta(d.winning, prev?.winning, true), `${d.winning} of ${KPI_TARGETS.winning}`, winPct < expectedPct) +
     cell('Submitted', d.kpi_submitted, delta(d.kpi_submitted, prev?.kpi_submitted, true), 'videos posted') +
     cell('Hook rate', (d.avg_hook_rate || 0) + '%', delta(d.avg_hook_rate, prev?.avg_hook_rate), 'average') +
