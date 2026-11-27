@@ -313,6 +313,38 @@ html { overflow-x: hidden; }
   padding: 24px;
 }
 
+/* ── OVERVIEW (minimal): one stat strip, gray everywhere, green only for good, red only for bad ── */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 4px 0 24px;
+}
+.stat-cell { background: var(--card); padding: 18px 20px; }
+.stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
+.stat-value { font-size: 26px; font-weight: 700; color: var(--text); margin-top: 8px; line-height: 1.1; }
+.stat-delta { font-size: 12px; font-weight: 600; margin-left: 6px; }
+.stat-delta.up { color: #62B134; }
+.stat-delta.down { color: #F87171; }
+.stat-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
+.stat-sub.bad { color: #F87171; }
+.ov-card { margin-bottom: 24px; }
+#tab-overview .chart-status-badge { background: none; border: none; color: var(--text3); padding: 0; font-weight: 500; }
+.bar-list-head { display: flex; justify-content: space-between; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); padding: 0 10px 8px; }
+.bar-list-row { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 10px; margin-bottom: 4px; font-size: 13px; color: var(--text); }
+.bar-list-row > span { position: relative; min-width: 0; }
+.bar-list-row > span:first-of-type { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-list-row > span:last-child { flex-shrink: 0; font-weight: 600; }
+.bar-list-row small { color: var(--text3); font-weight: 400; }
+.bar-list-fill { position: absolute; top: 0; bottom: 0; left: 0; background: rgba(98,177,52,0.14); border-radius: 2px; }
+.bar-list-row a { color: inherit; text-decoration: none; }
+.bar-list-row a:hover { text-decoration: underline; }
+.bar-list-empty { font-size: 13px; color: var(--text3); padding: 8px 10px; }
+
 /* ── KPI GRID ── */
 .kpi-grid {
   display: grid;
@@ -1516,53 +1548,35 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 </div>
 <div class="content">
   <div id="tab-overview" class="tab-panel active">
-    <div class="kpi-grid" id="kpiGrid"></div>
-    <div class="progress-section">
-      <div class="progress-title">KPI Progress vs Target</div>
-      <div id="progressBars"></div>
+    <div class="stat-strip" id="kpiGrid"></div>
+    <div class="chart-card ov-card">
+      <div class="chart-card-header">
+        <div><div class="chart-title">Views per month</div><div class="chart-subtitle">2026 · green ang napiling buwan</div></div>
+        <span class="chart-status-badge info" id="viewsChartBadge"></span>
+      </div>
+      <div class="chart-container"><canvas id="viewsChart"></canvas></div>
+    </div>
+    <div class="chart-card ov-card">
+      <div class="chart-card-header">
+        <div><div class="chart-title">Views vs thruplays</div><div class="chart-subtitle">Bawat buwan · green ang views, gray ang thruplays</div></div>
+        <span class="chart-status-badge info" id="trendChartBadge"></span>
+      </div>
+      <div class="chart-container" style="height:200px;"><canvas id="trendChart"></canvas></div>
     </div>
     <div class="charts-grid">
       <div class="chart-card">
-        <div class="chart-card-header">
-          <div><div class="chart-title">Monthly views</div><div class="chart-subtitle">By month · 2026</div></div>
-          <span class="chart-status-badge info" id="viewsChartBadge">Loading…</span>
-        </div>
-        <div class="chart-container"><canvas id="viewsChart"></canvas></div>
+        <div class="chart-card-header"><div><div class="chart-title">Pillars</div><div class="chart-subtitle">Views bawat pillar ngayong buwan</div></div></div>
+        <div id="pillarList"></div>
       </div>
       <div class="chart-card">
-        <div class="chart-card-header">
-          <div><div class="chart-title">Pillar breakdown</div><div class="chart-subtitle">Know · Like · Trust</div></div>
-          <span class="chart-status-badge info">Distribution</span>
-        </div>
-        <div class="chart-container"><canvas id="pillarChart"></canvas></div>
+        <div class="chart-card-header"><div><div class="chart-title">Creators</div><div class="chart-subtitle">Views, videos, wins, hook at hold</div></div></div>
+        <div id="creatorList"></div>
       </div>
-      <!-- NEW: Monthly Trend Line -->
       <div class="chart-card" style="grid-column:1/-1;">
-        <div class="chart-card-header">
-          <div><div class="chart-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,17 10,10 14,13 20,5"/><polyline points="14,5 20,5 20,11"/></svg> Views Trend</div><div class="chart-subtitle">Monthly views over time — all months</div></div>
-          <span class="chart-status-badge info" id="trendChartBadge">All Year</span>
-        </div>
-        <div class="chart-container" style="height:180px;"><canvas id="trendChart"></canvas></div>
-      </div>
-      <!-- NEW: Creator Comparison -->
-      <div class="chart-card" style="grid-column:1/-1;">
-        <div class="chart-card-header">
-          <div><div class="chart-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> Creator Comparison</div><div class="chart-subtitle">Hook Rate vs Hold Rate — avg per creator</div></div>
-          <span class="chart-status-badge info" id="creatorChartBadge">This month</span>
-        </div>
-        <div class="chart-container" id="creatorCompareChartWrap" style="height:200px;max-width:460px;margin:0 auto;"><canvas id="creatorCompareChart"></canvas></div>
-      </div>
-      <!-- NEW: Hold Rate Leaderboard -->
-      <div class="chart-card" style="grid-column:1/-1;">
-        <div class="chart-card-header">
-          <div><div class="chart-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg> Hold Rate Leaderboard</div><div class="chart-subtitle">Top 10 videos by Hold Rate % — this month</div></div>
-          <span class="chart-status-badge info" id="holdLeaderBadge">Top 10</span>
-        </div>
-        <div class="chart-container" style="height:260px;"><canvas id="holdLeaderChart"></canvas></div>
+        <div class="chart-card-header"><div><div class="chart-title">Top 10 by hold rate</div><div class="chart-subtitle">Mga video na pinakamatagal pinanood ngayong buwan</div></div></div>
+        <div id="holdLeaderList"></div>
       </div>
     </div>
-    <div class="section-title">Creator Breakdown</div>
-    <div class="creator-grid" id="creatorGrid"></div>
   </div>
   <div id="tab-top10" class="tab-panel">
     <div class="top10-list" id="top10List"></div>
@@ -2681,81 +2695,30 @@ function updateDashboard() {
   const prevMonth = sortedMonths[sortedMonths.indexOf(month) - 1];
   const prev = prevMonth ? DATA[prevMonth] : null;
 
-  // Small colored pill showing % change vs. last month — mirrors the KPI
-  // card's icon color so the whole card head reads as one unit.
-  function trendPill(curr, prevVal) {
-    if (!prevVal || prevVal === 0) return '';
-    const pct = Math.round((curr - prevVal) / prevVal * 100);
-    const up = pct >= 0;
-    return `<span class="kpi-trend ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${Math.abs(pct)}%</span>`;
+  // Change vs last month. An unfinished month is compared by daily pace, not raw total.
+  const today = new Date();
+  const inProgress = month === MONTHS_ORDER[today.getMonth()];
+  const daysIn = m => new Date(today.getFullYear(), MONTHS_ORDER.indexOf(m) + 1, 0).getDate();
+  const prevLabel = prevMonth ? prevMonth.charAt(0) + prevMonth.slice(1).toLowerCase() : '';
+  function delta(curr, prevVal, isCount) {
+    if (!prev || !prevVal) return '';
+    const c = isCount && inProgress ? curr / today.getDate() : curr;
+    const p = isCount && inProgress ? prevVal / daysIn(prevMonth) : prevVal;
+    const pct = Math.round((c - p) / p * 100);
+    const why = 'vs ' + prevLabel + (isCount && inProgress ? ', by daily pace' : '');
+    return `<span class="stat-delta ${pct >= 0 ? 'up' : 'down'}" title="${why}">${pct >= 0 ? '↑' : '↓'} ${Math.abs(pct)}%</span>`;
   }
-
-  function kpiIcon(emoji, colorVar) {
-    return `<div class="kpi-icon" style="background:${colorVar}1F;color:${colorVar};">${emoji}</div>`;
-  }
-
-  document.getElementById('kpiGrid').innerHTML = `
-    <div class="kpi-card cyan">
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>','var(--cyan)')}${trendPill(d.views, prev?.views)}</div>
-      <div class="kpi-value">${fmt(d.views)}</div>
-      <div class="kpi-label">Total Views</div>
-      <div class="kpi-sub">Target: ${fmt(KPI_TARGETS.views)}</div>
-      <div style="margin-top:10px">${kpiStatusBadge(viewsPct)}</div>
-    </div>
-    <div class="kpi-card purple">
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg>','var(--purple)')}${trendPill(d.thruplays, prev?.thruplays)}</div>
-      <div class="kpi-value">${fmt(d.thruplays)}</div>
-      <div class="kpi-label">Thruplays</div>
-      <div class="kpi-sub">Target: ${fmt(KPI_TARGETS.thruplays)}</div>
-      <div style="margin-top:10px">${kpiStatusBadge(thruPct)}</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg>','var(--green)')}${trendPill(d.winning, prev?.winning)}</div>
-      <div class="kpi-value">${d.winning}</div>
-      <div class="kpi-label">Winning Videos</div>
-      <div class="kpi-sub">Target: ${KPI_TARGETS.winning}</div>
-      <div style="margin-top:10px">${kpiStatusBadge(winPct)}</div>
-    </div>
-    <div class="kpi-card orange">
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="M12 14V8"/><polyline points="9,11 12,8 15,11"/></svg>','var(--orange)')}${trendPill(d.kpi_submitted, prev?.kpi_submitted)}</div>
-      <div class="kpi-value">${d.kpi_submitted}</div>
-      <div class="kpi-label">Videos Submitted</div>
-      <div class="kpi-sub">Video Log + Campaign Ads</div>
-    </div>
-    <div class="kpi-card pink">
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg>','var(--pink)')}${trendPill(d.avg_rate, prev?.avg_rate)}</div>
-      <div class="kpi-value">${d.avg_rate}%</div>
-      <div class="kpi-label">Avg Thruplay Rate</div>
-      <div class="kpi-sub">Authentic: ${d.authentic} videos</div>
-    </div>
-    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:#62B134"></div>
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg>','#62B134')}${trendPill(d.avg_hook_rate, prev?.avg_hook_rate)}</div>
-      <div class="kpi-value" style="color:${d.avg_hook_rate>=60?'#62B134':d.avg_hook_rate>=50?'#38BDF8':d.avg_hook_rate>=40?'#A78BFA':d.avg_hook_rate>=30?'#FBBF24':'#F87171'}">${d.avg_hook_rate}%</div>
-      <div class="kpi-label">Avg Hook Rate</div>
-      <div class="kpi-sub">${d.avg_hook_rate>=60?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg> Excellent':d.avg_hook_rate>=50?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong':d.avg_hook_rate>=40?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good':d.avg_hook_rate>=30?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average':'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg> Needs Work'}</div>
-    </div>
-    <div class="kpi-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:#A78BFA"></div>
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>','#A78BFA')}${trendPill(d.avg_hold_rate, prev?.avg_hold_rate)}</div>
-      <div class="kpi-value" style="color:${d.avg_hold_rate>=60?'#62B134':d.avg_hold_rate>=50?'#38BDF8':d.avg_hold_rate>=40?'#A78BFA':d.avg_hold_rate>=30?'#FBBF24':'#F87171'}">${d.avg_hold_rate}%</div>
-      <div class="kpi-label">Avg Hold Rate</div>
-      <div class="kpi-sub">${d.avg_hold_rate>=60?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg> Excellent':d.avg_hold_rate>=50?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong':d.avg_hold_rate>=40?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good':d.avg_hold_rate>=30?'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average':'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg> Needs Work'}</div>
-    </div>
-    <div class="kpi-card yellow">
-      <div class="kpi-card-head">${kpiIcon('<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.3"/><circle cx="12" cy="12" r="0.9" fill="currentColor" stroke="none"/></svg>','var(--yellow)')}</div>
-      <div class="kpi-value" style="font-size:16px;"><span class="status-badge status-${status}">${statusLabel}</span></div>
-      <div class="kpi-label">Overall KPI Status</div>
-      <div class="kpi-sub">${viewsPct}% views · ${winPct}% wins · ${thruPct}% thruplays</div>
-    </div>
-  `;
-
-  const vPct = Math.min(100, viewsPct), wPct = Math.min(100, winPct), tPct = Math.min(100, thruPct);
-  document.getElementById('progressBars').innerHTML = `
-    <div class="progress-item"><div class="progress-label"><span>Views</span><span>${fmt(d.views)} / ${fmt(KPI_TARGETS.views)} (${viewsPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-cyan" style="width:${vPct}%"></div></div></div>
-    <div class="progress-item"><div class="progress-label"><span>Winning Videos</span><span>${d.winning} / ${KPI_TARGETS.winning} (${winPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-green" style="width:${wPct}%"></div></div></div>
-    <div class="progress-item"><div class="progress-label"><span>Thruplays</span><span>${fmt(d.thruplays)} / ${fmt(KPI_TARGETS.thruplays)} (${thruPct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-purple" style="width:${tPct}%"></div></div></div>
-  `;
+  // Red only when behind where the month should be by now (full target for a finished month)
+  const expectedPct = inProgress ? Math.round(today.getDate() / daysIn(month) * 100) : 100;
+  const cell = (label, value, dlt, sub, bad) => `<div class="stat-cell"><div class="stat-label">${label}</div><div class="stat-value">${value}${dlt}</div><div class="stat-sub${bad ? ' bad' : ''}">${sub}</div></div>`;
+  document.getElementById('kpiGrid').innerHTML =
+    cell('Views', fmt(d.views), delta(d.views, prev?.views, true), `${viewsPct}% of ${fmt(KPI_TARGETS.views)}`, viewsPct < expectedPct) +
+    cell('Thruplays', fmt(d.thruplays), delta(d.thruplays, prev?.thruplays, true), `${thruPct}% of ${fmt(KPI_TARGETS.thruplays)}`, thruPct < expectedPct) +
+    cell('Winning videos', d.winning, delta(d.winning, prev?.winning, true), `${d.winning} of ${KPI_TARGETS.winning}`, winPct < expectedPct) +
+    cell('Submitted', d.kpi_submitted, delta(d.kpi_submitted, prev?.kpi_submitted, true), 'Video Log + Campaign Ads') +
+    cell('Thruplay rate', d.avg_rate + '%', delta(d.avg_rate, prev?.avg_rate), 'average') +
+    cell('Hook rate', (d.avg_hook_rate || 0) + '%', delta(d.avg_hook_rate, prev?.avg_hook_rate), 'average') +
+    cell('Hold rate', (d.avg_hold_rate || 0) + '%', delta(d.avg_hold_rate, prev?.avg_hold_rate), inProgress ? `day ${today.getDate()} of ${daysIn(month)}` : 'average');
 
   const monthLabels = sortedMonths.map(m => m.charAt(0) + m.slice(1,3).toLowerCase());
   const viewsData = sortedMonths.map(m => DATA[m] ? DATA[m].views : 0);
@@ -2763,7 +2726,7 @@ function updateDashboard() {
   if (viewsChart) viewsChart.destroy();
   viewsChart = new Chart(document.getElementById('viewsChart'), {
     type: 'bar',
-    data: { labels: monthLabels, datasets: [{ label: 'Views', data: viewsData, backgroundColor: sortedMonths.map(m => m === month ? '#62B134' : 'rgba(255,255,255,0.12)'), borderRadius: 8, borderSkipped: false, maxBarThickness: 36 }] },
+    data: { labels: monthLabels, datasets: [{ label: 'Views', data: viewsData, backgroundColor: sortedMonths.map(m => m === month ? '#62B134' : 'rgba(255,255,255,0.12)'), borderRadius: 2, borderSkipped: false, maxBarThickness: 36 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600, easing: 'easeOutQuart' },
@@ -2783,37 +2746,13 @@ function updateDashboard() {
     }
   });
   const vBadge = document.getElementById('viewsChartBadge');
-  if (vBadge && prev) {
-    const vDelta = Math.round((d.views - prev.views) / prev.views * 100);
-    vBadge.textContent = (vDelta >= 0 ? '↑ +' : '↓ ') + vDelta + '% MoM';
-    vBadge.className = 'chart-status-badge ' + (vDelta >= 0 ? 'good' : 'warn');
-  } else if (vBadge) { vBadge.textContent = fmt(d.views) + ' total'; vBadge.className = 'chart-status-badge info'; }
+  if (vBadge) vBadge.textContent = fmt(d.views) + ' views ngayong ' + prevLabelOf_(month);
 
-  if (pillarChart) pillarChart.destroy();
-  pillarChart = new Chart(document.getElementById('pillarChart'), {
-    type: 'doughnut',
-    data: { labels: ['Know', 'Like', 'Trust'], datasets: [{ data: [d.know, d.like, d.trust], backgroundColor: ['#62B134', '#A78BFA', '#62B134'], borderWidth: 0, hoverOffset: 4 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 600, easing: 'easeOutQuart' },
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#a7a7a7', padding: 18, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } },
-        tooltip: {
-          backgroundColor: 'rgba(0,0,0,0.95)', titleColor: '#FFFFFF', bodyColor: '#A1A1AA',
-          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
-          titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 }, displayColors: false
-        }
-      },
-      cutout: '70%'
-    }
+  const pillarRows = ['KNOW', 'LIKE', 'TRUST'].map(p => {
+    const vs = (d.all_videos || []).filter(v => v.pillar === p);
+    return { label: p.charAt(0) + p.slice(1).toLowerCase(), value: vs.reduce((s, v) => s + v.views, 0), note: vs.length + ' videos' };
   });
-
-  let creatorHTML = '';
-  for (const [name, c] of Object.entries(d.creators)) {
-    const winRate = c.videos > 0 ? Math.round(c.winning / c.videos * 100) : 0;
-    creatorHTML += `<div class="creator-card"><div class="creator-name">${name}</div><div class="creator-stat"><span>Videos</span><span>${c.videos}</span></div><div class="creator-stat"><span>Views</span><span>${fmt(c.views)}</span></div><div class="creator-stat"><span>Thruplays</span><span>${fmt(c.thruplays)}</span></div><div class="creator-stat"><span>Winning</span><span>${c.winning} (${winRate}%)</span></div></div>`;
-  }
-  document.getElementById('creatorGrid').innerHTML = creatorHTML;
+  document.getElementById('pillarList').innerHTML = barList_(pillarRows, r => fmt(r.value), 'Pillar', 'Views');
 
   renderTop10(month);
   renderAI(month);
@@ -2847,30 +2786,8 @@ function renderTrendChart() {
     data: {
       labels,
       datasets: [
-        {
-          label: 'Views',
-          data: views,
-          borderColor: '#62B134',
-          backgroundColor: 'rgba(98,177,52,0.08)',
-          borderWidth: 2.5,
-          pointRadius: 4,
-          pointBackgroundColor: '#62B134',
-          tension: 0.4,
-          fill: true,
-          yAxisID: 'y'
-        },
-        {
-          label: 'Thruplays',
-          data: thruplays,
-          borderColor: '#62B134',
-          backgroundColor: 'rgba(98,177,52,0.06)',
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: '#62B134',
-          tension: 0.4,
-          fill: true,
-          yAxisID: 'y'
-        }
+        { label: 'Views', data: views, borderColor: '#62B134', borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: '#62B134', tension: 0, fill: false, yAxisID: 'y' },
+        { label: 'Thruplays', data: thruplays, borderColor: '#71717A', borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: '#71717A', tension: 0, fill: false, yAxisID: 'y' }
       ]
     },
     options: {
@@ -2878,7 +2795,7 @@ function renderTrendChart() {
       animation: { duration: 700, easing: 'easeOutQuart' },
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { position: 'top', labels: { color: '#a7a7a7', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 7, boxHeight: 7, padding: 16 } },
+        legend: { display: false },
         tooltip: {
           backgroundColor: 'rgba(0,0,0,0.95)', titleColor: '#fff', bodyColor: '#A1A1AA',
           borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
@@ -2906,146 +2823,44 @@ function renderTrendChart() {
 // ─────────────────────────────────────────────────────────────
 function renderCreatorCompareChart(month) {
   const videos = getVideos(month);
-  if (!videos.length) return;
-
-  // Group by creator — avg hook + hold rate
-  const byCreator = {};
+  const by = {};
   videos.forEach(v => {
     if (!v.creator || !isActiveCreator(v.creator)) return;
-    if (!byCreator[v.creator]) byCreator[v.creator] = { hookTotal: 0, holdTotal: 0, hookCount: 0, holdCount: 0 };
-    if (v.hook_rate > 0) { byCreator[v.creator].hookTotal += v.hook_rate; byCreator[v.creator].hookCount++; }
-    if (v.hold_rate > 0) { byCreator[v.creator].holdTotal += v.hold_rate; byCreator[v.creator].holdCount++; }
+    const c = by[v.creator] = by[v.creator] || { views: 0, videos: 0, wins: 0, hook: [], hold: [] };
+    c.views += v.views; c.videos++; if (v.winning) c.wins++;
+    if (v.hook_rate > 0) c.hook.push(v.hook_rate);
+    if (v.hold_rate > 0) c.hold.push(v.hold_rate);
   });
-
-  const creators = Object.keys(byCreator).filter(c => byCreator[c].hookCount > 0 || byCreator[c].holdCount > 0);
-  if (!creators.length) return;
-
-  const hookData = creators.map(c => byCreator[c].hookCount > 0 ? Math.round(byCreator[c].hookTotal / byCreator[c].hookCount * 10) / 10 : 0);
-  const holdData = creators.map(c => byCreator[c].holdCount > 0 ? Math.round(byCreator[c].holdTotal / byCreator[c].holdCount * 10) / 10 : 0);
-
-  if (creatorCompareChart) creatorCompareChart.destroy();
-  creatorCompareChart = new Chart(document.getElementById('creatorCompareChart'), {
-    type: 'bar',
-    data: {
-      labels: creators,
-      datasets: [
-        {
-          label: 'Avg Hook Rate %',
-          data: hookData,
-          backgroundColor: 'rgba(98,177,52,0.75)',
-          borderRadius: 6,
-          borderSkipped: false,
-          maxBarThickness: 28
-        },
-        {
-          label: 'Avg Hold Rate %',
-          data: holdData,
-          backgroundColor: 'rgba(56,189,248,0.75)',
-          borderRadius: 6,
-          borderSkipped: false,
-          maxBarThickness: 28
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 600, easing: 'easeOutQuart' },
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { position: 'top', labels: { color: '#a7a7a7', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 7, boxHeight: 7, padding: 16 } },
-        tooltip: {
-          backgroundColor: 'rgba(0,0,0,0.95)', titleColor: '#fff', bodyColor: '#A1A1AA',
-          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
-          callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%' }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#a7a7a7', font: { size: 11 } } },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.08)' }, border: { display: false },
-          ticks: { color: '#a7a7a7', font: { size: 11 }, callback: v => v + '%' },
-          suggestedMax: Math.max(...hookData, ...holdData) * 1.2 || 100
-        }
-      }
-    }
-  });
-
-  // Badge: highest hook creator
-  const topHookIdx = hookData.indexOf(Math.max(...hookData));
-  const badge = document.getElementById('creatorChartBadge');
-  if (badge && topHookIdx >= 0 && hookData[topHookIdx] > 0) {
-    setIconHTML(badge, '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg>', 'Best Hook: ' + creators[topHookIdx] + ' (' + hookData[topHookIdx] + '%)');
-    badge.className = 'chart-status-badge good';
-  }
+  const avg = xs => xs.length ? Math.round(xs.reduce((s, x) => s + x, 0) / xs.length * 10) / 10 + '%' : '—';
+  const rows = Object.entries(by).sort((a, b) => b[1].views - a[1].views).map(([name, c]) => ({
+    label: name, value: c.views,
+    note: `${c.videos} videos · ${c.wins} wins · hook ${avg(c.hook)} · hold ${avg(c.hold)}`
+  }));
+  document.getElementById('creatorList').innerHTML = barList_(rows, r => fmt(r.value), 'Creator', 'Views');
 }
 
 // ─────────────────────────────────────────────────────────────
 // UPGRADE 3 — Hold Rate Leaderboard (horizontal bar, Top 10)
 // ─────────────────────────────────────────────────────────────
 function renderHoldLeaderChart(month) {
-  const videos = getVideos(month);
-  if (!videos.length) return;
-
-  const withRate = videos.filter(v => v.hold_rate > 0);
-  if (!withRate.length) return;
-
-  const top10 = [...withRate].sort((a, b) => b.hold_rate - a.hold_rate).slice(0, 10);
-  const labels = top10.map(v => v.title.length > 30 ? v.title.slice(0, 30) + '…' : v.title);
-  const data   = top10.map(v => v.hold_rate);
-  const colors = data.map(r =>
-    r >= 100 ? '#FBBF24' :
-    r >= 60  ? '#62B134' :
-    r >= 50  ? '#38BDF8' :
-    r >= 40  ? '#A78BFA' :
-    r >= 30  ? '#FBBF24' : '#71717A'
-  );
-
-  if (holdLeaderChart) holdLeaderChart.destroy();
-  holdLeaderChart = new Chart(document.getElementById('holdLeaderChart'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Hold Rate %',
-        data,
-        backgroundColor: colors,
-        borderRadius: 6,
-        borderSkipped: false,
-        maxBarThickness: 22
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 600, easing: 'easeOutQuart' },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(0,0,0,0.95)', titleColor: '#fff', bodyColor: '#A1A1AA',
-          borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 12, cornerRadius: 10,
-          callbacks: {
-            title: ctx => top10[ctx[0].dataIndex].title,
-            label: ctx => ctx.parsed.x + '% Hold Rate · ' + fmt(top10[ctx.dataIndex].views) + ' views'
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: 'rgba(255,255,255,0.08)' }, border: { display: false },
-          ticks: { color: '#a7a7a7', font: { size: 11 }, callback: v => v + '%' },
-          suggestedMax: Math.max(...data) * 1.15 || 100
-        },
-        y: { grid: { display: false }, border: { display: false }, ticks: { color: '#c9c9c9', font: { size: 10.5 } } }
-      }
-    }
-  });
-
-  const badge = document.getElementById('holdLeaderBadge');
-  if (badge && top10.length > 0) {
-    setIconHTML(badge, '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg>', 'Best: ' + top10[0].hold_rate + '%');
-    badge.className = top10[0].hold_rate >= 60 ? 'chart-status-badge good' : 'chart-status-badge info';
-  }
+  const rows = getVideos(month).filter(v => v.hold_rate > 0)
+    .sort((a, b) => b.hold_rate - a.hold_rate).slice(0, 10)
+    .map(v => ({ label: v.title, value: v.hold_rate, note: fmt(v.views) + ' views', link: v.link }));
+  document.getElementById('holdLeaderList').innerHTML = barList_(rows, r => r.value + '%', 'Video', 'Hold rate');
 }
+
+// Plausible-style list: a faint green bar behind each row shows its size against the biggest row
+function barList_(rows, valueText, headLeft, headRight) {
+  if (!rows.length) return '<div class="bar-list-empty">Wala pang data para sa buwang ito.</div>';
+  const max = Math.max(...rows.map(r => r.value), 1);
+  return `<div class="bar-list-head"><span>${headLeft}</span><span>${headRight}</span></div>` + rows.map(r => {
+    const label = progressEsc_(r.label);
+    const name = r.link && /^https?:\/\//i.test(r.link) ? `<a href="${progressEsc_(r.link)}" target="_blank" rel="noopener">${label}</a>` : label;
+    return `<div class="bar-list-row"><div class="bar-list-fill" style="width:${Math.max(0, r.value / max * 100)}%"></div><span>${name}${r.note ? ` <small>· ${progressEsc_(r.note)}</small>` : ''}</span><span>${valueText(r)}</span></div>`;
+  }).join('');
+}
+
+function prevLabelOf_(m) { return m.charAt(0) + m.slice(1).toLowerCase(); }
 
 function renderTop10(month) {
   const videos = getVideos(month);
