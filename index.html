@@ -4650,7 +4650,7 @@ async function aiInsights_(month, d, prev, prevMonth, ins) {
   const unmask = s => String(s || '').replace(/Creator (\d+)\b/g, (m, i) => creators[i - 1] || m);
   const rows = vids.map(v => mask([
     v.title.slice(0, 90), v.creator || '', v.pillar || '', v.hookType || '', videoSubCategory_(v),
-    v.views, v.thruplay_rate, v.hook_rate, v.hold_rate, v.winning ? 'WIN' : '', v.datePosted || ''
+    n(v.views), v.thruplay_rate, v.hook_rate, v.hold_rate, v.winning ? 'WIN' : '', v.datePosted || ''
   ].join(' | '))).join('\n');
   const openings = mask((ins.top_hooks || []).filter(h => h.opening)
     .map(h => `- "${h.title.slice(0, 70)}": ${h.opening.slice(0, 150)}`).join('\n')) || '(wala)';
