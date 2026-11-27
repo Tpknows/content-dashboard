@@ -28,13 +28,13 @@
   --accent:    #62B134;
   --accent-light: #9CCC65;
   --accent-text: #62B134;
-  --cyan:      #38BDF8;
-  --purple:    #A78BFA;
+  --cyan:      #8B8B94;
+  --purple:    #8B8B94;
   --green:     #62B134;
-  --orange:    #FB923C;
-  --pink:      #f472b6;
-  --yellow:    #FBBF24;
-  --yellow-text: #FBBF24;
+  --orange:    #8B8B94;
+  --pink:      #8B8B94;
+  --yellow:    #8B8B94;
+  --yellow-text: #8B8B94;
   --red:       #F87171;
   --radius:    10px;
   --radius-sm: 6px;
@@ -51,8 +51,8 @@
 
 .icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-.dot-red { background: #F87171; } .dot-orange { background: #FB923C; } .dot-idle { background: #a7a7a7; }
-.dot-green { background: #62B134; } .dot-blue { background: #38BDF8; }
+.dot-red { background: #F87171; } .dot-orange { background: #8B8B94; } .dot-idle { background: #a7a7a7; }
+.dot-green { background: #62B134; } .dot-blue { background: #8B8B94; }
 .rank-badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 4px; border-radius: 2px; border:1px solid #5e5e5e; background:#fff; font-size:11px; font-weight:700; color:#000; }
 .rank-badge.rank-1 { border-color:#62B134; border-width:2px; color:#62B134; }
 
@@ -335,6 +335,9 @@ html { overflow-x: hidden; }
 .stat-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
 .stat-sub.bad { color: #F87171; }
 .ov-card { margin-bottom: 24px; }
+/* Every page sits in a centered column; cards no longer jump on hover */
+.tab-panel { max-width: 1200px; margin-left: auto; margin-right: auto; }
+.kpi-card:hover, .creator-card:hover, .top10-item:hover, .hookbank-card:hover, .chart-card:hover { transform: none !important; }
 /* Narrow centered column like Plausible: wide screens shouldn't stretch the numbers apart */
 #tab-overview { max-width: 1000px; margin-left: auto; margin-right: auto; }
 #tab-overview .chart-card { padding: 20px 22px; }
@@ -523,7 +526,7 @@ html { overflow-x: hidden; }
   white-space: nowrap;
 }
 .chart-status-badge.good { background: rgba(98,177,52,0.1); color: var(--green); border: 1px solid rgba(98,177,52,0.2); }
-.chart-status-badge.warn { background: rgba(251,191,36,0.1); color: var(--yellow-text); border: 1px solid rgba(251,191,36,0.2); }
+.chart-status-badge.warn { background: rgba(139,139,148,0.1); color: var(--yellow-text); border: 1px solid rgba(139,139,148,0.2); }
 .chart-status-badge.info { background: rgba(98,177,52,0.1); color: var(--accent-text); border: 1px solid rgba(98,177,52,0.2); }
 .chart-container { position: relative; height: 260px; }
 
@@ -538,12 +541,12 @@ html { overflow-x: hidden; }
   font-weight: 700;
   letter-spacing: 0.4px;
 }
-.pillar-k { background: rgba(56,189,248,0.1); color: var(--cyan);   border: 1px solid rgba(56,189,248,0.2);  padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
-.pillar-l { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
+.pillar-k { background: rgba(139,139,148,0.1); color: var(--cyan);   border: 1px solid rgba(139,139,148,0.2);  padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
+.pillar-l { background: rgba(139,139,148,0.1); color: var(--purple); border: 1px solid rgba(139,139,148,0.2); padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
 .pillar-t { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 10px; border-radius: 2px; font-size: 10px; font-weight: 700; }
 
 .win-badge { background: rgba(98,177,52,0.1);   color: var(--green);  border: 1px solid rgba(98,177,52,0.2);   padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; }
-.ai-tag    { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; }
+.ai-tag    { background: rgba(139,139,148,0.1); color: var(--purple); border: 1px solid rgba(139,139,148,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; }
 .creator-tag { background: var(--surface); border: 1px solid var(--border2); padding: 3px 9px; border-radius: 2px; font-size: 10px; color: var(--text2); white-space: nowrap; }
 .fb-link { color: var(--accent-text); font-size: 11px; text-decoration: none; transition: color 0.2s; }
 .fb-link:hover { color: var(--cyan); }
@@ -753,9 +756,9 @@ html { overflow-x: hidden; }
   padding: 2px 9px;
   border: 1px solid rgba(255,255,255,0.08);
 }
-.rank-1 .top10-rank-badge { color: #ffcb66; border-color: rgba(251,191,36,0.3); }
+.rank-1 .top10-rank-badge { color: #8B8B94; border-color: rgba(139,139,148,0.3); }
 .rank-2 .top10-rank-badge { color: #d4d4d4; border-color: rgba(161,161,170,0.3); }
-.rank-3 .top10-rank-badge { color: #e0a877; border-color: rgba(205,127,50,0.3); }
+.rank-3 .top10-rank-badge { color: #8B8B94; border-color: rgba(205,127,50,0.3); }
 .rank-other .top10-rank-badge { color: var(--text3); }
 .top10-views-overlay {
   position: absolute;
@@ -893,7 +896,7 @@ html { overflow-x: hidden; }
 .progress-task-title { font-size: 12.5px; font-weight: 600; color: var(--text); word-break: break-word; overflow-wrap: break-word; }
 .progress-task-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
 .progress-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 2px; margin-left: 4px; }
-.progress-tag.late { color: #FBBF24; background: rgba(251,191,36,0.12); }
+.progress-tag.late { color: #8B8B94; background: rgba(139,139,148,0.12); }
 @media (max-width: 900px) {
   .progress-lists { grid-template-columns: 1fr; }
   .progress-trend-row { grid-template-columns: 110px 1fr 70px; }
@@ -1057,9 +1060,9 @@ html { overflow-x: hidden; }
 
 /* ── HOOK RATE ── */
 .hook-excellent { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hook-strong    { background: rgba(56,189,248,0.1);  color: var(--cyan);   border: 1px solid rgba(56,189,248,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hook-good      { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hook-average   { background: rgba(251,191,36,0.1); color: var(--yellow-text); border: 1px solid rgba(251,191,36,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-strong    { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-good      { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-average   { background: rgba(139,139,148,0.1); color: #8B8B94; border: 1px solid rgba(139,139,148,0.25); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hook-weak      { background: rgba(248,113,113,0.1);  color: var(--red);    border: 1px solid rgba(248,113,113,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hook-none      { background: var(--surface); color: var(--text3); border: 1px solid var(--border); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 
@@ -1083,9 +1086,9 @@ html { overflow-x: hidden; }
 
 /* ── HOLD RATE ── */
 .hold-excellent { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hold-strong    { background: rgba(56,189,248,0.1);  color: var(--cyan);   border: 1px solid rgba(56,189,248,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hold-good      { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hold-average   { background: rgba(251,191,36,0.1); color: var(--yellow-text); border: 1px solid rgba(251,191,36,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-strong    { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-good      { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-average   { background: rgba(139,139,148,0.1); color: #8B8B94; border: 1px solid rgba(139,139,148,0.25); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hold-weak      { background: rgba(248,113,113,0.1);  color: var(--red);    border: 1px solid rgba(248,113,113,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hold-none      { background: var(--surface); color: var(--text3); border: 1px solid var(--border); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 
@@ -1236,8 +1239,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 }
 
 /* Inline insight card overrides */
-#tab-insights [style*="background:#1a1d2e"],
-#tab-insights [style*="background: #1a1d2e"] {
+#tab-insights [style*="background:var(--card)"],
+#tab-insights [style*="background:var(--card)"] {
   background: var(--card) !important;
   border-color: var(--border) !important;
   border-radius: var(--radius) !important;
@@ -1772,18 +1775,18 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px;">
       <span style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">TYPE</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(98,177,52,0.08);color:#62B134;border:1px solid rgba(98,177,52,0.18);">🎬 Content</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(56,189,248,0.08);color:#38BDF8;border:1px solid rgba(56,189,248,0.18);">📅 Meeting</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(251,146,60,0.08);color:#FB923C;border:1px solid rgba(251,146,60,0.18);">📌 Other Task</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);">📅 Meeting</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);">📌 Other Task</span>
     </div>
 
     <!-- Status legend -->
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:16px;">
       <span style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">STATUS</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16a6 6 0 1 1 6 0c-.6 1-1 1.5-1 3h-4c0-1.5-.4-2-1-3z"/><line x1="10" y1="21" x2="14" y2="21"/></svg> Idea</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(251,191,36,0.08);color:#FBBF24;border:1px solid rgba(251,191,36,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Scripting</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(167,139,250,0.08);color:#A78BFA;border:1px solid rgba(167,139,250,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="1"/><rect x="3" y="5" width="18" height="4"/><line x1="6" y1="5" x2="8" y2="9"/><line x1="11" y1="5" x2="13" y2="9"/><line x1="16" y1="5" x2="18" y2="9"/></svg> Filming/Design</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(251,146,60,0.08);color:#FB923C;border:1px solid rgba(251,146,60,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg> Editing</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(56,189,248,0.08);color:#38BDF8;border:1px solid rgba(56,189,248,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/><path d="M9 17l-3 4M15 17l3 4"/></svg> Ready to post</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Scripting</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="1"/><rect x="3" y="5" width="18" height="4"/><line x1="6" y1="5" x2="8" y2="9"/><line x1="11" y1="5" x2="13" y2="9"/><line x1="16" y1="5" x2="18" y2="9"/></svg> Filming/Design</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg> Editing</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/><path d="M9 17l-3 4M15 17l3 4"/></svg> Ready to post</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(98,177,52,0.08);color:#62B134;border:1px solid rgba(98,177,52,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Posted</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(98,177,52,0.08);color:#62B134;border:1px solid rgba(98,177,52,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Done</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(148,163,184,0.08);color:#94A3B8;border:1px solid rgba(148,163,184,0.18);">📅 Scheduled</span>
@@ -1868,15 +1871,15 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <!-- Status legend -->
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:18px;">
       <span style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">STATUS</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(99,102,241,0.1);color:#818CF8;border:1px solid rgba(99,102,241,0.2);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="M12 8v6"/><polyline points="9,11 12,14 15,11"/></svg> Received</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(251,191,36,0.08);color:#FBBF24;border:1px solid rgba(251,191,36,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> In Progress</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(56,189,248,0.08);color:#38BDF8;border:1px solid rgba(56,189,248,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> For Review</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(99,102,241,0.1);color:#8B8B94;border:1px solid rgba(99,102,241,0.2);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="M12 8v6"/><polyline points="9,11 12,14 15,11"/></svg> Received</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> In Progress</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> For Review</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(248,113,113,0.08);color:#F87171;border:1px solid rgba(248,113,113,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Revision</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(167,139,250,0.08);color:#C084FC;border:1px solid rgba(167,139,250,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Approved</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.08);color:#8B8B94;border:1px solid rgba(139,139,148,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Approved</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(98,177,52,0.08);color:#62B134;border:1px solid rgba(98,177,52,0.18);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,4 13.5,10.5 20,12 13.5,13.5 12,20 10.5,13.5 4,12 10.5,10.5"/><circle cx="19" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg> Done</span>
       <span style="margin-left:12px;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;">PRIORITY</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(248,113,113,0.1);color:#F87171;border:1px solid rgba(248,113,113,0.2);"><span class="dot dot-red"></span> Rush</span>
-      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(251,146,60,0.1);color:#fb923c;border:1px solid rgba(251,146,60,0.2);"><span class="dot dot-orange"></span> Urgent</span>
+      <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(139,139,148,0.1);color:#8B8B94;border:1px solid rgba(139,139,148,0.2);"><span class="dot dot-orange"></span> Urgent</span>
       <span style="font-size:11px;font-weight:600;padding:4px 11px;border-radius: 2px;background:rgba(113,113,122,0.1);color:#71717A;border:1px solid rgba(113,113,122,0.2);"><span class="dot dot-idle"></span> Normal</span>
     </div>
 
@@ -2071,18 +2074,18 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         <!-- Top performers + opportunities -->
         <div class="insight-pair-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
-            <div style="font-size:11px;color:#38BDF8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Top Performing Content</div>
+            <div style="font-size:11px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Top Performing Content</div>
             <div id="insightsTopVideos" style="font-size:12px;color:var(--text2);line-height:1.8;"></div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
-            <div style="font-size:11px;color:#FBBF24;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16a6 6 0 1 1 6 0c-.6 1-1 1.5-1 3h-4c0-1.5-.4-2-1-3z"/><line x1="10" y1="21" x2="14" y2="21"/></svg> Content Opportunities</div>
+            <div style="font-size:11px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16a6 6 0 1 1 6 0c-.6 1-1 1.5-1 3h-4c0-1.5-.4-2-1-3z"/><line x1="10" y1="21" x2="14" y2="21"/></svg> Content Opportunities</div>
             <div id="insightsOpportunities" style="font-size:13px;color:var(--text2);line-height:1.7;"></div>
           </div>
         </div>
 
         <!-- Creator insights -->
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
-          <div style="font-size:11px;color:#f472b6;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> Creator Performance Notes</div>
+          <div style="font-size:11px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> Creator Performance Notes</div>
           <div id="insightsCreators" style="font-size:13px;color:var(--text2);line-height:1.7;"></div>
         </div>
 
@@ -2117,21 +2120,21 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
         <!-- Hook + Hold Rate side by side -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="insight-pair-grid">
-          <div style="background:#1a1d2e;border:1px solid #62B13433;border-radius: 2px;padding:22px;">
+          <div style="background:var(--card);border:1px solid #62B13433;border-radius: 2px;padding:22px;">
             <div style="font-size:11px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Hook Rate Analysis & Recommendations</div>
             <div style="font-size:11px;color:var(--text2);margin-bottom:16px;">Based on benchmarks: &lt;30% Weak · 30–39% Average · 40–49% Good · 50–59% Very Strong · 60%+ Excellent</div>
             <div id="insightsHookRate" style="font-size:13px;color:var(--text2);line-height:1.8;"></div>
           </div>
-          <div style="background:#1a1d2e;border:1px solid rgba(56,189,248,0.25);border-radius: 2px;padding:22px;">
-            <div style="font-size:11px;color:#38BDF8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg> Hold Rate Analysis & Recommendations</div>
+          <div style="background:var(--card);border:1px solid rgba(139,139,148,0.25);border-radius: 2px;padding:22px;">
+            <div style="font-size:11px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg> Hold Rate Analysis & Recommendations</div>
             <div style="font-size:11px;color:var(--text2);margin-bottom:16px;">Based on benchmarks: &lt;30% Weak · 30–39% Average · 40–49% Good · 50–59% Very Strong · 60%+ Excellent</div>
             <div id="insightsHoldRate" style="font-size:13px;color:var(--text2);line-height:1.8;"></div>
           </div>
         </div>
 
         <!-- Hidden Gems & Wasted Hooks -->
-        <div id="insightsHiddenGems" style="margin-top:20px;background:#1a1d2e;border:1px solid rgba(251,191,36,0.2);border-radius: 2px;padding:22px;display:none;">
-          <div style="font-size:11px;color:#FBBF24;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="20" y2="20"/></svg> Hook vs Hold Mismatch — Actionable Videos</div>
+        <div id="insightsHiddenGems" style="margin-top:20px;background:var(--card);border:1px solid rgba(139,139,148,0.2);border-radius: 2px;padding:22px;display:none;">
+          <div style="font-size:11px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="20" y2="20"/></svg> Hook vs Hold Mismatch — Actionable Videos</div>
           <div style="font-size:11px;color:var(--text2);margin-bottom:16px;">Hidden gems need a better opening · Wasted hooks need better content body</div>
           <div id="insightsHiddenGemsBody"></div>
         </div>
@@ -2662,7 +2665,7 @@ function renderThumbFill(v) {
 
 function kpiStatusBadge(pct) {
   if (pct >= 100) return `<span style="color:#62B134;font-size:11px;font-weight:700">✓ ACHIEVED ${pct}%</span>`;
-  if (pct >= 70) return `<span style="color:#FBBF24;font-size:11px;font-weight:700"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg> AT RISK ${pct}%</span>`;
+  if (pct >= 70) return `<span style="color:#8B8B94;font-size:11px;font-weight:700"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg> AT RISK ${pct}%</span>`;
   return `<span style="color:#F87171;font-size:11px;font-weight:700">✗ BEHIND ${pct}%</span>`;
 }
 
@@ -3041,7 +3044,7 @@ function liveViewsSummaryHTML_(month, vids, recordedTotal) {
   const total = posts.reduce((s, p) => s + postViews_(p), 0);
   const at = zernioAtLabel_();
   return `<div class="msb-item" title="Lahat ng video posts ngayong buwan (walang stories), kasama ang wala sa Video Log. Galing sa Zernio${at ? ', as of ' + at : ''}.">
-    <div class="msb-val" style="color:#38BDF8">${fmt(total)}</div>
+    <div class="msb-val" style="color:#8B8B94">${fmt(total)}</div>
     <div class="msb-label">Live Views ${liveDeltaHTML_(total - recordedTotal)}</div>
     <div class="msb-label" style="margin-top:2px;">${posts.length} posts · Zernio${at ? ' · ' + at : ''}</div>
   </div>`;
@@ -3060,12 +3063,12 @@ function renderMonthlyResults() {
   const statusLabel = status === 'on-track' ? 'ON TRACK' : status === 'at-risk' ? 'AT RISK' : 'BEHIND';
   document.getElementById('monthlyResultsTitle').textContent = month.charAt(0) + month.slice(1).toLowerCase() + ' — Video Results';
   document.getElementById('monthlySummaryBar').innerHTML = `
-    <div class="msb-item"><div class="msb-val" style="color:#38BDF8">${fmt(d.views)}</div><div class="msb-label">Total Views</div></div>
-    <div class="msb-item"><div class="msb-val" style="color:#A78BFA">${fmt(d.thruplays)}</div><div class="msb-label">Thruplays</div></div>
-    <div class="msb-item"><div class="msb-val" style="color:#FB923C">${d.avg_rate}%</div><div class="msb-label">Avg Rate</div></div>
-    <div class="msb-item"><div class="msb-val" style="color:${d.avg_hook_rate>=60?'#62B134':d.avg_hook_rate>=50?'#38BDF8':d.avg_hook_rate>=40?'#A78BFA':d.avg_hook_rate>=30?'#FBBF24':'#F87171'}">${d.avg_hook_rate}%</div><div class="msb-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Avg Hook Rate</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${fmt(d.views)}</div><div class="msb-label">Total Views</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${fmt(d.thruplays)}</div><div class="msb-label">Thruplays</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${d.avg_rate}%</div><div class="msb-label">Avg Rate</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:${d.avg_hook_rate>=60?'#62B134':d.avg_hook_rate>=50?'#62B134':d.avg_hook_rate>=40?'#62B134':d.avg_hook_rate>=30?'#8B8B94':'#F87171'}">${d.avg_hook_rate}%</div><div class="msb-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Avg Hook Rate</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#62B134">${d.winning}</div><div class="msb-label">Winning</div></div>
-    <div class="msb-item"><div class="msb-val" style="color:#FBBF24">${d.kpi_submitted}</div><div class="msb-label">Videos Submitted</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${d.kpi_submitted}</div><div class="msb-label">Videos Submitted</div></div>
     ${liveViewsSummaryHTML_(month, d.all_videos || [], d.views)}
     <div class="msb-item"><div class="msb-val"><span class="status-badge status-${status}">${statusLabel}</span></div><div class="msb-label">KPI Status</div></div>
   `;
@@ -3098,13 +3101,13 @@ function renderMonthlyResults() {
   const TARGET = 50000;
   let rows = '';
   vids.forEach((v, i) => {
-    const viewsColor = v.views >= TARGET ? '#38BDF8' : '#3a3d4e';
+    const viewsColor = v.views >= TARGET ? '#8B8B94' : '#3a3d4e';
     const linkHTML = v.link ? `<a href="${v.link}" target="_blank" class="fb-link"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '—';
     const dateDisplay = v.dateTimestamp ? (() => { const d = new Date(v.dateTimestamp); return (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0') + '/' + d.getFullYear(); })() : v.datePosted;
     const dateHTML = dateDisplay ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;">${dateDisplay}</span>` : '<span style="color:var(--text3);font-size:11px;">—</span>';
     const live = liveViewsOf_(v);
     const liveHTML = live === null ? '' : `<div style="font-size:10.5px;font-weight:600;color:var(--text3);white-space:nowrap;" title="Live views from Zernio">Live: ${fmt(live)} ${liveDeltaHTML_(live - (v.views || 0))}</div>`;
-    rows += `<tr><td style="color:var(--text2);font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div>${videoTagSelectHtml_(v.link, v.title)}</td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}${liveHTML}</td><td style="color:#A78BFA">${fmt(v.thruplays)}</td><td>${getHookBadgeCompact(v.hook_rate)}</td><td>${getHoldBadgeCompact(v.hold_rate)}</td><td style="color:var(--text2)">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
+    rows += `<tr><td style="color:var(--text2);font-size:11px">${i+1}</td><td>${dateHTML}</td><td class="video-title-cell"><div class="video-title-text">${v.title}</div>${videoTagSelectHtml_(v.link, v.title)}</td><td><span class="creator-tag">${v.creator}</span></td><td style="color:${viewsColor};font-weight:700">${fmt(v.views)}${liveHTML}</td><td style="color:#8B8B94">${fmt(v.thruplays)}</td><td>${getHookBadgeCompact(v.hook_rate)}</td><td>${getHoldBadgeCompact(v.hold_rate)}</td><td style="color:var(--text2)">${v.thruplay_rate}%</td><td>${getPillarBadge(v.pillar)}</td><td>${v.winning ? '<span class="win-badge">WIN</span>' : ''}${v.ai ? '<span class="ai-tag" style="margin-left:4px">AI</span>' : ''}${!v.winning && !v.ai ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}</td><td>${linkHTML}</td></tr>`;
   });
   document.getElementById('monthlyTableBody').innerHTML = rows || '<tr><td colspan="12" style="text-align:center;color:#444;padding:30px">No videos match your filter</td></tr>';
 }
@@ -3144,9 +3147,9 @@ function mutedRateBadge(icon, rate) {
 
 function hookRateTierColor(r) {
   if (r>=60) return '#62B134';
-  if (r>=50) return '#38BDF8';
-  if (r>=40) return '#A78BFA';
-  if (r>=30) return '#FBBF24';
+  if (r>=50) return '#62B134';
+  if (r>=40) return '#62B134';
+  if (r>=30) return '#8B8B94';
   return '#F87171';
 }
 function hookRateTierLabel(r) {
@@ -3290,10 +3293,10 @@ function renderHookBank(month) {
   const totalWins = videos.filter(v => v.winning).length;
   document.getElementById('hookBankSummary').innerHTML = `
     <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${rows.length}</div><div class="hook-stat-label">Hook Types Tracked</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#38BDF8">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (${scopeLabel})</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#FB923C">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (30%+ videos lang)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#FBBF24">${totalWins}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Total Winning Videos</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#A78BFA;font-size:16px;line-height:1.3;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> ${best.name}</div><div class="hook-stat-label">Best Hook Type</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (${scopeLabel})</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (30%+ videos lang)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${totalWins}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Total Winning Videos</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94;font-size:16px;line-height:1.3;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> ${best.name}</div><div class="hook-stat-label">Best Hook Type</div></div>
   `;
 
   grid.innerHTML = rows.map((r, i) => {
@@ -3442,10 +3445,10 @@ function renderHook(month) {
 
   document.getElementById('hookSummary').innerHTML = `
     <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${excellent}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg> Excellent (60%+)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#38BDF8">${veryStrong}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#A78BFA">${good}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#FBBF24">${average}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average (30–39%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#FB923C">${avgHook}%</div><div class="hook-stat-label">Avg Hook Rate</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${veryStrong}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${good}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${average}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average (30–39%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${avgHook}%</div><div class="hook-stat-label">Avg Hook Rate</div></div>
   `;
 
   const TARGET_VIEWS = 50000;
@@ -3513,10 +3516,10 @@ function renderHold(month) {
 
   document.getElementById('holdSummary').innerHTML = `
     <div class="hold-stat"><div class="hold-stat-val" style="color:#62B134">${excellent}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg> Excellent (60%+)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#38BDF8">${veryStrong}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#A78BFA">${good}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#FBBF24">${average}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average (30–39%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#FB923C">${avgHold}%</div><div class="hold-stat-label">Avg Hold Rate</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#8B8B94">${veryStrong}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#8B8B94">${good}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#8B8B94">${average}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average (30–39%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#8B8B94">${avgHold}%</div><div class="hold-stat-label">Avg Hold Rate</div></div>
   `;
 
   const TARGET_VIEWS = 50000;
@@ -3723,14 +3726,14 @@ async function saveCurrentInsights() {
     const result = await response.json();
     if (result.status === 'error') {
       setIconHTML(statusEl, '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>', 'Local saved, Sheet error: ' + result.message);
-      statusEl.style.color = '#FBBF24';
+      statusEl.style.color = '#8B8B94';
     } else {
       statusEl.textContent = `✓ Saved as "${label}"`;
       statusEl.style.color = '#62B134';
     }
   } catch(err) {
     statusEl.textContent = '✓ Local saved · Sheet unreachable (' + err.message + ')';
-    statusEl.style.color = '#FBBF24';
+    statusEl.style.color = '#8B8B94';
   }
 
   btn.innerHTML = '✓ Saved';
@@ -3765,31 +3768,31 @@ function renderInsightRecords() {
     return;
   }
   empty.style.display = 'none';
-  const bc = { green:'#62B134', yellow:'#FBBF24', red:'#F87171' };
-  const bbg = { green:'rgba(98,177,52,0.08)', yellow:'rgba(251,191,36,0.08)', red:'rgba(248,113,113,0.08)' };
+  const bc = { green:'#62B134', yellow:'#8B8B94', red:'#F87171' };
+  const bbg = { green:'rgba(98,177,52,0.08)', yellow:'rgba(139,139,148,0.08)', red:'rgba(248,113,113,0.08)' };
   const toList = arr => (arr||[]).map(x=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;margin-top:2px;color:var(--text2)">•</span><span>${x}</span></div>`).join('');
 
   list.innerHTML = sorted.reverse().map(r => {
-    const color = bc[r.kpi_color] || '#38BDF8';
-    const bg    = bbg[r.kpi_color] || 'rgba(56,189,248,0.06)';
+    const color = bc[r.kpi_color] || '#8B8B94';
+    const bg    = bbg[r.kpi_color] || 'rgba(139,139,148,0.06)';
     const dt    = r.savedAt ? (() => { const d=new Date(r.savedAt); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const h=d.getHours()%12||12; return `${mo[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${h}:${d.getMinutes().toString().padStart(2,'0')} ${d.getHours()<12?'AM':'PM'}`; })() : '';
     const hasMoM = (r.mom_highlights && r.mom_highlights.length > 0) || (r.mom_lowlights && r.mom_lowlights.length > 0);
     const s = r.snapshot || {};
     const snapHtml = s.views ? `
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
         ${[
-          { label:'Views',          val: fmt(s.views),           pct: s.views_pct,      color:'#38BDF8' },
-          { label:'Thruplays',      val: fmt(s.thruplays),       pct: s.thruplays_pct,  color:'#A78BFA' },
+          { label:'Views',          val: fmt(s.views),           pct: s.views_pct,      color:'#8B8B94' },
+          { label:'Thruplays',      val: fmt(s.thruplays),       pct: s.thruplays_pct,  color:'#8B8B94' },
           { label:'Winning Videos', val: s.winning,              pct: s.winning_pct,    color:'#62B134' },
-          { label:'Submitted',      val: s.videos_submitted,     pct: null,             color:'#FB923C' },
-          { label:'Avg Thruplay %', val: (s.avg_thruplay_rate||0)+'%', pct: null,       color:'#f472b6' },
-          { label:'Avg Hook Rate',  val: (s.avg_hook_rate||0)+'%',     pct: null,       color: s.avg_hook_rate>=60?'#62B134':s.avg_hook_rate>=50?'#38BDF8':s.avg_hook_rate>=40?'#A78BFA':s.avg_hook_rate>=30?'#FBBF24':'#F87171' },
-          { label:'Avg Hold Rate',  val: (s.avg_hold_rate||0)+'%',     pct: null,       color: s.avg_hold_rate>=60?'#62B134':s.avg_hold_rate>=50?'#38BDF8':s.avg_hold_rate>=40?'#A78BFA':s.avg_hold_rate>=30?'#FBBF24':'#F87171' },
+          { label:'Submitted',      val: s.videos_submitted,     pct: null,             color:'#8B8B94' },
+          { label:'Avg Thruplay %', val: (s.avg_thruplay_rate||0)+'%', pct: null,       color:'#8B8B94' },
+          { label:'Avg Hook Rate',  val: (s.avg_hook_rate||0)+'%',     pct: null,       color: s.avg_hook_rate>=60?'#62B134':s.avg_hook_rate>=50?'#62B134':s.avg_hook_rate>=40?'#62B134':s.avg_hook_rate>=30?'#8B8B94':'#F87171' },
+          { label:'Avg Hold Rate',  val: (s.avg_hold_rate||0)+'%',     pct: null,       color: s.avg_hold_rate>=60?'#62B134':s.avg_hold_rate>=50?'#62B134':s.avg_hold_rate>=40?'#62B134':s.avg_hold_rate>=30?'#8B8B94':'#F87171' },
           { label:'Win Rate',       val: (s.win_rate_pct||0)+'%',pct: null,             color:'#62B134' },
         ].map(st => `<div style="background:var(--surface);border:1px solid var(--border);border-radius: 2px;padding:10px 14px;text-align:center;min-width:90px;">
           <div style="font-size:17px;font-weight:700;color:${st.color}">${st.val}</div>
           <div style="font-size:9.5px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px">${st.label}</div>
-          ${st.pct !== null ? `<div style="font-size:9px;font-weight:700;margin-top:3px;color:${st.pct>=100?'#62B134':st.pct>=70?'#FBBF24':'#F87171'}">${st.pct}% of target</div>` : ''}
+          ${st.pct !== null ? `<div style="font-size:9px;font-weight:700;margin-top:3px;color:${st.pct>=100?'#62B134':st.pct>=70?'#8B8B94':'#F87171'}">${st.pct}% of target</div>` : ''}
         </div>`).join('')}
       </div>` : '';
     return `
@@ -3874,17 +3877,17 @@ function renderInsightRecords() {
           <div style="font-size:12px;color:var(--text2);">${toList(r.dont)}</div>
         </div>
         <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-          <div style="background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.1);border-radius: 2px;padding:14px;">
-            <div style="font-size:10px;color:#38BDF8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Top Performing Content</div>
+          <div style="background:rgba(139,139,148,0.05);border:1px solid rgba(139,139,148,0.1);border-radius: 2px;padding:14px;">
+            <div style="font-size:10px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Top Performing Content</div>
             <div style="font-size:12px;color:var(--text2);">${r.top_videos_insight || ''}</div>
           </div>
-          <div style="background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.1);border-radius: 2px;padding:14px;">
-            <div style="font-size:10px;color:#FBBF24;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16a6 6 0 1 1 6 0c-.6 1-1 1.5-1 3h-4c0-1.5-.4-2-1-3z"/><line x1="10" y1="21" x2="14" y2="21"/></svg> Opportunities</div>
+          <div style="background:rgba(139,139,148,0.05);border:1px solid rgba(139,139,148,0.1);border-radius: 2px;padding:14px;">
+            <div style="font-size:10px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16a6 6 0 1 1 6 0c-.6 1-1 1.5-1 3h-4c0-1.5-.4-2-1-3z"/><line x1="10" y1="21" x2="14" y2="21"/></svg> Opportunities</div>
             <div style="font-size:12px;color:var(--text2);">${toList(r.opportunities)}</div>
           </div>
         </div>
-        <div style="margin-top:14px;background:rgba(244,114,182,0.05);border:1px solid rgba(244,114,182,0.1);border-radius: 2px;padding:14px;">
-          <div style="font-size:10px;color:#f472b6;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> Creator Performance Notes</div>
+        <div style="margin-top:14px;background:rgba(139,139,148,0.05);border:1px solid rgba(139,139,148,0.1);border-radius: 2px;padding:14px;">
+          <div style="font-size:10px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> Creator Performance Notes</div>
           <div style="font-size:12px;color:var(--text2);">${toList(r.creator_notes)}</div>
         </div>
         <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
@@ -3892,8 +3895,8 @@ function renderInsightRecords() {
             <div style="font-size:10px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Hook Rate Analysis</div>
             <div style="font-size:12px;color:var(--text2);">${toList(r.hook_recs)}</div>
           </div>
-          <div style="background:rgba(56,189,248,0.04);border:1px solid rgba(56,189,248,0.15);border-radius: 2px;padding:14px;">
-            <div style="font-size:10px;color:#38BDF8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg> Hold Rate Analysis</div>
+          <div style="background:rgba(139,139,148,0.04);border:1px solid rgba(139,139,148,0.15);border-radius: 2px;padding:14px;">
+            <div style="font-size:10px;color:#8B8B94;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg> Hold Rate Analysis</div>
             <div style="font-size:12px;color:var(--text2);">${(r.hold_recs && r.hold_recs.length > 0) ? toList(r.hold_recs) : '<div style="color:var(--text2);font-size:11px;font-style:italic;">Re-generate and re-save to include hold rate data.</div>'}</div>
           </div>
         </div>
@@ -3930,7 +3933,7 @@ async function loadInsightsFromSheet() {
 
     if (result.status === 'error') {
       setIconHTML(statusEl, '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>', 'Error from Sheet: ' + result.message);
-      statusEl.style.color = '#FBBF24';
+      statusEl.style.color = '#8B8B94';
       btn.disabled = false;
       btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1-1-7.9 5 5 0 0 1 9.6-2A4.5 4.5 0 0 1 17 18H7z"/></svg> Load from Sheet';
       return;
@@ -4301,7 +4304,7 @@ function analyzeData(month, d) {
   } else {
     const avgHook = d.avg_hook_rate || 0;
     const hookLabel = avgHook>=60?'Excellent':avgHook>=50?'Very Strong':avgHook>=40?'Good':avgHook>=30?'Average':'Weak';
-    const hookColor = avgHook>=60?'#62B134':avgHook>=50?'#38BDF8':avgHook>=40?'#A78BFA':avgHook>=30?'#FBBF24':'#F87171';
+    const hookColor = avgHook>=60?'#62B134':avgHook>=50?'#62B134':avgHook>=40?'#62B134':avgHook>=30?'#8B8B94':'#F87171';
     hookRecs.push(`Month avg hook rate is <strong style="color:${hookColor}">${avgHook}% — ${hookLabel}</strong> across ${hookVids.length} videos with data.`);
 
     const excellentH = hookVids.filter(v=>v.hook_rate>=60);
@@ -4344,7 +4347,7 @@ function analyzeData(month, d) {
   } else {
     const avgHold = d.avg_hold_rate || 0;
     const holdLabel = avgHold>=60?'Excellent':avgHold>=50?'Very Strong':avgHold>=40?'Good':avgHold>=30?'Average':'Weak';
-    const holdColor = avgHold>=60?'#62B134':avgHold>=50?'#38BDF8':avgHold>=40?'#A78BFA':avgHold>=30?'#FBBF24':'#F87171';
+    const holdColor = avgHold>=60?'#62B134':avgHold>=50?'#62B134':avgHold>=40?'#62B134':avgHold>=30?'#8B8B94':'#F87171';
     holdRecs.push(`Month avg hold rate is <strong style="color:${holdColor}">${avgHold}% — ${holdLabel}</strong> across ${holdVids.length} video${holdVids.length>1?'s':''} with data.`);
 
     const excellentHo = holdVids.filter(v=>v.hold_rate>=60);
@@ -4744,11 +4747,11 @@ function renderInsightsOutput(ins, hasPrev) {
   const claudeBtn = document.getElementById('claudePromptBtn');
   if (claudeBtn) claudeBtn.style.display = 'flex';
 
-  const bannerColors = { green:'#62B134', yellow:'#FBBF24', red:'#F87171' };
-  const bannerBg = { green:'rgba(98,177,52,0.08)', yellow:'rgba(251,191,36,0.08)', red:'rgba(248,113,113,0.08)' };
-  const bc = bannerColors[ins.kpi_color] || '#38BDF8';
+  const bannerColors = { green:'#62B134', yellow:'#8B8B94', red:'#F87171' };
+  const bannerBg = { green:'rgba(98,177,52,0.08)', yellow:'rgba(139,139,148,0.08)', red:'rgba(248,113,113,0.08)' };
+  const bc = bannerColors[ins.kpi_color] || '#8B8B94';
   const banner = document.getElementById('insightsBanner');
-  banner.style.background = bannerBg[ins.kpi_color] || 'rgba(56,189,248,0.08)';
+  banner.style.background = bannerBg[ins.kpi_color] || 'rgba(139,139,148,0.08)';
   banner.style.borderColor = bc + '44';
   const bannerLabel = { green: 'On track', yellow: 'At risk', red: 'Behind target' }[ins.kpi_color] || 'Summary';
   banner.innerHTML = `<div style="color:${bc};font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${bannerLabel}${ins.ai_generated ? ' · AI summary' : ''}</div>
@@ -4861,10 +4864,10 @@ function renderInsightsOutput(ins, hasPrev) {
     gemsSection.style.display = 'block';
     let gemsHtml = '';
     if (gems.length > 0) {
-      gemsHtml += `<div style="margin-bottom:16px;"><div style="font-size:11px;color:#FBBF24;font-weight:700;margin-bottom:10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="6,4 18,4 22,9 12,21 2,9"/></svg> Hidden Gems — Weak Hook, Strong Hold (rewrite the opening)</div>`;
+      gemsHtml += `<div style="margin-bottom:16px;"><div style="font-size:11px;color:#8B8B94;font-weight:700;margin-bottom:10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="6,4 18,4 22,9 12,21 2,9"/></svg> Hidden Gems — Weak Hook, Strong Hold (rewrite the opening)</div>`;
       gems.forEach(v => {
-        const linkHTML = v.link ? `<a href="${v.link}" target="_blank" style="color:#FBBF24;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '';
-        gemsHtml += `<div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);border-radius: 2px;padding:12px 14px;margin-bottom:8px;">
+        const linkHTML = v.link ? `<a href="${v.link}" target="_blank" style="color:#8B8B94;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 19,12 8,19"/></svg> Watch</a>` : '';
+        gemsHtml += `<div style="background:rgba(139,139,148,0.06);border:1px solid rgba(139,139,148,0.15);border-radius: 2px;padding:12px 14px;margin-bottom:8px;">
           <div style="font-size:12.5px;color:var(--text);font-weight:500;margin-bottom:8px;line-height:1.4;">${v.title}</div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
             <span style="background:rgba(255,255,255,0.08);color:var(--text2);border:1px solid rgba(255,255,255,0.14);padding:3px 9px;border-radius: 2px;font-size:11px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> ${v.creator || 'Unknown'}</span>
@@ -5184,7 +5187,7 @@ function copyClaudePrompt() {
       document.execCommand('copy');
       if (statusEl) { statusEl.textContent = '✓ Copied to clipboard!'; statusEl.style.color = '#62B134'; }
     } catch(e) {
-      if (statusEl) { setIconHTML(statusEl, '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>', 'Copy failed — select the text manually.'); statusEl.style.color = '#FBBF24'; }
+      if (statusEl) { setIconHTML(statusEl, '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>', 'Copy failed — select the text manually.'); statusEl.style.color = '#8B8B94'; }
     }
   });
 }
@@ -5446,7 +5449,7 @@ function setTeamsStatus(state, text) {
   if (chip) {
     chip.style.display = text ? 'inline-block' : 'none';
     chip.textContent = text || '';
-    chip.style.color = (state === 'blocked' || state === 'error' || state === 'needs-connect') ? '#FBBF24' : 'var(--text3)';
+    chip.style.color = (state === 'blocked' || state === 'error' || state === 'needs-connect') ? '#8B8B94' : 'var(--text3)';
     chip.style.cursor = state === 'on' ? 'pointer' : 'default';
     chip.title = state === 'on' ? 'Click to disconnect Teams meetings' : '';
     chip.onclick = state === 'on' ? disconnectTeamsCalendar : null;
@@ -5600,7 +5603,7 @@ function teamsTime_(hhmm) {
 // Subjects come from whoever sent the invite, so everything here is set via
 // textContent (never innerHTML).
 function buildTeamsPill_(ev) {
-  const color = '#38BDF8';
+  const color = '#8B8B94';
   const card = document.createElement('div');
   card.className = 'cal-entry-pill';
   card.style.cssText = `background:${color}16;border-left:3px solid ${color};cursor:${ev.webLink ? 'pointer' : 'default'};`;
@@ -6110,7 +6113,7 @@ function renderNewsArticles() {
 
     const articleRelevance = generateAngleForArticle(article).relevance;
     const relevanceStarBadge = articleRelevance === 'high'
-      ? '<span style="font-size:10px;color:#FBBF24;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 14.7,9 21,9.5 16.2,13.6 17.6,20 12,16.5 6.4,20 7.8,13.6 3,9.5 9.3,9"/></svg> Relevant</span>'
+      ? '<span style="font-size:10px;color:#8B8B94;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 14.7,9 21,9.5 16.2,13.6 17.6,20 12,16.5 6.4,20 7.8,13.6 3,9.5 9.3,9"/></svg> Relevant</span>'
       : '';
 
     const thumbHtml = article.image
@@ -6351,7 +6354,7 @@ async function logGeneratedTopics(topics) {
 function relevanceBadge(level) {
   if (level === 'high') return '<span style="background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.2);padding:3px 9px;border-radius: 2px;font-size:10px;font-weight:700;">High relevance</span>';
   if (level === 'low') return '<span style="background:var(--surface);color:var(--text3);border:1px solid var(--border);padding:3px 9px;border-radius: 2px;font-size:10px;font-weight:700;">Low relevance</span>';
-  return '<span style="background:rgba(251,191,36,0.1);color:#FBBF24;border:1px solid rgba(251,191,36,0.2);padding:3px 9px;border-radius: 2px;font-size:10px;font-weight:700;">Medium relevance</span>';
+  return '<span style="background:rgba(139,139,148,0.1);color:#8B8B94;border:1px solid rgba(139,139,148,0.2);padding:3px 9px;border-radius: 2px;font-size:10px;font-weight:700;">Medium relevance</span>';
 }
 
 function renderWeeklyTopics() {
@@ -6365,7 +6368,7 @@ function renderWeeklyTopics() {
     if (topic.alreadyCovered) card.style.opacity = '0.75';
 
     const coveredWarning = topic.alreadyCovered
-      ? `<div style="font-size:11px;color:#FBBF24;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);border-radius: 2px;padding:6px 10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg> Posibleng paulit-ulit${topic.coveredWeekLabel ? ' — may kahawig na topic mula ' + topic.coveredWeekLabel : ''}</div>`
+      ? `<div style="font-size:11px;color:#8B8B94;background:rgba(139,139,148,0.1);border:1px solid rgba(139,139,148,0.2);border-radius: 2px;padding:6px 10px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg> Posibleng paulit-ulit${topic.coveredWeekLabel ? ' — may kahawig na topic mula ' + topic.coveredWeekLabel : ''}</div>`
       : '';
 
     card.innerHTML = `
@@ -6805,15 +6808,15 @@ async function loadContentCalendar() {
 function calendarStatusColor(status) {
   const map = {
     'Idea': '#71717A',
-    'Scripting': '#FBBF24',
-    'Filming/Design': '#A78BFA',
-    'Editing': '#FB923C',
-    'Ready to post': '#38BDF8',
+    'Scripting': '#8B8B94',
+    'Filming/Design': '#8B8B94',
+    'Editing': '#8B8B94',
+    'Ready to post': '#8B8B94',
     'Posted': '#62B134',
     'Done': '#62B134',
     'Scheduled': '#94A3B8',
     'To do': '#71717A',
-    'In progress': '#FBBF24'
+    'In progress': '#8B8B94'
   };
   return map[status] || '#71717A';
 }
@@ -6821,10 +6824,10 @@ function calendarStatusColor(status) {
 function scheduleTypeMeta(type) {
   const map = {
     'Content':     { color: '#62B134', icon: '🎬' },
-    'Task':        { color: '#F472B6', icon: '✅' },
-    'Project':     { color: '#B48CFF', icon: '📁' },
-    'Meeting':     { color: '#38BDF8', icon: '📅' },
-    'Other Task':  { color: '#FB923C', icon: '📌' }
+    'Task':        { color: '#8B8B94', icon: '✅' },
+    'Project':     { color: '#8B8B94', icon: '📁' },
+    'Meeting':     { color: '#8B8B94', icon: '📅' },
+    'Other Task':  { color: '#8B8B94', icon: '📌' }
   };
   return map[type] || map['Content'];
 }
@@ -7664,11 +7667,11 @@ async function deleteCalendarEntry(id) {
 
 function creativeStatusColor(status) {
   const map = {
-    'Received':   '#818CF8',
-    'In Progress':'#FBBF24',
-    'For Review': '#38BDF8',
+    'Received':   '#8B8B94',
+    'In Progress':'#8B8B94',
+    'For Review': '#8B8B94',
     'Revision':   '#F87171',
-    'Approved':   '#C084FC',
+    'Approved':   '#8B8B94',
     'Done':       '#62B134'
   };
   return map[status] || '#71717A';
@@ -7677,7 +7680,7 @@ function creativeStatusColor(status) {
 function creativePriorityBadge(priority) {
   const map = {
     'Rush':   { color:'#F87171', icon:'<span class="dot dot-red"></span>' },
-    'Urgent': { color:'#fb923c', icon:'<span class="dot dot-orange"></span>' },
+    'Urgent': { color:'#8B8B94', icon:'<span class="dot dot-orange"></span>' },
     'Normal': { color:'#71717A', icon:'<span class="dot dot-idle"></span>' },
     'Low':    { color:'#62B134', icon:'<span class="dot dot-blue"></span>' }
   };
@@ -8080,7 +8083,7 @@ function openCrDayPopup(dateStr, entries) {
             ${entry.client ? `<span style="font-size:11px;color:var(--text3);">· ${entry.client}</span>` : ''}
           </div>
         </div>
-        <span onclick="(function(e){e.stopPropagation();closeCrDayPopup();openReassignModal('${entry.id}')})(event)" style="color:#A78BFA;font-weight:700;cursor:pointer;font-size:10px;background:rgba(167,139,250,0.1);padding:3px 8px;border-radius: 2px;border:1px solid rgba(167,139,250,0.2);white-space:nowrap;flex-shrink:0;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Pass</span>
+        <span onclick="(function(e){e.stopPropagation();closeCrDayPopup();openReassignModal('${entry.id}')})(event)" style="color:#8B8B94;font-weight:700;cursor:pointer;font-size:10px;background:rgba(139,139,148,0.1);padding:3px 8px;border-radius: 2px;border:1px solid rgba(139,139,148,0.2);white-space:nowrap;flex-shrink:0;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Pass</span>
       </div>`;
 
     card.onclick = () => {
@@ -8189,7 +8192,7 @@ function openCrViewModal(entry) {
       const dateLabel = isNaN(dt.getTime()) ? h.at : dt.toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
       if (h.type === 'reassign') {
         return `<div style="font-size:11.5px;color:var(--text2);padding:8px 0;border-bottom:1px solid var(--border);">
-          <div><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> <span style="color:#A78BFA;font-weight:700;">${h.from||'Unassigned'}</span> → <span style="color:#f472b6;font-weight:700;">${h.to}</span>${h.note ? ` · <span style="color:var(--text3);font-style:italic;">"${h.note}"</span>` : ''}</div>
+          <div><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> <span style="color:#8B8B94;font-weight:700;">${h.from||'Unassigned'}</span> → <span style="color:#8B8B94;font-weight:700;">${h.to}</span>${h.note ? ` · <span style="color:var(--text3);font-style:italic;">"${h.note}"</span>` : ''}</div>
           <div style="font-size:10px;color:var(--text3);margin-top:2px;">${h.by ? 'by ' + h.by + ' · ' : ''}${dateLabel}</div>
         </div>`;
       }
@@ -8246,7 +8249,7 @@ function openReassignModal(entryId) {
       const dt = new Date(h.at);
       const dateLabel = isNaN(dt.getTime()) ? h.at : dt.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
       return `<div style="font-size:11.5px;color:var(--text2);padding:8px 0;border-bottom:1px solid var(--border);">
-        <div><span style="color:#A78BFA;font-weight:700;">${h.from || 'Unassigned'}</span> → <span style="color:#f472b6;font-weight:700;">${h.to}</span>${h.note ? ` <span style="color:var(--text3);">· "${h.note}"</span>` : ''}</div>
+        <div><span style="color:#8B8B94;font-weight:700;">${h.from || 'Unassigned'}</span> → <span style="color:#8B8B94;font-weight:700;">${h.to}</span>${h.note ? ` <span style="color:var(--text3);">· "${h.note}"</span>` : ''}</div>
         <div style="font-size:10px;color:var(--text3);margin-top:2px;">${h.by ? 'by ' + h.by + ' · ' : ''}${dateLabel}</div>
       </div>`;
     }).join('');
@@ -8463,7 +8466,7 @@ INSTRUCTIONS:
 function renderViralTopics(ideas) {
   const grid = document.getElementById('viralTopicsGrid');
   grid.innerHTML = '';
-  const pillarColor = { KNOW: '#62B134', LIKE: '#f472b6', TRUST: '#62B134' };
+  const pillarColor = { KNOW: '#62B134', LIKE: '#8B8B94', TRUST: '#62B134' };
 
   ideas.forEach(idea => {
     const color = pillarColor[idea.pillar] || '#71717A';
@@ -8837,7 +8840,7 @@ function addViralTopicToCalendar(title) {
         </div>
         <div style="display:flex;gap:10px;">
           <button id="crViewEditBtn" onclick="crViewToEdit()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-5L16 4l4 4L9 19l-5 1z"/><line x1="13" y1="7" x2="17" y2="11"/></svg> Edit</button>
-          <button onclick="openReassignModal(crViewCurrentId)" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Reassign</button>
+          <button onclick="openReassignModal(crViewCurrentId)" style="background:rgba(139,139,148,0.1);color:#8B8B94;border:1px solid rgba(139,139,148,0.2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6.3 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 16"/><path d="M20 20v-4h-4"/></svg> Reassign</button>
           <button onclick="closeCrViewModal()" style="background:var(--surface);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius: 2px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>
         </div>
       </div>
