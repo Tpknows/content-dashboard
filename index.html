@@ -3892,11 +3892,12 @@ async function saveCurrentInsights() {
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       // The Insights sheet has fixed columns, so the newer sections ride inside existing
       // ones with a prefix; loadInsightsFromSheet and the Script Library read them back out.
-      body: JSON.stringify({ action: 'save', ...record,
+      // 'saveInsight' with a record wrapper; plain 'save' on this backend is the Topics save
+      body: JSON.stringify({ action: 'saveInsight', record: { ...record,
         kpi_status: (note ? `[Note: ${note}] ` : '') + record.kpi_status,
         working: [...record.working, ...record.video_diagnosis.filter(x => x.startsWith('Pumatok'))],
         not_working: [...record.not_working, ...record.video_diagnosis.filter(x => x.startsWith('Hindi pumatok'))],
-        actions: [...record.actions, ...record.script_rules.map(x => 'Script rule: ' + x), ...record.hook_plan.map(x => 'Hook plan: ' + x)] })
+        actions: [...record.actions, ...record.script_rules.map(x => 'Script rule: ' + x), ...record.hook_plan.map(x => 'Hook plan: ' + x)] } })
     });
     const result = await response.json();
     if (result.status === 'error') {
