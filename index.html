@@ -3297,7 +3297,7 @@ function renderHookBank(month) {
   document.getElementById('hookBankSummary').innerHTML = `
     <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${rows.length}</div><div class="hook-stat-label">Hook Types Tracked</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${videos.length}</div><div class="hook-stat-label">Videos Analyzed (${scopeLabel})</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (30%+ videos lang)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:${hookRateTierColor(overallAvgHook)}">${overallAvgHook}%</div><div class="hook-stat-label">Avg Hook Rate (30%+ videos lang)</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${totalWins}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> Total Winning Videos</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94;font-size:16px;line-height:1.3;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/></svg> ${best.name}</div><div class="hook-stat-label">Best Hook Type</div></div>
   `;
@@ -3448,10 +3448,10 @@ function renderHook(month) {
 
   document.getElementById('hookSummary').innerHTML = `
     <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${excellent}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg> Excellent (60%+)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${veryStrong}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${good}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${veryStrong}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:#62B134">${good}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
     <div class="hook-stat"><div class="hook-stat-val" style="color:#D4A72C">${average}</div><div class="hook-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average (30–39%)</div></div>
-    <div class="hook-stat"><div class="hook-stat-val" style="color:#8B8B94">${avgHook}%</div><div class="hook-stat-label">Avg Hook Rate</div></div>
+    <div class="hook-stat"><div class="hook-stat-val" style="color:${hookRateTierColor(avgHook)}">${avgHook}%</div><div class="hook-stat-label">Avg Hook Rate</div></div>
   `;
 
   const TARGET_VIEWS = 50000;
@@ -3519,10 +3519,10 @@ function renderHold(month) {
 
   document.getElementById('holdSummary').innerHTML = `
     <div class="hold-stat"><div class="hold-stat-val" style="color:#62B134">${excellent}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 3-4 4.2-4 8.2a4 4 0 0 0 8 0c0-1.6-.6-2.6-1.4-3.4.1 1.6-.9 1.8-1.6.9-.8-1-.2-2.8-1-5.7z"/></svg> Excellent (60%+)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#8B8B94">${veryStrong}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#8B8B94">${good}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#62B134">${veryStrong}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 9,22 20,9 13,9"/></svg> Very Strong (50–59%)</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:#62B134">${good}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg> Good (40–49%)</div></div>
     <div class="hold-stat"><div class="hold-stat-val" style="color:#D4A72C">${average}</div><div class="hold-stat-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg> Average (30–39%)</div></div>
-    <div class="hold-stat"><div class="hold-stat-val" style="color:#8B8B94">${avgHold}%</div><div class="hold-stat-label">Avg Hold Rate</div></div>
+    <div class="hold-stat"><div class="hold-stat-val" style="color:${hookRateTierColor(avgHold)}">${avgHold}%</div><div class="hold-stat-label">Avg Hold Rate</div></div>
   `;
 
   const TARGET_VIEWS = 50000;
