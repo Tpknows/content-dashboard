@@ -5658,7 +5658,7 @@ async function loadSchedulerPosts() {
 }
 
 function buildSchedulerPill_(p) {
-  const color = '#62B134';
+  const color = '#71717A'; // already posted: gray like Posted entries
   const card = document.createElement('div');
   card.className = 'cal-entry-pill';
   card.style.cssText = `background:${color}16;border-left:3px solid ${color};cursor:${p.url ? 'pointer' : 'default'};`;
@@ -6805,18 +6805,19 @@ async function loadContentCalendar() {
   }
 }
 
+// Green = still needs work, gray = finished or already scheduled, so pending items stand out
 function calendarStatusColor(status) {
   const map = {
-    'Idea': '#71717A',
-    'Scripting': '#8B8B94',
-    'Filming/Design': '#8B8B94',
-    'Editing': '#8B8B94',
-    'Ready to post': '#8B8B94',
-    'Posted': '#62B134',
-    'Done': '#62B134',
-    'Scheduled': '#94A3B8',
-    'To do': '#71717A',
-    'In progress': '#8B8B94'
+    'Idea': '#62B134',
+    'Scripting': '#62B134',
+    'Filming/Design': '#62B134',
+    'Editing': '#62B134',
+    'Ready to post': '#62B134',
+    'Posted': '#71717A',
+    'Done': '#71717A',
+    'Scheduled': '#71717A',
+    'To do': '#62B134',
+    'In progress': '#62B134'
   };
   return map[status] || '#71717A';
 }
