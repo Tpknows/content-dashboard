@@ -4636,15 +4636,22 @@ Respond with ONLY valid JSON, no markdown, in this exact shape (plain text strin
 "hook_plan":["hook plan item for next month"]}
 Give 4-6 items per list, and 8-12 video_diagnosis entries: the strongest and the weakest videos.`;
 
-  const response = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'insights', prompt })
-  });
-  const raw = (await response.text()).replace(/```json/g, '').replace(/```/g, '').trim();
+  // Free-tier Gemini returns 503 "high demand" during spikes; wait and retry before giving up
   let ai;
-  try { ai = JSON.parse(raw); } catch (e) { throw new Error('hindi ma-parse ang sagot: ' + raw.slice(0, 120)); }
-  if (ai && ai.error) throw new Error(ai.error);
+  for (let attempt = 1; ; attempt++) {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'insights', prompt })
+    });
+    const raw = (await response.text()).replace(/```json/g, '').replace(/```/g, '').trim();
+    try { ai = JSON.parse(raw); } catch (e) { throw new Error('hindi ma-parse ang sagot: ' + raw.slice(0, 120)); }
+    const busy = ai && ai.error && /503|high demand|overloaded|429/i.test(ai.error);
+    if (!busy || attempt === 3) break;
+    document.getElementById('insightsLoadingMsg').textContent = `Busy ang AI ngayon, uulitin sa ${attempt * 10} seconds... (try ${attempt + 1} of 3)`;
+    await new Promise(r => setTimeout(r, attempt * 10000));
+  }
+  if (ai && ai.error) throw new Error(/503|high demand/i.test(ai.error) ? 'busy ang Gemini ngayon, subukan ulit after ilang minuto' : ai.error);
   if (!ai || !Array.isArray(ai.working)) throw new Error('kulang ang sagot ng AI');
 
   // AI text is untrusted: put real creator names back, then escape before it goes into innerHTML
