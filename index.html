@@ -4639,7 +4639,7 @@ async function aiInsights_(month, d, prev, prevMonth, ins) {
   const inProgress = month === MONTHS_ORDER[today.getMonth()];
   const daysIn = m => new Date(today.getFullYear(), MONTHS_ORDER.indexOf(m) + 1, 0).getDate();
   const dayNote = inProgress ? `${month} is IN PROGRESS: day ${today.getDate()} of ${daysIn(month)}. Compare with the previous month by daily pace (per day), never raw totals.` : `${month} is a complete month.`;
-  const perDay = (x, m, isCur) => (x / (isCur && inProgress ? today.getDate() : daysIn(m))).toFixed(2);
+  const perDay = (x, m, isCur) => { const v = x / (isCur && inProgress ? today.getDate() : daysIn(m)); return v >= 100 ? fmt(v) : v.toFixed(1); };
   // Creator names are employees' personal data (Data Privacy Act) and the Gemini
   // free tier may use prompts to improve Google products: send "Creator N" instead,
   // then swap the real names back into the answer.
