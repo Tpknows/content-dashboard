@@ -3835,7 +3835,8 @@ async function saveCurrentInsights() {
     savedAt: timestamp,
 
     // KPI Status
-    kpi_status:   stripHtml(ins.kpi_status),
+    // Headline plus the "bakit" bullets, so saved versions keep the reasons
+    kpi_status:   stripHtml(ins.kpi_status) + ((ins.summary_reasons || []).length ? ' Bakit: ' + stripArr(ins.summary_reasons).join(' / ') : ''),
     kpi_color:    ins.kpi_color,
 
     // KPI Snapshot numbers
@@ -4625,10 +4626,20 @@ function analyzeData(month, d) {
 async function aiInsights_(month, d, prev, prevMonth, ins) {
   const vids = d.all_videos || [];
   if (!vids.length) throw new Error('walang video ngayong buwan');
-  const median = k => {
-    const xs = vids.map(v => v[k]).filter(x => x > 0).sort((a, b) => a - b);
+  const median = (k, list = vids) => {
+    const xs = list.map(v => v[k]).filter(x => x > 0).sort((a, b) => a - b);
     return xs.length ? xs[Math.floor(xs.length / 2)] : 0;
   };
+  // Rounded, human numbers so the AI quotes "140.8K", never "140,753.59"
+  const n = x => fmt(Math.round(x || 0));
+  const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : 'n/a';
+  // An unfinished month is compared to the previous one by daily pace, not raw totals
+  const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const today = new Date();
+  const inProgress = month === MONTHS_ORDER[today.getMonth()];
+  const daysIn = m => new Date(today.getFullYear(), MONTHS_ORDER.indexOf(m) + 1, 0).getDate();
+  const dayNote = inProgress ? `${month} is IN PROGRESS: day ${today.getDate()} of ${daysIn(month)}. Compare with the previous month by daily pace (per day), never raw totals.` : `${month} is a complete month.`;
+  const perDay = (x, m, isCur) => (x / (isCur && inProgress ? today.getDate() : daysIn(m))).toFixed(2);
   // Creator names are employees' personal data (Data Privacy Act) and the Gemini
   // free tier may use prompts to improve Google products: send "Creator N" instead,
   // then swap the real names back into the answer.
@@ -4643,16 +4654,22 @@ async function aiInsights_(month, d, prev, prevMonth, ins) {
   ].join(' | '))).join('\n');
   const openings = mask((ins.top_hooks || []).filter(h => h.opening)
     .map(h => `- "${h.title.slice(0, 70)}": ${h.opening.slice(0, 150)}`).join('\n')) || '(wala)';
+  const pv = prev ? (prev.all_videos || []) : [];
   const prevText = prev
-    ? `${prevMonth}: ${prev.views} views, ${prev.thruplays} thruplays, ${prev.winning} wins mula ${prev.videos} videos, avg hook ${prev.avg_hook_rate || 0}%, avg hold ${prev.avg_hold_rate || 0}%`
-    : '(walang previous month)';
+    ? `${prevMonth} (complete): ${n(prev.views)} views (${perDay(prev.views, prevMonth)} per day), ${n(prev.thruplays)} thruplays, ${prev.winning} wins, ${prev.kpi_submitted} videos submitted (${perDay(prev.kpi_submitted, prevMonth)} per day), ${prev.videos} videos with data in the Video Log (${perDay(prev.videos, prevMonth)} per day), median hook rate ${median('hook_rate', pv)}%, median hold rate ${median('hold_rate', pv)}%, median thruplay rate ${median('thruplay_rate', pv)}%`
+    : '(no previous month)';
+  const curText = `${n(d.views)} views (${perDay(d.views, month, true)} per day), ${n(d.thruplays)} thruplays, ${d.winning} wins, ${d.kpi_submitted} videos submitted (${perDay(d.kpi_submitted, month, true)} per day), ${d.videos} videos with data in the Video Log (${perDay(d.videos, month, true)} per day)`;
 
   const prompt = `You are the content performance analyst for EasyPC, a Philippine PC retailer posting Facebook reels. Analyze ${month} using ONLY the data below (source: Video Log sheet).
 
 KPI TARGETS vs ACTUAL (${month}):
-views ${d.views} / ${KPI_TARGETS.views}, thruplays ${d.thruplays} / ${KPI_TARGETS.thruplays}, winning videos ${d.winning} / ${KPI_TARGETS.winning}, total videos ${d.videos}
-Month medians: views ${median('views')}, thruplay rate ${median('thruplay_rate')}%, hook rate ${median('hook_rate')}%, hold rate ${median('hold_rate')}%
+views ${n(d.views)} of ${n(KPI_TARGETS.views)} (${pct(d.views, KPI_TARGETS.views)}), thruplays ${n(d.thruplays)} of ${n(KPI_TARGETS.thruplays)} (${pct(d.thruplays, KPI_TARGETS.thruplays)}), winning videos ${d.winning} of ${KPI_TARGETS.winning}
+${dayNote}
+This month: ${curText}
+This month medians: views ${n(median('views'))}, thruplay rate ${median('thruplay_rate')}%, hook rate ${median('hook_rate')}%, hold rate ${median('hold_rate')}%
 Previous month: ${prevText}
+"Submitted" counts every video the team posted; "with data in the Video Log" counts only videos that already have metrics. Do not mix the two.
+NUMBERS: quote numbers exactly as written above (1.1M, 140.8K, 36%). Never add decimals to views or thruplays. Compare median with median, never median with average.
 
 DEFINITIONS: hook rate = % who watched past the first 3 seconds. hold rate = % who kept watching after the hook. thruplay rate = % who watched 15s or to the end. WIN = the sheet's winning flag. Pillars: KNOW = educational, LIKE = relatable, TRUST = credibility. A value of 0 means no data, not zero.
 
@@ -4678,7 +4695,8 @@ LANGUAGE (strict): Taglish, the way a Manila marketing team talks on Slack. EVER
 No textbook Filipino, no stiff AI phrasing. Keep metric names in English (views, hook rate, hold rate, thruplay).
 
 Respond with ONLY valid JSON, no markdown, in this exact shape (plain text strings, no HTML):
-{"summary":"2-3 sentences: where we are vs target and the single biggest reason",
+{"headline":"ONE short sentence, max 20 words: where we are vs target, with at most 2 numbers",
+"reasons":["2-3 items, each ONE short sentence (max 25 words) giving one cause of the result, with at most 2 numbers"],
 "working":["what worked + why, with numbers"],
 "not_working":["what did not work + why, with numbers"],
 "video_diagnosis":[{"title":"exact title from the data","result":"pumatok or hindi pumatok","why":"cause with numbers","workaround":"specific fix"}],
@@ -4715,7 +4733,8 @@ Give 4-6 items per list, 5-8 script_rules, and 8-12 video_diagnosis entries: the
   const esc = s => progressEsc_(unmask(s));
   const list = a => (Array.isArray(a) ? a : []).map(x => esc(x));
   return {
-    kpi_status: esc(ai.summary || ins.kpi_status),
+    kpi_status: esc(ai.headline || ai.summary || ins.kpi_status),
+    summary_reasons: list(ai.reasons),
     working: list(ai.working), not_working: list(ai.not_working),
     actions: list(ai.actions), dont: list(ai.dont),
     top_videos_insight: esc(ai.top_videos_insight || ''),
@@ -4913,7 +4932,8 @@ function renderInsightsOutput(ins, hasPrev) {
   banner.style.borderColor = bc + '44';
   const bannerLabel = { green: 'On track', yellow: 'At risk', red: 'Behind target' }[ins.kpi_color] || 'Summary';
   banner.innerHTML = `<div style="color:${bc};font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${bannerLabel}${ins.ai_generated ? ' · AI summary' : ''}</div>
-    <div style="color:var(--text);font-size:14px;line-height:1.7;">${ins.kpi_status}</div>`;
+    <div style="color:var(--text);font-size:16px;font-weight:700;line-height:1.5;">${ins.kpi_status}</div>
+    ${(ins.summary_reasons || []).length ? `<div style="margin-top:12px;">${ins.summary_reasons.map(x => `<div style="display:flex;gap:10px;margin-bottom:6px;color:var(--text2);font-size:13.5px;line-height:1.6;"><span style="color:${bc};flex-shrink:0;">•</span><span>${x}</span></div>`).join('')}</div>` : ''}`;
 
   const rules = ins.script_rules || [];
   document.getElementById('insightsScriptCard').style.display = rules.length ? 'block' : 'none';
