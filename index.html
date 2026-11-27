@@ -2681,6 +2681,7 @@ function updateDashboard() {
   const month = document.getElementById('monthSelect').value;
   syncCalendarToMonthFilter(month);
   fetchZernioThumbnails(); // re-scoped to whichever month this just switched to
+  try { notifyUntagged_(); } catch (e) {}
   if (month === 'ALL_YEAR') {
     // For All Year: only refresh the four content tabs, hide KPI section
     document.getElementById('kpiGrid').innerHTML = `<div style="grid-column:1/-1;padding:28px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);text-align:center;color:var(--text3);font-size:13px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> <strong style="color:var(--text)">All Year view</strong> — KPI cards show per-month targets. Select a month to see KPIs.</div>`;
@@ -4120,10 +4121,11 @@ function buildMoMInsights(month, d, prev, prevMonth) {
   return { mom_highlights: highlights, mom_lowlights: lowlights };
 }
 
-function generateInsights() {
+async function generateInsights() {
   const month = document.getElementById('monthSelect').value;
   const d = DATA[month];
   if (!d) return;
+  if (!(await confirmUntaggedBeforeInsights_(month))) return;
 
   document.getElementById('insightsEmpty').style.display = 'none';
   document.getElementById('insightsOutput').style.display = 'none';
@@ -5708,6 +5710,52 @@ function videoTagSelectHtml_(link, title) {
 function rerenderTaggedViews_() {
   try { renderMonthlyResults(); } catch (e) {}
   try { renderContentCalendar(); } catch (e) {}
+  try { notifyUntagged_(); } catch (e) {}
+}
+
+// ── Untagged sub-category reminder ─────────────────────────────────────
+let videoTagsLoaded = false;   // true after the first loadVideoTags() answer
+let untagNoticeDismissed = ''; // "MONTH:count" the user closed, so it doesn't pop up again
+function untaggedVideos_(month) {
+  return ((DATA[month] || {}).all_videos || []).filter(v => !videoSubCategory_(v));
+}
+function goTagVideos_() {
+  const n = document.getElementById('untagNotice');
+  if (n) n.remove();
+  switchTab('monthly');
+}
+function notifyUntagged_() {
+  if (!videoTagsReady) return;
+  const month = (document.getElementById('monthSelect') || {}).value;
+  const list = untaggedVideos_(month);
+  const key = month + ':' + list.length;
+  let n = document.getElementById('untagNotice');
+  if (!list.length || untagNoticeDismissed === key) { if (n) n.remove(); return; }
+  if (!n) {
+    n = document.createElement('div');
+    n.id = 'untagNotice';
+    n.setAttribute('role', 'status');
+    n.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:9999;max-width:340px;background:#111;color:#fff;border:1px solid #D97706;border-left:4px solid #D97706;border-radius:4px;padding:14px 16px;font-size:13px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.4);';
+    document.body.appendChild(n);
+  }
+  n.innerHTML = `<div style="font-weight:700;color:#F59E0B;margin-bottom:4px;">May ${list.length} video pa na walang sub-category</div>
+    <div style="color:#ccc;">${progressEsc_(month.charAt(0) + month.slice(1).toLowerCase())}: i-tag muna para tama ang sub-category breakdown sa report.</div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="goTagVideos_()" style="background:#62B134;color:#fff;border:0;border-radius:2px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;">I-tag ngayon</button>
+      <button onclick="untagNoticeDismissed='${key}';this.closest('#untagNotice').remove()" style="background:transparent;color:#ccc;border:1px solid #444;border-radius:2px;padding:6px 12px;font-size:12px;cursor:pointer;">Mamaya na</button>
+    </div>`;
+}
+// Asked before Generate Insights; true = go ahead
+async function confirmUntaggedBeforeInsights_(month) {
+  if (!videoTagsLoaded) await loadVideoTags();
+  if (!videoTagsReady) return true; // backend without tags: nothing to check
+  const list = untaggedVideos_(month);
+  if (!list.length) return true;
+  const names = list.slice(0, 5).map(v => '• ' + String(v.title || '').split('\n')[0].slice(0, 70)).join('\n');
+  const more = list.length > 5 ? `\n...at ${list.length - 5} pa` : '';
+  const go = confirm(`May ${list.length} video pa na walang sub-category ngayong ${month}:\n\n${names}${more}\n\nOK = i-generate pa rin ang insights\nCancel = mag-tag muna`);
+  if (!go) goTagVideos_();
+  return go;
 }
 
 async function loadVideoTags() {
@@ -5718,6 +5766,7 @@ async function loadVideoTags() {
     videoTagsReady = !entries.some(e => 'platform' in e);
     videoTags = {};
     if (videoTagsReady) entries.forEach(e => { if (e.id && e.subCategory) videoTags[String(e.id)] = e.subCategory; });
+    videoTagsLoaded = true;
     rerenderTaggedViews_();
   } catch (err) {
     console.warn('Video tags not loaded:', err.message);
