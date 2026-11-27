@@ -334,6 +334,7 @@ html { overflow-x: hidden; }
 .stat-delta.down { color: #F87171; }
 .stat-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
 .stat-sub.bad { color: #F87171; }
+.stat-sub.warn { color: #D4A72C; }
 .ov-card { margin-bottom: 24px; }
 /* Every page sits in a centered column; cards no longer jump on hover */
 .tab-panel { max-width: 1200px; margin-left: auto; margin-right: auto; }
@@ -1062,7 +1063,7 @@ html { overflow-x: hidden; }
 .hook-excellent { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hook-strong    { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hook-good      { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hook-average   { background: rgba(139,139,148,0.1); color: #8B8B94; border: 1px solid rgba(139,139,148,0.25); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hook-average   { background: rgba(212,167,44,0.1); color: #D4A72C; border: 1px solid rgba(212,167,44,0.25); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hook-weak      { background: rgba(248,113,113,0.1);  color: var(--red);    border: 1px solid rgba(248,113,113,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hook-none      { background: var(--surface); color: var(--text3); border: 1px solid var(--border); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 
@@ -1088,7 +1089,7 @@ html { overflow-x: hidden; }
 .hold-excellent { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hold-strong    { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hold-good      { background: rgba(98,177,52,0.1);  color: var(--green);  border: 1px solid rgba(98,177,52,0.2); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.hold-average   { background: rgba(139,139,148,0.1); color: #8B8B94; border: 1px solid rgba(139,139,148,0.25); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hold-average   { background: rgba(212,167,44,0.1); color: #D4A72C; border: 1px solid rgba(212,167,44,0.25); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hold-weak      { background: rgba(248,113,113,0.1);  color: var(--red);    border: 1px solid rgba(248,113,113,0.2);  padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .hold-none      { background: var(--surface); color: var(--text3); border: 1px solid var(--border); padding: 3px 9px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 
@@ -2719,11 +2720,13 @@ function updateDashboard() {
   }
   // Red only when behind where the month should be by now (full target for a finished month)
   const expectedPct = inProgress ? Math.round(today.getDate() / daysIn(month) * 100) : 100;
-  const cell = (label, value, dlt, sub, bad) => `<div class="stat-cell"><div class="stat-label">${label}</div><div class="stat-value">${value}${dlt}</div><div class="stat-sub${bad ? ' bad' : ''}">${sub}</div></div>`;
+  // On pace: plain gray. Slightly behind (75%+ of where we should be): amber. Further behind: red.
+  const paceLevel = pct => pct >= expectedPct ? '' : pct >= expectedPct * 0.75 ? 'warn' : 'bad';
+  const cell = (label, value, dlt, sub, bad) => `<div class="stat-cell"><div class="stat-label">${label}</div><div class="stat-value">${value}${dlt}</div><div class="stat-sub${bad ? ' ' + bad : ''}">${sub}</div></div>`;
   document.getElementById('kpiGrid').innerHTML =
-    cell('Views', fmt(d.views), delta(d.views, prev?.views, true), `${viewsPct}% of ${fmt(KPI_TARGETS.views)}`, viewsPct < expectedPct) +
-    cell('Thruplays', fmt(d.thruplays), delta(d.thruplays, prev?.thruplays, true), `${thruPct}% of ${fmt(KPI_TARGETS.thruplays)}`, thruPct < expectedPct) +
-    cell('Winning videos', d.winning, delta(d.winning, prev?.winning, true), `${d.winning} of ${KPI_TARGETS.winning}`, winPct < expectedPct) +
+    cell('Views', fmt(d.views), delta(d.views, prev?.views, true), `${viewsPct}% of ${fmt(KPI_TARGETS.views)}`, paceLevel(viewsPct)) +
+    cell('Thruplays', fmt(d.thruplays), delta(d.thruplays, prev?.thruplays, true), `${thruPct}% of ${fmt(KPI_TARGETS.thruplays)}`, paceLevel(thruPct)) +
+    cell('Winning videos', d.winning, delta(d.winning, prev?.winning, true), `${d.winning} of ${KPI_TARGETS.winning}`, paceLevel(winPct)) +
     cell('Submitted', d.kpi_submitted, delta(d.kpi_submitted, prev?.kpi_submitted, true), 'videos posted') +
     cell('Hook rate', (d.avg_hook_rate || 0) + '%', delta(d.avg_hook_rate, prev?.avg_hook_rate), 'average') +
     cell('Hold rate', (d.avg_hold_rate || 0) + '%', delta(d.avg_hold_rate, prev?.avg_hold_rate), 'average');
@@ -3066,7 +3069,7 @@ function renderMonthlyResults() {
     <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${fmt(d.views)}</div><div class="msb-label">Total Views</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${fmt(d.thruplays)}</div><div class="msb-label">Thruplays</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${d.avg_rate}%</div><div class="msb-label">Avg Rate</div></div>
-    <div class="msb-item"><div class="msb-val" style="color:${d.avg_hook_rate>=60?'#62B134':d.avg_hook_rate>=50?'#62B134':d.avg_hook_rate>=40?'#62B134':d.avg_hook_rate>=30?'#8B8B94':'#F87171'}">${d.avg_hook_rate}%</div><div class="msb-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Avg Hook Rate</div></div>
+    <div class="msb-item"><div class="msb-val" style="color:${d.avg_hook_rate>=60?'#62B134':d.avg_hook_rate>=50?'#62B134':d.avg_hook_rate>=40?'#62B134':d.avg_hook_rate>=30?'#D4A72C':'#F87171'}">${d.avg_hook_rate}%</div><div class="msb-label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v11a3 3 0 0 0 6 0v-3"/></svg> Avg Hook Rate</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#62B134">${d.winning}</div><div class="msb-label">Winning</div></div>
     <div class="msb-item"><div class="msb-val" style="color:#8B8B94">${d.kpi_submitted}</div><div class="msb-label">Videos Submitted</div></div>
     ${liveViewsSummaryHTML_(month, d.all_videos || [], d.views)}
@@ -3149,7 +3152,7 @@ function hookRateTierColor(r) {
   if (r>=60) return '#62B134';
   if (r>=50) return '#62B134';
   if (r>=40) return '#62B134';
-  if (r>=30) return '#8B8B94';
+  if (r>=30) return '#D4A72C';
   return '#F87171';
 }
 function hookRateTierLabel(r) {
@@ -3786,8 +3789,8 @@ function renderInsightRecords() {
           { label:'Winning Videos', val: s.winning,              pct: s.winning_pct,    color:'#62B134' },
           { label:'Submitted',      val: s.videos_submitted,     pct: null,             color:'#8B8B94' },
           { label:'Avg Thruplay %', val: (s.avg_thruplay_rate||0)+'%', pct: null,       color:'#8B8B94' },
-          { label:'Avg Hook Rate',  val: (s.avg_hook_rate||0)+'%',     pct: null,       color: s.avg_hook_rate>=60?'#62B134':s.avg_hook_rate>=50?'#62B134':s.avg_hook_rate>=40?'#62B134':s.avg_hook_rate>=30?'#8B8B94':'#F87171' },
-          { label:'Avg Hold Rate',  val: (s.avg_hold_rate||0)+'%',     pct: null,       color: s.avg_hold_rate>=60?'#62B134':s.avg_hold_rate>=50?'#62B134':s.avg_hold_rate>=40?'#62B134':s.avg_hold_rate>=30?'#8B8B94':'#F87171' },
+          { label:'Avg Hook Rate',  val: (s.avg_hook_rate||0)+'%',     pct: null,       color: s.avg_hook_rate>=60?'#62B134':s.avg_hook_rate>=50?'#62B134':s.avg_hook_rate>=40?'#62B134':s.avg_hook_rate>=30?'#D4A72C':'#F87171' },
+          { label:'Avg Hold Rate',  val: (s.avg_hold_rate||0)+'%',     pct: null,       color: s.avg_hold_rate>=60?'#62B134':s.avg_hold_rate>=50?'#62B134':s.avg_hold_rate>=40?'#62B134':s.avg_hold_rate>=30?'#D4A72C':'#F87171' },
           { label:'Win Rate',       val: (s.win_rate_pct||0)+'%',pct: null,             color:'#62B134' },
         ].map(st => `<div style="background:var(--surface);border:1px solid var(--border);border-radius: 2px;padding:10px 14px;text-align:center;min-width:90px;">
           <div style="font-size:17px;font-weight:700;color:${st.color}">${st.val}</div>
@@ -4304,7 +4307,7 @@ function analyzeData(month, d) {
   } else {
     const avgHook = d.avg_hook_rate || 0;
     const hookLabel = avgHook>=60?'Excellent':avgHook>=50?'Very Strong':avgHook>=40?'Good':avgHook>=30?'Average':'Weak';
-    const hookColor = avgHook>=60?'#62B134':avgHook>=50?'#62B134':avgHook>=40?'#62B134':avgHook>=30?'#8B8B94':'#F87171';
+    const hookColor = avgHook>=60?'#62B134':avgHook>=50?'#62B134':avgHook>=40?'#62B134':avgHook>=30?'#D4A72C':'#F87171';
     hookRecs.push(`Month avg hook rate is <strong style="color:${hookColor}">${avgHook}% — ${hookLabel}</strong> across ${hookVids.length} videos with data.`);
 
     const excellentH = hookVids.filter(v=>v.hook_rate>=60);
@@ -4347,7 +4350,7 @@ function analyzeData(month, d) {
   } else {
     const avgHold = d.avg_hold_rate || 0;
     const holdLabel = avgHold>=60?'Excellent':avgHold>=50?'Very Strong':avgHold>=40?'Good':avgHold>=30?'Average':'Weak';
-    const holdColor = avgHold>=60?'#62B134':avgHold>=50?'#62B134':avgHold>=40?'#62B134':avgHold>=30?'#8B8B94':'#F87171';
+    const holdColor = avgHold>=60?'#62B134':avgHold>=50?'#62B134':avgHold>=40?'#62B134':avgHold>=30?'#D4A72C':'#F87171';
     holdRecs.push(`Month avg hold rate is <strong style="color:${holdColor}">${avgHold}% — ${holdLabel}</strong> across ${holdVids.length} video${holdVids.length>1?'s':''} with data.`);
 
     const excellentHo = holdVids.filter(v=>v.hold_rate>=60);
