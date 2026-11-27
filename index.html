@@ -4645,7 +4645,7 @@ Give 4-6 items per list, and 8-12 video_diagnosis entries: the strongest and the
       body: JSON.stringify({ action: 'insights', prompt })
     });
     const raw = (await response.text()).replace(/```json/g, '').replace(/```/g, '').trim();
-    try { ai = JSON.parse(raw); } catch (e) { throw new Error('hindi ma-parse ang sagot: ' + raw.slice(0, 120)); }
+    try { ai = JSON.parse(raw); } catch (e) { console.error('AI raw answer:', raw); throw new Error('hindi buo ang sagot ng AI, subukan ulit'); }
     const busy = ai && ai.error && /503|high demand|overloaded|429/i.test(ai.error);
     if (!busy || attempt === 3) break;
     document.getElementById('insightsLoadingMsg').textContent = `Busy ang AI ngayon, uulitin sa ${attempt * 10} seconds... (try ${attempt + 1} of 3)`;
