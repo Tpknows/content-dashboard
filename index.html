@@ -316,7 +316,7 @@ html { overflow-x: hidden; }
 /* ── OVERVIEW (minimal): one stat strip, gray everywhere, green only for good, red only for bad ── */
 .stat-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
@@ -325,6 +325,8 @@ html { overflow-x: hidden; }
   margin: 4px 0 24px;
 }
 .stat-cell { background: var(--card); padding: 18px 20px; }
+@media (max-width: 900px) { .stat-strip { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 520px) { .stat-strip { grid-template-columns: repeat(2, 1fr); } }
 .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
 .stat-value { font-size: 26px; font-weight: 700; color: var(--text); margin-top: 8px; line-height: 1.1; }
 .stat-delta { font-size: 12px; font-weight: 600; margin-left: 6px; }
@@ -333,6 +335,10 @@ html { overflow-x: hidden; }
 .stat-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
 .stat-sub.bad { color: #F87171; }
 .ov-card { margin-bottom: 24px; }
+/* Narrow centered column like Plausible: wide screens shouldn't stretch the numbers apart */
+#tab-overview { max-width: 1000px; margin-left: auto; margin-right: auto; }
+#tab-overview .chart-card { padding: 20px 22px; }
+#tab-overview .chart-container { height: 200px; }
 #tab-overview .chart-status-badge { background: none; border: none; color: var(--text3); padding: 0; font-weight: 500; }
 .bar-list-head { display: flex; justify-content: space-between; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); padding: 0 10px 8px; }
 .bar-list-row { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 10px; margin-bottom: 4px; font-size: 13px; color: var(--text); }
@@ -2713,12 +2719,11 @@ function updateDashboard() {
   const cell = (label, value, dlt, sub, bad) => `<div class="stat-cell"><div class="stat-label">${label}</div><div class="stat-value">${value}${dlt}</div><div class="stat-sub${bad ? ' bad' : ''}">${sub}</div></div>`;
   document.getElementById('kpiGrid').innerHTML =
     cell('Views', fmt(d.views), delta(d.views, prev?.views, true), `${viewsPct}% of ${fmt(KPI_TARGETS.views)}`, viewsPct < expectedPct) +
-    cell('Thruplays', fmt(d.thruplays), delta(d.thruplays, prev?.thruplays, true), `${thruPct}% of ${fmt(KPI_TARGETS.thruplays)}`, thruPct < expectedPct) +
+    cell('Thruplays', fmt(d.thruplays), delta(d.thruplays, prev?.thruplays, true), `${thruPct}% of ${fmt(KPI_TARGETS.thruplays)} · ${d.avg_rate}% rate`, thruPct < expectedPct) +
     cell('Winning videos', d.winning, delta(d.winning, prev?.winning, true), `${d.winning} of ${KPI_TARGETS.winning}`, winPct < expectedPct) +
-    cell('Submitted', d.kpi_submitted, delta(d.kpi_submitted, prev?.kpi_submitted, true), 'Video Log + Campaign Ads') +
-    cell('Thruplay rate', d.avg_rate + '%', delta(d.avg_rate, prev?.avg_rate), 'average') +
+    cell('Submitted', d.kpi_submitted, delta(d.kpi_submitted, prev?.kpi_submitted, true), 'videos posted') +
     cell('Hook rate', (d.avg_hook_rate || 0) + '%', delta(d.avg_hook_rate, prev?.avg_hook_rate), 'average') +
-    cell('Hold rate', (d.avg_hold_rate || 0) + '%', delta(d.avg_hold_rate, prev?.avg_hold_rate), inProgress ? `day ${today.getDate()} of ${daysIn(month)}` : 'average');
+    cell('Hold rate', (d.avg_hold_rate || 0) + '%', delta(d.avg_hold_rate, prev?.avg_hold_rate), 'average');
 
   const monthLabels = sortedMonths.map(m => m.charAt(0) + m.slice(1,3).toLowerCase());
   const viewsData = sortedMonths.map(m => DATA[m] ? DATA[m].views : 0);
@@ -2741,12 +2746,12 @@ function updateDashboard() {
       },
       scales: {
         x: { grid: { display: false }, border: { display: false }, ticks: { color: '#a7a7a7', font: { size: 11 } } },
-        y: { grid: { color: 'rgba(255,255,255,0.08)' }, border: { display: false }, ticks: { color: '#a7a7a7', font: { size: 11 }, callback: v => fmt(v) } }
+        y: { grid: { color: 'rgba(255,255,255,0.08)' }, border: { display: false }, ticks: { color: '#a7a7a7', font: { size: 11 }, maxTicksLimit: 5, callback: v => fmt(v) } }
       }
     }
   });
   const vBadge = document.getElementById('viewsChartBadge');
-  if (vBadge) vBadge.textContent = fmt(d.views) + ' views ngayong ' + prevLabelOf_(month);
+  if (vBadge) vBadge.textContent = fmt(d.views) + ' views ngayong ' + prevLabelOf_(month) + (inProgress ? ` · day ${today.getDate()} of ${daysIn(month)}` : '');
 
   const pillarRows = ['KNOW', 'LIKE', 'TRUST'].map(p => {
     const vs = (d.all_videos || []).filter(v => v.pillar === p);
@@ -2804,7 +2809,7 @@ function renderTrendChart() {
       },
       scales: {
         x: { grid: { display: false }, border: { display: false }, ticks: { color: '#a7a7a7', font: { size: 11 } } },
-        y: { grid: { color: 'rgba(255,255,255,0.08)' }, border: { display: false }, ticks: { color: '#a7a7a7', font: { size: 11 }, callback: v => fmt(v) } }
+        y: { grid: { color: 'rgba(255,255,255,0.08)' }, border: { display: false }, ticks: { color: '#a7a7a7', font: { size: 11 }, maxTicksLimit: 5, callback: v => fmt(v) } }
       }
     }
   });
