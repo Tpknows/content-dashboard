@@ -2021,6 +2021,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
           </div>
         </div>
 
+        <!-- AI per-video diagnosis -->
+        <div id="insightsDiagnosisCard" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+          <div style="font-size:11px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Bakit Pumatok / Bakit Hindi</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:16px;">AI analysis ng bawat video kumpara sa ibang videos ngayong buwan. Source: Video Log.</div>
+          <div id="insightsDiagnosis" style="font-size:13px;color:var(--text2);line-height:1.7;"></div>
+        </div>
+
         <!-- Action items -->
         <div style="background:var(--card);border:1px solid rgba(167,139,250,0.15);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
           <div style="font-size:11px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg> Action Plan to Hit KPI</div>
@@ -3842,6 +3849,9 @@ async function saveCurrentInsights() {
     // Content worth repeating (kept locally; the Sheet has no column for it)
     repeat_content:   repeatContentLines_(ins),
 
+    // AI per-video diagnosis (kept locally, like repeat_content)
+    video_diagnosis:  (ins.video_diagnosis || []).map(x => stripHtml(`${x.hit ? 'Pumatok' : 'Hindi pumatok'}: "${x.title}". Bakit: ${x.why} Workaround: ${x.workaround}`)),
+
     // Claude presentation prompt (if generated before saving) — two framings.
     // Field names keep the old manus_ prefix so earlier saved records and the
     // Insights sheet columns still line up.
@@ -4241,7 +4251,7 @@ function generateInsights() {
   document.getElementById('insightsLoading').style.display = 'block';
   document.getElementById('generateBtn').disabled = true;
   document.getElementById('generateBtnIcon').innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l-5 7-5-7z"/><path d="M7 21h10l-5-7-5 7z"/></svg>';
-  document.getElementById('insightsLoadingMsg').textContent = 'Analyzing your data...';
+  document.getElementById('insightsLoadingMsg').textContent = 'Sinusuri ng AI ang bawat video... (mga 20–60 seconds)';
   // Reset save bar
   document.getElementById('insightsSaveStatus').textContent = '';
   const sBtn = document.getElementById('saveInsightsBtn');
@@ -4254,7 +4264,7 @@ function generateInsights() {
   const prevMonth = sortedMonths[sortedMonths.indexOf(month) - 1];
   const prev = prevMonth ? DATA[prevMonth] : null;
 
-  setTimeout(() => {
+  setTimeout(async () => {
     try {
       const ins = analyzeData(month, d);
       const mom = buildMoMInsights(month, d, prev, prevMonth);
@@ -4262,6 +4272,13 @@ function generateInsights() {
       ins.mom_lowlights  = mom.mom_lowlights;
       Object.assign(ins, buildHookPlan(month, d, ins));
       Object.assign(ins, buildRepeatContent(d));
+      // AI replaces the rule-based text; the rules stay only as a labelled fallback
+      try {
+        Object.assign(ins, await aiInsights_(month, d, prev, prevMonth, ins));
+      } catch (aiErr) {
+        console.error(aiErr);
+        ins.kpi_status = `Hindi naabot ang AI (${aiErr.message}). Rule-based muna ang laman sa baba, subukan ulit mamaya. ` + ins.kpi_status;
+      }
       _currentInsightsData = { month, ins };
       renderInsightsOutput(ins, !!prev);
       document.getElementById('insightsLoading').style.display = 'none';
@@ -4550,6 +4567,107 @@ function analyzeData(month, d) {
   return { kpi_color, kpi_status, working, not_working: notWorking, actions, dont, top_videos_insight, opportunities, creator_notes, hook_recs: hookRecs, hold_recs: holdRecs, hidden_gems: hiddenGemsAll, wasted_hooks: wastedHooksAll, snapshot };
 }
 
+// Real AI analysis: sends every video of the month to the Gemini backend
+// (APPS_SCRIPT_URL, action=insights) and asks why each one worked or not.
+// Comparisons are against this month's own videos, not fixed cutoffs.
+async function aiInsights_(month, d, prev, prevMonth, ins) {
+  const vids = d.all_videos || [];
+  if (!vids.length) throw new Error('walang video ngayong buwan');
+  const median = k => {
+    const xs = vids.map(v => v[k]).filter(x => x > 0).sort((a, b) => a - b);
+    return xs.length ? xs[Math.floor(xs.length / 2)] : 0;
+  };
+  // Creator names are employees' personal data (Data Privacy Act) and the Gemini
+  // free tier may use prompts to improve Google products: send "Creator N" instead,
+  // then swap the real names back into the answer.
+  const creators = [...new Set(vids.map(v => (v.creator || '').trim()).filter(Boolean))]
+    .sort((a, b) => b.length - a.length); // longest first, so "Ana Cruz" masks before "Ana"
+  const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const mask = s => creators.reduce((t, n, i) => t.replace(new RegExp(reEsc(n), 'gi'), `Creator ${i + 1}`), String(s || ''));
+  const unmask = s => String(s || '').replace(/Creator (\d+)\b/g, (m, i) => creators[i - 1] || m);
+  const rows = vids.map(v => mask([
+    v.title.slice(0, 90), v.creator || '', v.pillar || '', v.hookType || '', videoSubCategory_(v),
+    v.views, v.thruplay_rate, v.hook_rate, v.hold_rate, v.winning ? 'WIN' : '', v.datePosted || ''
+  ].join(' | '))).join('\n');
+  const openings = mask((ins.top_hooks || []).filter(h => h.opening)
+    .map(h => `- "${h.title.slice(0, 70)}": ${h.opening.slice(0, 150)}`).join('\n')) || '(wala)';
+  const prevText = prev
+    ? `${prevMonth}: ${prev.views} views, ${prev.thruplays} thruplays, ${prev.winning} wins mula ${prev.videos} videos, avg hook ${prev.avg_hook_rate || 0}%, avg hold ${prev.avg_hold_rate || 0}%`
+    : '(walang previous month)';
+
+  const prompt = `You are the content performance analyst for EasyPC, a Philippine PC retailer posting Facebook reels. Analyze ${month} using ONLY the data below (source: Video Log sheet).
+
+KPI TARGETS vs ACTUAL (${month}):
+views ${d.views} / ${KPI_TARGETS.views}, thruplays ${d.thruplays} / ${KPI_TARGETS.thruplays}, winning videos ${d.winning} / ${KPI_TARGETS.winning}, total videos ${d.videos}
+Month medians: views ${median('views')}, thruplay rate ${median('thruplay_rate')}%, hook rate ${median('hook_rate')}%, hold rate ${median('hold_rate')}%
+Previous month: ${prevText}
+
+DEFINITIONS: hook rate = % who watched past the first 3 seconds. hold rate = % who kept watching after the hook. thruplay rate = % who watched 15s or to the end. WIN = the sheet's winning flag. Pillars: KNOW = educational, LIKE = relatable, TRUST = credibility. A value of 0 means no data, not zero.
+
+EVERY VIDEO (title | creator | pillar | hook type | sub-category | views | thruplay% | hook% | hold% | win | date posted):
+${rows}
+
+OPENING LINES OF TOP HOOKS (from Hook Bank):
+${openings}
+
+HOW TO ANALYZE:
+- Explain WHY, not just WHAT. For each pattern, find the cause in the data: hook vs hold vs topic/sub-category vs pillar vs creator vs hook type vs posting date. Compare against this month's own videos (medians, top vs bottom), never against generic benchmarks.
+- Check if a result is a real pattern or one outlier (e.g. one video carrying most of a pillar's views). Say so when the sample is small (1-2 videos).
+- Diagnose videos individually: weak opening (low hook), weak body (good hook, low hold), weak topic/reach (good hook and hold, low views), or strong all through.
+- Every workaround must be specific and doable next month: what to change, in which video type, by whom if the data shows it. Name the video or creator it comes from.
+- Every claim must quote the numbers behind it. Never invent a number, title, creator, product, price or sale. If data is missing, say what is missing.
+- Hook advice must not break these EasyPC rules: no greeting or filler first, no comment card first, no story opening, no cover frame as the only text hook, no voice-only audio, no flat delivery, no promo or product video without a tip angle, first word within 0.3 seconds, avoid skit openings.
+- Do not suggest double-digit sale dates (11.11, 12.12 and the like) or meme content.
+
+LANGUAGE: natural spoken Taglish, about 80% Tagalog and 20% English, the way a Filipino content lead talks to the team. No textbook Filipino, no stiff AI phrasing. Keep metric names in English (views, hook rate, hold rate, thruplay).
+
+Respond with ONLY valid JSON, no markdown, in this exact shape (plain text strings, no HTML):
+{"summary":"2-3 sentences: where we are vs target and the single biggest reason",
+"working":["what worked + why, with numbers"],
+"not_working":["what did not work + why, with numbers"],
+"video_diagnosis":[{"title":"exact title from the data","result":"pumatok or hindi pumatok","why":"cause with numbers","workaround":"specific fix"}],
+"actions":["specific action for next month + the data reason"],
+"dont":["what to stop + the data reason"],
+"top_videos_insight":"what the top videos have in common, with numbers",
+"opportunities":["untapped angle backed by the data"],
+"creator_notes":["per creator: strength, weakness, what to change"],
+"hook_recs":["hook rate finding + fix"],
+"hold_recs":["hold rate finding + fix"],
+"hook_plan":["hook plan item for next month"]}
+Give 4-6 items per list, and 8-12 video_diagnosis entries: the strongest and the weakest videos.`;
+
+  const response = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'insights', prompt })
+  });
+  const raw = (await response.text()).replace(/```json/g, '').replace(/```/g, '').trim();
+  let ai;
+  try { ai = JSON.parse(raw); } catch (e) { throw new Error('hindi ma-parse ang sagot: ' + raw.slice(0, 120)); }
+  if (ai && ai.error) throw new Error(ai.error);
+  if (!ai || !Array.isArray(ai.working)) throw new Error('kulang ang sagot ng AI');
+
+  // AI text is untrusted: put real creator names back, then escape before it goes into innerHTML
+  const esc = s => progressEsc_(unmask(s));
+  const list = a => (Array.isArray(a) ? a : []).map(x => esc(x));
+  return {
+    kpi_status: esc(ai.summary || ins.kpi_status),
+    working: list(ai.working), not_working: list(ai.not_working),
+    actions: list(ai.actions), dont: list(ai.dont),
+    top_videos_insight: esc(ai.top_videos_insight || ''),
+    opportunities: list(ai.opportunities), creator_notes: list(ai.creator_notes),
+    hook_recs: list(ai.hook_recs), hold_recs: list(ai.hold_recs),
+    hook_plan: ai.hook_plan && ai.hook_plan.length ? list(ai.hook_plan) : ins.hook_plan,
+    video_diagnosis: (Array.isArray(ai.video_diagnosis) ? ai.video_diagnosis : []).map(x => ({
+      title: esc(x.title), hit: !/hindi/i.test(x.result || ''), why: esc(x.why), workaround: esc(x.workaround),
+      link: (vids.find(v => v.title.slice(0, 90) === unmask(x.title) || v.title === unmask(x.title)) || {}).link || ''
+    })),
+    // The diagnosis replaces the fixed-cutoff hidden gem / wasted hook lists
+    hidden_gems: [], wasted_hooks: [],
+    ai_generated: true
+  };
+}
+
 // Calendar year a report month belongs to: a month later than the current
 // one is last year's (e.g. December reported in January).
 function reportYear_(month) {
@@ -4757,6 +4875,17 @@ function renderInsightsOutput(ins, hasPrev) {
   document.getElementById('insightsCreators').innerHTML    = toList(ins.creator_notes || []);
   document.getElementById('insightsHookRate').innerHTML    = toList(ins.hook_recs || []);
   document.getElementById('insightsHoldRate').innerHTML    = toList(ins.hold_recs || []);
+
+  const diag = ins.video_diagnosis || [];
+  document.getElementById('insightsDiagnosisCard').style.display = diag.length ? 'block' : 'none';
+  document.getElementById('insightsDiagnosis').innerHTML = diag.map(x => `
+    <div style="border-left:3px solid ${x.hit ? '#62B134' : '#F87171'};padding:4px 0 4px 12px;margin-bottom:16px;">
+      <div style="color:var(--text);font-weight:600;line-height:1.4;">${x.title}
+        <span style="font-size:10.5px;font-weight:700;color:${x.hit ? '#62B134' : '#F87171'};margin-left:6px;">${x.hit ? 'PUMATOK' : 'HINDI PUMATOK'}</span>
+        ${x.link ? `<a href="${x.link}" target="_blank" style="color:#62B134;font-size:11px;font-weight:700;text-decoration:none;margin-left:6px;">▶ Watch</a>` : ''}</div>
+      <div style="margin-top:4px;"><strong>Bakit:</strong> ${x.why}</div>
+      <div style="margin-top:2px;"><strong>Workaround:</strong> ${x.workaround}</div>
+    </div>`).join('');
 
   // Top hooks + next-month hook plan
   document.getElementById('insightsHookSource').textContent = ins.hook_source ? 'Source: ' + ins.hook_source : '';
@@ -5595,7 +5724,8 @@ async function loadSchedulerPosts() {
     const res = await fetch(SCHEDULER_WORKER_URL + '/posts', { headers: { Authorization: 'Bearer ' + SCHEDULER_READ_TOKEN }, cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const { posts } = await res.json();
-    schedulerPosts = (posts || []).map(p => {
+    // The scheduler also posts for personal and client pages; the calendar shows EasyPC accounts only
+    schedulerPosts = (posts || []).filter(p => /easy\s*pc/i.test(p.account_name || '')).map(p => {
       const d = new Date(p.scheduled_time * 1000);
       return {
         _sched: true,
