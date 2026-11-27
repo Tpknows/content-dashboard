@@ -1959,7 +1959,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px;">
       <div>
         <div style="font-size:18px;font-weight:800;color:var(--text);" id="insightsTitle">AI Insights</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:6px;">Powered by Claude · Analyzes your filtered month data</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:6px;">Powered by Gemini · Sinusuri ang bawat video ng napiling buwan</div>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <!-- Sub-tab pills -->
@@ -1982,10 +1982,11 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
       <!-- AI Output -->
       <div id="insightsOutput" style="display:none;">
         <!-- Save bar -->
-        <div id="insightsSaveBar" style="display:flex;align-items:center;justify-content:space-between;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius: 2px;padding:14px 20px;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-          <div style="font-size:12.5px;color:var(--text2);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 4v5h8V4"/><rect x="7" y="14" width="10" height="6"/></svg> Looks good? Save this analysis to your records for future reference.</div>
-          <div style="display:flex;gap:8px;align-items:center;">
+        <div id="insightsSaveBar" style="display:flex;align-items:center;justify-content:space-between;background:rgba(98,177,52,0.08);border:1px solid rgba(98,177,52,0.2);border-radius: 2px;padding:14px 20px;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div style="font-size:12.5px;color:var(--text2);"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 4v5h8V4"/><rect x="7" y="14" width="10" height="6"/></svg> Okay ba? I-save para magamit sa script making. Pwedeng mag-save ng ilang version sa isang buwan.</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <span id="insightsSaveStatus" style="font-size:11.5px;color:var(--text3);"></span>
+            <input id="insightsSaveNote" type="text" maxlength="60" placeholder="Note (optional), e.g. after promo week" aria-label="Note for this saved version" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:2px;padding:8px 10px;font-size:12px;font-family:inherit;width:230px;max-width:100%;">
             <button id="saveInsightsBtn" onclick="saveCurrentInsights()" style="background:transparent;color:#fff;border:2px solid #62B134;padding:9px 20px;border-radius: 2px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 4v5h8V4"/><rect x="7" y="14" width="10" height="6"/></svg> Save Analysis
             </button>
@@ -1994,6 +1995,13 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
         <!-- KPI Status Banner -->
         <div id="insightsBanner" style="border-radius: 2px;padding:18px 22px;margin-bottom:20px;border:1px solid #2a2d3e;"></div>
+
+        <!-- Rules the Script Library applies to the next scripts -->
+        <div id="insightsScriptCard" style="display:none;background:var(--card);border:1px solid rgba(98,177,52,0.35);border-left:3px solid #62B134;border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+          <div style="font-size:11px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Para sa Script Making</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">Ia-apply ito ng Script Library sa susunod na scripts kapag naka-save ang version na ito.</div>
+          <div id="insightsScriptRules" style="font-size:13px;color:var(--text2);line-height:1.7;"></div>
+        </div>
 
         <!-- ▸ HIGHLIGHTS vs PREV MONTH (new section) -->
         <div id="insightsMoMSection" style="margin-bottom:20px;display:none;">
@@ -2029,8 +2037,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
         </div>
 
         <!-- Action items -->
-        <div style="background:var(--card);border:1px solid rgba(167,139,250,0.15);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
-          <div style="font-size:11px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg> Action Plan to Hit KPI</div>
+        <div style="background:var(--card);border:1px solid rgba(98,177,52,0.15);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+          <div style="font-size:11px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg> Action Plan to Hit KPI</div>
           <div id="insightsActions" style="font-size:13px;color:var(--text2);line-height:1.8;"></div>
         </div>
 
@@ -2065,8 +2073,8 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
             <div id="insightsHookSource" style="font-size:11px;color:var(--text3);margin-bottom:14px;"></div>
             <div id="insightsTopHooks" style="font-size:12.5px;color:var(--text2);line-height:1.6;"></div>
           </div>
-          <div style="background:var(--card);border:1px solid rgba(167,139,250,0.2);border-radius:var(--radius);padding:22px;">
-            <div style="font-size:11px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> <span id="insightsHookPlanTitle">Hook Plan for Next Month</span></div>
+          <div style="background:var(--card);border:1px solid rgba(98,177,52,0.2);border-radius:var(--radius);padding:22px;">
+            <div style="font-size:11px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> <span id="insightsHookPlanTitle">Hook Plan for Next Month</span></div>
             <div id="insightsHookPlan" style="font-size:13px;color:var(--text2);line-height:1.8;"></div>
           </div>
         </div>
@@ -2111,7 +2119,7 @@ button[onclick="manualRefresh()"]:hover { background: var(--surface2) !important
 
       <!-- Loading state -->
       <div id="insightsLoading" style="display:none;text-align:center;padding:60px 20px;">
-        <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.08);border-top:3px solid #A78BFA;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
+        <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.08);border-top:3px solid #62B134;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
         <div style="color:var(--text2);font-size:13px;font-weight:500;" id="insightsLoadingMsg">Claude is analyzing your data...</div>
       </div>
 
@@ -3802,7 +3810,7 @@ let _currentInsightsData = null; // holds the last generated ins object + month
 /* Strip HTML tags for clean plain-text storage */
 function stripHtml(str) {
   if (!str) return '';
-  return str.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  return str.replace(/<[^>]*>/g, '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
 }
 function stripArr(arr) {
   return (arr || []).map(x => stripHtml(x));
@@ -3812,10 +3820,18 @@ async function saveCurrentInsights() {
   if (!_currentInsightsData) return;
   const { month, ins } = _currentInsightsData;
   const records = loadInsightRecords();
-  const timestamp = new Date().toISOString();
+  const now = new Date();
+  const timestamp = now.toISOString();
+  // Each save is its own version ("NOVEMBER · Nov 27, 10:15 AM"), so a month can hold several
+  // and the Script Library can ask which one to use. Saving the same generation again updates it.
+  const note = (document.getElementById('insightsSaveNote').value || '').trim();
+  const label = _currentInsightsData.savedLabel || `${month} · ${now.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`;
+  _currentInsightsData.savedLabel = label;
 
   const record = {
-    month,
+    month: label,
+    base_month: month,
+    note,
     savedAt: timestamp,
 
     // KPI Status
@@ -3851,6 +3867,7 @@ async function saveCurrentInsights() {
 
     // AI per-video diagnosis (kept locally, like repeat_content)
     video_diagnosis:  (ins.video_diagnosis || []).map(x => stripHtml(`${x.hit ? 'Pumatok' : 'Hindi pumatok'}: "${x.title}". Bakit: ${x.why} Workaround: ${x.workaround}`)),
+    script_rules:     stripArr(ins.script_rules),
 
     // Claude presentation prompt (if generated before saving) — two framings.
     // Field names keep the old manus_ prefix so earlier saved records and the
@@ -3859,7 +3876,7 @@ async function saveCurrentInsights() {
     manus_prompt_working: ins.manus_prompt_working || ''
   };
 
-  records[month] = record;
+  records[label] = record;
   saveInsightRecords(records);
 
   const statusEl = document.getElementById('insightsSaveStatus');
@@ -3873,14 +3890,20 @@ async function saveCurrentInsights() {
     const response = await fetch(INSIGHTS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'save', ...record })
+      // The Insights sheet has fixed columns, so the newer sections ride inside existing
+      // ones with a prefix; loadInsightsFromSheet and the Script Library read them back out.
+      body: JSON.stringify({ action: 'save', ...record,
+        kpi_status: (note ? `[Note: ${note}] ` : '') + record.kpi_status,
+        working: [...record.working, ...record.video_diagnosis.filter(x => x.startsWith('Pumatok'))],
+        not_working: [...record.not_working, ...record.video_diagnosis.filter(x => x.startsWith('Hindi pumatok'))],
+        actions: [...record.actions, ...record.script_rules.map(x => 'Script rule: ' + x), ...record.hook_plan.map(x => 'Hook plan: ' + x)] })
     });
     const result = await response.json();
     if (result.status === 'error') {
       setIconHTML(statusEl, '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>', 'Local saved, Sheet error: ' + result.message);
       statusEl.style.color = '#FBBF24';
     } else {
-      statusEl.textContent = '✓ Saved locally & to Google Sheet!';
+      statusEl.textContent = `✓ Saved as "${label}"`;
       statusEl.style.color = '#62B134';
     }
   } catch(err) {
@@ -3894,7 +3917,7 @@ async function saveCurrentInsights() {
   setTimeout(() => {
     statusEl.textContent = '';
     btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 4v5h8V4"/><rect x="7" y="14" width="10" height="6"/></svg> Save Analysis';
-    btn.style.background = '#A78BFA';
+    btn.style.background = 'transparent';
   }, 4000);
 
   // If the Claude prompt modal is open, reflect that it's now part of the saved record
@@ -3910,7 +3933,10 @@ function renderInsightRecords() {
   const list = document.getElementById('insightsRecordsList');
   const empty = document.getElementById('insightsRecordsEmpty');
   const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-  const sorted = MONTHS_ORDER.filter(m => records[m]).map(m => records[m]);
+  // Several versions per month: newest month first, newest version first within a month
+  const baseOf = r => r.base_month || String(r.month || '').split(' ')[0];
+  const sorted = Object.values(records).filter(r => MONTHS_ORDER.includes(baseOf(r)))
+    .sort((a, b) => MONTHS_ORDER.indexOf(baseOf(a)) - MONTHS_ORDER.indexOf(baseOf(b)) || String(a.savedAt).localeCompare(String(b.savedAt)));
   if (sorted.length === 0) {
     list.innerHTML = '';
     empty.style.display = 'block';
@@ -3948,18 +3974,30 @@ function renderInsightRecords() {
     <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
         <div>
-          <div style="font-size:17px;font-weight:800;color:var(--text);">${r.month.charAt(0)+r.month.slice(1).toLowerCase()}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;">Saved ${dt}</div>
+          <div style="font-size:17px;font-weight:800;color:var(--text);">${baseOf(r).charAt(0)+baseOf(r).slice(1).toLowerCase()}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px;">Saved ${dt}${r.note ? ` · <span style="color:var(--text2);">${progressEsc_(r.note)}</span>` : ''}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="color:${color};font-size:12px;font-weight:700;background:${bg};border:1px solid ${color}44;padding:5px 14px;border-radius: 2px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${r.kpi_status}</span>
-          ${r.manus_prompt ? `<button onclick="copyRecordClaudePrompt('${r.month}','mom')" style="background:rgba(167,139,250,0.1);color:#A78BFA;border:1px solid rgba(167,139,250,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy Claude Prompt</button>` : ''}
+          ${r.manus_prompt ? `<button onclick="copyRecordClaudePrompt('${r.month}','mom')" style="background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy Claude Prompt</button>` : ''}
           ${r.manus_prompt_working ? `<button onclick="copyRecordClaudePrompt('${r.month}','working')" style="background:rgba(98,177,52,0.1);color:#62B134;border:1px solid rgba(98,177,52,0.25);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="8" x2="12" y2="4"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg> Copy What's Working Prompt</button>` : ''}
           <button onclick="deleteInsightRecord('${r.month}')" style="background:rgba(248,113,113,0.1);color:#F87171;border:1px solid rgba(248,113,113,0.2);padding:6px 12px;border-radius: 2px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Delete</button>
         </div>
       </div>
 
       ${snapHtml}
+
+      ${r.script_rules && r.script_rules.length ? `
+      <div style="border:1px solid rgba(98,177,52,0.35);border-left:3px solid #62B134;border-radius: 2px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:10px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Para sa Script Making</div>
+        <div style="font-size:12px;color:var(--text2);">${toList(r.script_rules)}</div>
+      </div>` : ''}
+
+      ${r.video_diagnosis && r.video_diagnosis.length ? `
+      <details style="margin-bottom:16px;">
+        <summary style="cursor:pointer;font-size:12.5px;color:var(--text2);font-weight:600;padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius: 2px;">Bakit Pumatok / Bakit Hindi (${r.video_diagnosis.length} videos)</summary>
+        <div style="font-size:12px;color:var(--text2);margin-top:12px;">${toList(r.video_diagnosis)}</div>
+      </details>` : ''}
 
       ${hasMoM ? `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
@@ -3979,8 +4017,8 @@ function renderInsightRecords() {
           <div style="font-size:10px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Top Hooks this Month</div>
           <div style="font-size:12px;color:var(--text2);">${(r.top_hooks || []).length ? toList(r.top_hooks.map(h => `<strong>${h.hook_rate}%</strong> · ${h.title}${h.creator ? ` (${h.creator})` : ''}${h.hook_type ? ` · ${h.hook_type}` : ''}`)) : '<div>Hindi kasama sa Sheet copy.</div>'}</div>
         </div>
-        <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.15);border-radius: 2px;padding:14px;">
-          <div style="font-size:10px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Hook Plan for ${r.hook_plan_month || 'Next Month'}</div>
+        <div style="background:rgba(98,177,52,0.06);border:1px solid rgba(98,177,52,0.15);border-radius: 2px;padding:14px;">
+          <div style="font-size:10px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Hook Plan for ${r.hook_plan_month || 'Next Month'}</div>
           <div style="font-size:12px;color:var(--text2);">${toList(r.hook_plan)}</div>
         </div>
       </div>` : ''}
@@ -4005,9 +4043,9 @@ function renderInsightRecords() {
             <div style="font-size:12px;color:var(--text2);">${toList(r.not_working)}</div>
           </div>
         </div>
-        <div style="margin-top:14px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.1);border-radius: 2px;padding:14px;">
-          <div style="font-size:10px;color:#A78BFA;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg> Action Plan to Hit KPI</div>
-          <div style="font-size:12px;color:var(--text2);">${(r.actions||[]).map((x,i)=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;background:#A78BFA22;color:#A78BFA;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">${i+1}</span><span>${x}</span></div>`).join('')}</div>
+        <div style="margin-top:14px;background:rgba(98,177,52,0.05);border:1px solid rgba(98,177,52,0.1);border-radius: 2px;padding:14px;">
+          <div style="font-size:10px;color:#62B134;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.8 2.8M15.2 15.2 18 18M18 6l-2.8 2.8M8.8 15.2 6 18"/></svg> Action Plan to Hit KPI</div>
+          <div style="font-size:12px;color:var(--text2);">${(r.actions||[]).map((x,i)=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;background:#62B13422;color:#62B134;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">${i+1}</span><span>${x}</span></div>`).join('')}</div>
         </div>
         <div style="margin-top:14px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.08);border-radius: 2px;padding:14px;">
           <div style="font-size:10px;color:#F87171;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 20h18L12 4z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg> What NOT To Do</div>
@@ -4065,7 +4103,7 @@ async function loadInsightsFromSheet() {
   statusEl.style.color = 'var(--text3)';
 
   try {
-    const response = await fetch(INSIGHTS_SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    const response = await fetch(INSIGHTS_SCRIPT_URL + '?action=listInsights&t=' + Date.now(), { cache: 'no-store' });
     const result = await response.json();
 
     if (result.status === 'error') {
@@ -4087,7 +4125,8 @@ async function loadInsightsFromSheet() {
 
     // Remap Sheet column-header keys → camelCase JS fields
     const remapped = sheetRecords.map(r => {
-      const splitBullets = v => typeof v === 'string' && v ? v.replace(/^• /,'').split('\n• ') : [];
+      // listInsights returns arrays; older sheet exports returned "• "-joined text
+      const splitBullets = v => Array.isArray(v) ? v.map(String) : typeof v === 'string' && v ? v.replace(/^• /,'').split('\n• ') : [];
       return {
         month:              r['Month'] || r.month || '',
         savedAt:            r['Saved At'] || r.savedAt || '',
@@ -4105,7 +4144,7 @@ async function loadInsightsFromSheet() {
         hook_recs:          splitBullets(r['Hook Rate Analysis'] || r.hook_recs),
         hook_plan:          splitBullets(r['Hook Plan'] || r.hook_plan),
         hook_plan_month:    r['Hook Plan Month'] || r.hook_plan_month || '',
-        snapshot: {
+        snapshot: r.snapshot && typeof r.snapshot === 'object' ? r.snapshot : {
           views:               r['Views'] || 0,
           views_target:        r['Views Target'] || 0,
           views_pct:           r['Views % of Target'] || 0,
@@ -4138,6 +4177,18 @@ async function loadInsightsFromSheet() {
     const local = loadInsightRecords();
     remapped.forEach(r => {
       if (!r.month) return;
+      // Undo the prefixes saveCurrentInsights packs into the fixed Sheet columns
+      const take = (arr, prefix) => arr.filter(x => x.startsWith(prefix));
+      const noteMatch = r.kpi_status.match(/^\[Note: (.*?)\] /);
+      if (noteMatch) { r.note = noteMatch[1]; r.kpi_status = r.kpi_status.slice(noteMatch[0].length); }
+      r.base_month = r.month.split(' ')[0];
+      r.script_rules = take(r.actions, 'Script rule: ').map(x => x.slice(13));
+      const plan = take(r.actions, 'Hook plan: ').map(x => x.slice(11));
+      if (plan.length) r.hook_plan = plan;
+      r.actions = r.actions.filter(x => !x.startsWith('Script rule: ') && !x.startsWith('Hook plan: '));
+      r.video_diagnosis = [...take(r.working, 'Pumatok: '), ...take(r.not_working, 'Hindi pumatok: ')];
+      r.working = r.working.filter(x => !x.startsWith('Pumatok: '));
+      r.not_working = r.not_working.filter(x => !x.startsWith('Hindi pumatok: '));
       if (!r.hook_plan.length) { delete r.hook_plan; delete r.hook_plan_month; }
       local[r.month] = { ...(local[r.month] || {}), ...r };
     });
@@ -4256,7 +4307,7 @@ function generateInsights() {
   document.getElementById('insightsSaveStatus').textContent = '';
   const sBtn = document.getElementById('saveInsightsBtn');
   sBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 4v5h8V4"/><rect x="7" y="14" width="10" height="6"/></svg> Save Analysis';
-  sBtn.style.background = '#A78BFA';
+  sBtn.style.background = 'transparent';
 
   // Resolve previous month
   const MONTHS_ORDER = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
@@ -4619,7 +4670,7 @@ HOW TO ANALYZE:
 - Hook advice must not break these EasyPC rules: no greeting or filler first, no comment card first, no story opening, no cover frame as the only text hook, no voice-only audio, no flat delivery, no promo or product video without a tip angle, first word within 0.3 seconds, avoid skit openings.
 - Do not suggest double-digit sale dates (11.11, 12.12 and the like) or meme content.
 
-LANGUAGE: natural spoken Taglish, about 80% Tagalog and 20% English, the way a Filipino content lead talks to the team. No textbook Filipino, no stiff AI phrasing. Keep metric names in English (views, hook rate, hold rate, thruplay).
+LANGUAGE: Taglish the way a Manila marketing team talks on Slack: mostly English sentences with Tagalog words and short phrases mixed in, about 60% English and 40% Tagalog. Example tone: "Strong ang hook pero bumabagsak ang hold after 5 seconds, so i-tighten natin yung intro." No deep or textbook Filipino, no stiff AI phrasing. Keep metric names in English (views, hook rate, hold rate, thruplay).
 
 Respond with ONLY valid JSON, no markdown, in this exact shape (plain text strings, no HTML):
 {"summary":"2-3 sentences: where we are vs target and the single biggest reason",
@@ -4633,8 +4684,9 @@ Respond with ONLY valid JSON, no markdown, in this exact shape (plain text strin
 "creator_notes":["per creator: strength, weakness, what to change"],
 "hook_recs":["hook rate finding + fix"],
 "hold_recs":["hold rate finding + fix"],
-"hook_plan":["hook plan item for next month"]}
-Give 4-6 items per list, and 8-12 video_diagnosis entries: the strongest and the weakest videos.`;
+"hook_plan":["hook plan item for next month"],
+"script_rules":["one concrete rule for writing the next scripts (opening line, first 3 seconds, pacing, topic, on-screen text or CTA) + the number behind it"]}
+Give 4-6 items per list, 5-8 script_rules, and 8-12 video_diagnosis entries: the strongest and the weakest videos.`;
 
   // Free-tier Gemini returns 503 "high demand" during spikes; wait and retry before giving up
   let ai;
@@ -4665,6 +4717,7 @@ Give 4-6 items per list, and 8-12 video_diagnosis entries: the strongest and the
     opportunities: list(ai.opportunities), creator_notes: list(ai.creator_notes),
     hook_recs: list(ai.hook_recs), hold_recs: list(ai.hold_recs),
     hook_plan: ai.hook_plan && ai.hook_plan.length ? list(ai.hook_plan) : ins.hook_plan,
+    script_rules: list(ai.script_rules),
     video_diagnosis: (Array.isArray(ai.video_diagnosis) ? ai.video_diagnosis : []).map(x => ({
       title: esc(x.title), hit: !/hindi/i.test(x.result || ''), why: esc(x.why), workaround: esc(x.workaround),
       link: (vids.find(v => v.title.slice(0, 90) === unmask(x.title) || v.title === unmask(x.title)) || {}).link || ''
@@ -4853,7 +4906,13 @@ function renderInsightsOutput(ins, hasPrev) {
   const banner = document.getElementById('insightsBanner');
   banner.style.background = bannerBg[ins.kpi_color] || 'rgba(56,189,248,0.08)';
   banner.style.borderColor = bc + '44';
-  banner.innerHTML = `<span style="color:${bc};font-weight:700;font-size:14px"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${ins.kpi_status}</span>`;
+  const bannerLabel = { green: 'On track', yellow: 'At risk', red: 'Behind target' }[ins.kpi_color] || 'Summary';
+  banner.innerHTML = `<div style="color:${bc};font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="13" width="3" height="7"/><rect x="11" y="9" width="3" height="11"/><rect x="16" y="5" width="3" height="15"/></svg> ${bannerLabel}${ins.ai_generated ? ' · AI summary' : ''}</div>
+    <div style="color:var(--text);font-size:14px;line-height:1.7;">${ins.kpi_status}</div>`;
+
+  const rules = ins.script_rules || [];
+  document.getElementById('insightsScriptCard').style.display = rules.length ? 'block' : 'none';
+  document.getElementById('insightsScriptRules').innerHTML = rules.map((x, i) => `<div style="display:flex;gap:10px;margin-bottom:10px;"><span style="flex-shrink:0;color:#62B134;font-weight:800;width:18px;">${i + 1}</span><span>${x}</span></div>`).join('');
 
   // Highlights / Lowlights vs prev month
   const momSection = document.getElementById('insightsMoMSection');
@@ -4871,7 +4930,7 @@ function renderInsightsOutput(ins, hasPrev) {
   }
 
   const toList = arr => arr.map(x => `<div style="display:flex;gap:8px;margin-bottom:10px;"><span style="flex-shrink:0;margin-top:2px;color:var(--text2)">•</span><span>${x}</span></div>`).join('');
-  const toNumbered = arr => arr.map((x,i) => `<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="flex-shrink:0;background:#A78BFA22;color:#A78BFA;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px">${i+1}</span><span>${x}</span></div>`).join('');
+  const toNumbered = arr => arr.map((x,i) => `<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="flex-shrink:0;background:#62B13422;color:#62B134;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px">${i+1}</span><span>${x}</span></div>`).join('');
 
   document.getElementById('insightsWorking').innerHTML     = toList(ins.working || []);
   document.getElementById('insightsNotWorking').innerHTML  = toList(ins.not_working || []);
